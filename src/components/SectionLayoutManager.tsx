@@ -8,6 +8,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -28,9 +30,14 @@ import { GripVertical, Eye, EyeOff } from 'lucide-react';
 interface SortableSectionProps {
   section: SectionConfig;
   onToggleVisibility: (id: string) => void;
+  isDragOverlay?: boolean;
 }
 
-const SortableSection: React.FC<SortableSectionProps> = ({ section, onToggleVisibility }) => {
+const SortableSection: React.FC<SortableSectionProps> = ({ 
+  section, 
+  onToggleVisibility, 
+  isDragOverlay = false 
+}) => {
   const {
     attributes,
     listeners,
@@ -40,6 +47,7 @@ const SortableSection: React.FC<SortableSectionProps> = ({ section, onToggleVisi
     isDragging,
   } = useSortable({ 
     id: section.id,
+    disabled: isDragOverlay,
   });
 
   const style = {
@@ -52,21 +60,22 @@ const SortableSection: React.FC<SortableSectionProps> = ({ section, onToggleVisi
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm ${
-        isDragging ? 'shadow-lg' : ''
-      }`}
+      className={`flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm transition-all duration-200 ${
+        isDragging ? 'shadow-lg ring-2 ring-blue-500 ring-opacity-50' : 'hover:shadow-md'
+      } ${isDragOverlay ? 'rotate-3 shadow-xl' : ''}`}
     >
       <div className="flex items-center gap-3">
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab text-gray-400 hover:text-gray-600"
+          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded transition-colors"
+          title="Drag to reorder"
         >
           <GripVertical className="h-4 w-4" />
         </div>
-        <span className="font-medium text-gray-900">{section.title}</span>
+        <span className="font-medium text-gray-900 select-none">{section.title}</span>
         {section.required && (
-          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded select-none">
             Required
           </span>
         )}
@@ -100,24 +109,43 @@ const SectionLayoutManager: React.FC<SectionLayoutManagerProps> = ({
   onToggleVisibility,
   onResetLayout,
 }) => {
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+  
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before starting drag
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragStart = (event: DragStartEvent) => {
+    console.log('Drag started:', event.active.id);
+    setActiveId(event.active.id as string);
+  };
 
-    if (active.id !== over?.id) {
+  const handleDragEnd = (event: DragEndEvent) => {
+    console.log('Drag ended:', event);
+    const { active, over } = event;
+    
+    setActiveId(null);
+
+    if (active.id !== over?.id && over?.id) {
       const oldIndex = sections.findIndex((section) => section.id === active.id);
-      const newIndex = sections.findIndex((section) => section.id === over?.id);
+      const newIndex = sections.findIndex((section) => section.id === over.id);
+      
+      console.log('Reordering from index', oldIndex, 'to', newIndex);
       
       const newOrder = arrayMove(sections, oldIndex, newIndex);
+      console.log('New order:', newOrder.map(s => s.title));
       onReorder(newOrder);
     }
   };
+
+  const activeSection = activeId ? sections.find(section => section.id === activeId) : null;
 
   return (
     <Card>
@@ -136,6 +164,7 @@ const SectionLayoutManager: React.FC<SectionLayoutManagerProps> = ({
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
           <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
@@ -149,6 +178,15 @@ const SectionLayoutManager: React.FC<SectionLayoutManagerProps> = ({
               ))}
             </div>
           </SortableContext>
+          <DragOverlay>
+            {activeSection ? (
+              <SortableSection
+                section={activeSection}
+                onToggleVisibility={onToggleVisibility}
+                isDragOverlay={true}
+              />
+            ) : null}
+          </DragOverlay>
         </DndContext>
       </CardContent>
     </Card>
