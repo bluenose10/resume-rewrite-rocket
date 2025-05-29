@@ -9,13 +9,13 @@ interface HowItWorksSectionProps {
 
 const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onStartBuilding }) => {
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-brand-dark-navy via-brand-medium-blue to-brand-cyan/20 relative overflow-hidden">
-      {/* Enhanced background with more contrast */}
+    <section className="py-20 px-4 hero-gradient relative overflow-hidden">
+      {/* Same background decorations as hero section */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 -right-32 w-96 h-96 bg-brand-cyan/15 rounded-full opacity-40 floating-particle"></div>
-        <div className="absolute top-32 -left-32 w-80 h-80 bg-white/5 rounded-full opacity-50 floating-particle"></div>
-        <div className="absolute bottom-16 right-16 w-64 h-64 bg-brand-cyan/20 rounded-full opacity-30 floating-particle"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-medium-blue/10 rounded-full opacity-20"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-brand-cyan/20 rounded-full opacity-30 floating-particle"></div>
+        <div className="absolute top-20 -left-20 w-60 h-60 bg-brand-medium-blue/30 rounded-full opacity-40 floating-particle"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-brand-cyan/25 rounded-full opacity-35 floating-particle"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-cyan/10 rounded-full opacity-20"></div>
       </div>
       
       <div className="container mx-auto relative z-10">
