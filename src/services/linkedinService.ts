@@ -48,6 +48,103 @@ export interface LinkedInImportData {
   skills: string[];
 }
 
+export const parseLinkedInText = async (linkedinText: string): Promise<LinkedInImportData> => {
+  const prompt = `
+You are a LinkedIn profile data extractor. Parse the following LinkedIn profile text and extract structured professional information for a resume.
+
+LinkedIn Profile Content:
+${linkedinText}
+
+Extract and structure the information into the following JSON format:
+
+{
+  "personalInfo": {
+    "firstName": "extracted first name",
+    "lastName": "extracted last name", 
+    "location": "extracted location",
+    "linkedin": "extracted linkedin url or empty string"
+  },
+  "summary": "professional summary from about section",
+  "experience": [
+    {
+      "company": "company name",
+      "position": "job title",
+      "startDate": "YYYY-MM format",
+      "endDate": "YYYY-MM format or empty if current",
+      "current": true/false,
+      "description": "job description and achievements"
+    }
+  ],
+  "education": [
+    {
+      "institution": "school name",
+      "degree": "degree type",
+      "field": "field of study",
+      "startDate": "YYYY-MM format",
+      "endDate": "YYYY-MM format"
+    }
+  ],
+  "skills": ["skill1", "skill2", "skill3"]
+}
+
+Important parsing rules:
+- Extract dates and convert to YYYY-MM format
+- For current positions, set "current": true and leave "endDate" empty
+- Clean up descriptions to be professional and concise
+- Extract relevant professional skills
+- If information is missing, use empty strings or arrays
+- Parse location from any location mentions
+- Look for patterns like "at [Company]", "· [Duration]", etc.
+
+Only return the JSON response, no additional text.
+`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + (process.env.OPENAI_API_KEY || 'your-api-key'),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a professional LinkedIn profile data extractor. Always respond with valid JSON only.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.error?.message || 
+      `LinkedIn text parsing failed: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  const content = data.choices[0]?.message?.content;
+
+  if (!content) {
+    throw new Error('No content received from LinkedIn text parsing API');
+  }
+
+  try {
+    return JSON.parse(content);
+  } catch (error) {
+    console.error('Failed to parse LinkedIn text parsing response:', content);
+    throw new Error('Invalid response format from LinkedIn text parsing API');
+  }
+};
+
 const parseLinkedInDate = (dateStr: string): string => {
   if (!dateStr) return '';
   try {
@@ -172,6 +269,30 @@ export const parseLinkedInArchive = async (zipFile: File): Promise<LinkedInImpor
 
 export const validateLinkedInArchive = (file: File): boolean => {
   return file.type === 'application/zip' || file.name.endsWith('.zip');
+};
+
+export const validateLinkedInText = (text: string): boolean => {
+  if (!text || text.trim().length < 50) return false;
+  
+  // Check for common LinkedIn profile indicators
+  const indicators = [
+    'experience',
+    'education',
+    'skills',
+    'about',
+    'summary',
+    'work',
+    'university',
+    'college',
+    'company',
+    'position',
+    'role'
+  ];
+  
+  const lowerText = text.toLowerCase();
+  const foundIndicators = indicators.filter(indicator => lowerText.includes(indicator));
+  
+  return foundIndicators.length >= 2;
 };
 
 // Keep the old URL-based function for backwards compatibility
