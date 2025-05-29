@@ -25,7 +25,7 @@ export interface OptimizeRequest {
     field: string;
     startDate: string;
     endDate: string;
-    gpa: string;
+    classification: string;
   }>;
   projects: Array<{
     name: string;
