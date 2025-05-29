@@ -10,17 +10,22 @@ interface ResumeSectionProps {
 
 const ResumeSection: React.FC<ResumeSectionProps> = ({ title, theme, children }) => {
   return (
-    <section>
-      <h2 
-        className="text-sm font-bold uppercase tracking-wide mb-2 pb-1"
-        style={{ 
-          color: theme.primary,
-          borderBottom: `1px solid ${theme.primary}`
-        }}
-      >
-        {title}
-      </h2>
-      {children}
+    <section className="mb-8">
+      <div className="mb-4">
+        <h2 
+          className="text-lg font-bold uppercase tracking-wide mb-2"
+          style={{ color: theme.primary }}
+        >
+          {title}
+        </h2>
+        <div 
+          className="w-full h-px"
+          style={{ backgroundColor: theme.primary }}
+        />
+      </div>
+      <div className="pl-1">
+        {children}
+      </div>
     </section>
   );
 };

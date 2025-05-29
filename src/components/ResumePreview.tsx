@@ -92,7 +92,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
         <CardContent className="p-0" id="resume-content">
           <div className="max-w-4xl mx-auto bg-white text-gray-900">
             <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-            <div className="px-8 py-6 space-y-5">
+            <div className="px-8 py-6">
               {getSectionOrder().map(sectionId => renderSection(sectionId))}
             </div>
           </div>
