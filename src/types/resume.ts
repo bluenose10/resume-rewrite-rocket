@@ -100,6 +100,13 @@ export interface Publication {
   link: string;
 }
 
+export interface SectionConfig {
+  id: string;
+  title: string;
+  visible: boolean;
+  required?: boolean;
+}
+
 export interface ResumeData {
   personalInfo: PersonalInfo;
   personalStatement: string;
@@ -116,4 +123,6 @@ export interface ResumeData {
   publications: Publication[];
   interests: string[];
   theme?: ColorTheme;
+  sectionOrder?: string[];
+  sectionConfig?: SectionConfig[];
 }

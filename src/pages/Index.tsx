@@ -1,13 +1,31 @@
 import React, { useState } from 'react';
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
+import SectionLayoutManager from '@/components/SectionLayoutManager';
 import { useToast } from '@/hooks/use-toast';
 import { optimizeResumeContent } from '@/services/openaiService';
 import { generatePDF } from '@/utils/pdfGenerator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CheckCircle, Wand2, Download, FileText, Zap, Shield, Clock } from 'lucide-react';
-import { ResumeData } from '@/types/resume';
+import { ResumeData, SectionConfig } from '@/types/resume';
+
+const DEFAULT_SECTION_ORDER: SectionConfig[] = [
+  { id: 'personalStatement', title: 'Personal Statement', visible: true },
+  { id: 'summary', title: 'Professional Summary', visible: true },
+  { id: 'experience', title: 'Professional Experience', visible: true, required: true },
+  { id: 'projects', title: 'Projects', visible: true },
+  { id: 'education', title: 'Education', visible: true, required: true },
+  { id: 'skills', title: 'Technical Skills', visible: true },
+  { id: 'achievements', title: 'Achievements & Awards', visible: false },
+  { id: 'certifications', title: 'Certifications & Licenses', visible: false },
+  { id: 'languages', title: 'Languages', visible: false },
+  { id: 'volunteerExperience', title: 'Volunteer Experience', visible: false },
+  { id: 'publications', title: 'Publications', visible: false },
+  { id: 'references', title: 'References', visible: false },
+  { id: 'interests', title: 'Interests & Hobbies', visible: false },
+];
 
 const Index = () => {
   const { toast } = useToast();
@@ -35,13 +53,46 @@ const Index = () => {
     volunteerExperience: [],
     references: [],
     publications: [],
-    interests: []
+    interests: [],
+    sectionOrder: DEFAULT_SECTION_ORDER.map(s => s.id),
+    sectionConfig: DEFAULT_SECTION_ORDER
   });
   
   const [isOptimizing, setIsOptimizing] = useState(false);
 
   const handleDataChange = (data: ResumeData) => {
     setResumeData(data);
+  };
+
+  const handleSectionReorder = (newOrder: SectionConfig[]) => {
+    setResumeData(prev => ({
+      ...prev,
+      sectionConfig: newOrder,
+      sectionOrder: newOrder.map(s => s.id)
+    }));
+  };
+
+  const handleToggleVisibility = (sectionId: string) => {
+    setResumeData(prev => ({
+      ...prev,
+      sectionConfig: prev.sectionConfig?.map(section => 
+        section.id === sectionId 
+          ? { ...section, visible: !section.visible }
+          : section
+      ) || DEFAULT_SECTION_ORDER
+    }));
+  };
+
+  const handleResetLayout = () => {
+    setResumeData(prev => ({
+      ...prev,
+      sectionConfig: [...DEFAULT_SECTION_ORDER],
+      sectionOrder: DEFAULT_SECTION_ORDER.map(s => s.id)
+    }));
+    toast({
+      title: "Layout Reset",
+      description: "Section layout has been reset to default order."
+    });
   };
 
   const handleOptimize = async () => {
@@ -61,7 +112,6 @@ const Index = () => {
       const optimizedContent = await optimizeResumeContent(resumeData);
       console.log('Optimization completed:', optimizedContent);
 
-      // Update resume data with optimized content
       const updatedData = { ...resumeData };
       
       if (optimizedContent.summary) {
@@ -123,7 +173,6 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="container mx-auto px-4 py-8">
-          {/* Back Button */}
           <div className="mb-8">
             <Button 
               variant="outline" 
@@ -134,7 +183,6 @@ const Index = () => {
             </Button>
           </div>
 
-          {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-blue-600 mb-4">
               AI-Powered Resume Builder
@@ -145,18 +193,31 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {/* Form Section */}
             <div className="lg:max-h-screen lg:overflow-y-auto lg:pr-4">
-              <ResumeForm
-                onDataChange={handleDataChange}
-                onOptimize={handleOptimize}
-                isOptimizing={isOptimizing}
-              />
+              <Tabs defaultValue="content" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="content">Content</TabsTrigger>
+                  <TabsTrigger value="layout">Layout</TabsTrigger>
+                </TabsList>
+                <TabsContent value="content" className="space-y-6">
+                  <ResumeForm
+                    onDataChange={handleDataChange}
+                    onOptimize={handleOptimize}
+                    isOptimizing={isOptimizing}
+                  />
+                </TabsContent>
+                <TabsContent value="layout" className="space-y-6">
+                  <SectionLayoutManager
+                    sections={resumeData.sectionConfig || DEFAULT_SECTION_ORDER}
+                    onReorder={handleSectionReorder}
+                    onToggleVisibility={handleToggleVisibility}
+                    onResetLayout={handleResetLayout}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
 
-            {/* Preview Section */}
             <div className="lg:sticky lg:top-8">
               <ResumePreview
                 data={resumeData}
@@ -170,9 +231,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
-        {/* Background decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full opacity-20"></div>
           <div className="absolute top-20 -left-20 w-60 h-60 bg-indigo-200 rounded-full opacity-20"></div>
@@ -200,7 +259,6 @@ const Index = () => {
             </Button>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 mb-2">50,000+</div>
@@ -218,7 +276,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">
           <div className="text-center mb-16">
@@ -282,7 +339,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 3-Step Process Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto">
           <div className="text-center mb-16">
@@ -348,7 +404,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Success Stories Section */}
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto">
           <div className="text-center mb-16">
@@ -403,7 +458,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-600">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
