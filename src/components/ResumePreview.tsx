@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ResumeData } from '@/types/resume';
@@ -76,8 +75,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
       <Card className="shadow-lg border border-gray-200 bg-white">
         <CardContent className="p-0" id="resume-content">
           <div className="max-w-4xl mx-auto bg-white text-gray-900">
-            {/* Professional Header */}
-            <div className="px-8 py-6 text-center" style={{ borderBottom: `3px solid ${theme.primary}` }}>
+            {/* Professional Header - Removed the full-width line */}
+            <div className="px-8 py-6 text-center">
               <h1 className="text-2xl font-bold tracking-wide mb-3" style={{ color: theme.text }}>
                 {data.personalInfo.firstName} {data.personalInfo.lastName}
               </h1>

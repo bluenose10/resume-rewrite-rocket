@@ -9,62 +9,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, Wand2, Download, FileText, Zap, Shield, Clock } from 'lucide-react';
 import { ResumeData } from '@/types/resume';
 
-interface PersonalInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  location: string;
-  linkedin: string;
-  github: string;
-  website: string;
-}
-
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
-  description: string;
-}
-
-interface Education {
-  id: string;
-  institution: string;
-  degree: string;
-  field: string;
-  startDate: string;
-  endDate: string;
-  gpa: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string;
-  link: string;
-}
-
-interface ResumeData {
-  personalInfo: PersonalInfo;
-  personalStatement: string;
-  summary: string;
-  experience: Experience[];
-  education: Education[];
-  projects: Project[];
-  skills: string[];
-  achievements: string[];
-  certifications: string[];
-  languages: string[];
-  volunteerExperience: string[];
-  references: string[];
-  publications: string[];
-  interests: string[];
-}
-
 const Index = () => {
   const { toast } = useToast();
   const [showBuilder, setShowBuilder] = useState(false);
@@ -216,7 +160,6 @@ const Index = () => {
             <div className="lg:sticky lg:top-8">
               <ResumePreview
                 data={resumeData}
-                onDownload={handleDownload}
               />
             </div>
           </div>
