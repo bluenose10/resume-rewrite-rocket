@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
-import { ColorPicker } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import { ColorTheme } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 
@@ -40,7 +40,7 @@ const ColorThemeSelector: React.FC<ColorThemeSelectorProps> = ({
     <Card>
       <CardHeader>
         <CardTitle className="text-xl flex items-center gap-2">
-          <ColorPicker className="h-5 w-5" />
+          <Palette className="h-5 w-5" />
           Color Theme
         </CardTitle>
       </CardHeader>
