@@ -75,180 +75,224 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 font-inter">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Resume Preview</h2>
-        <Button onClick={onDownload} className="flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-gray-900">Resume Preview</h2>
+        <Button onClick={onDownload} className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-lg">
           <Download className="h-4 w-4" />
           Download PDF
         </Button>
       </div>
 
-      <Card className="shadow-lg">
-        <CardContent className="p-8" id="resume-content">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {data.personalInfo.firstName} {data.personalInfo.lastName}
-            </h1>
-            
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-              {data.personalInfo.email && (
-                <div className="flex items-center gap-1">
-                  <Mail className="h-4 w-4" />
-                  {data.personalInfo.email}
-                </div>
-              )}
-              {data.personalInfo.phone && (
-                <div className="flex items-center gap-1">
-                  <Phone className="h-4 w-4" />
-                  {data.personalInfo.phone}
-                </div>
-              )}
-              {data.personalInfo.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  {data.personalInfo.location}
-                </div>
-              )}
-              {data.personalInfo.linkedin && (
-                <div className="flex items-center gap-1">
-                  <Linkedin className="h-4 w-4" />
-                  {data.personalInfo.linkedin}
-                </div>
-              )}
-              {data.personalInfo.github && (
-                <div className="flex items-center gap-1">
-                  <Github className="h-4 w-4" />
-                  {data.personalInfo.github}
-                </div>
-              )}
-              {data.personalInfo.website && (
-                <div className="flex items-center gap-1">
-                  <Globe className="h-4 w-4" />
-                  {data.personalInfo.website}
-                </div>
-              )}
+      <Card className="shadow-xl border-0 bg-white">
+        <CardContent className="p-0" id="resume-content">
+          {/* Modern Header with Gradient Background */}
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-8 rounded-t-lg">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-4xl font-bold mb-3 tracking-tight">
+                {data.personalInfo.firstName} {data.personalInfo.lastName}
+              </h1>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                {data.personalInfo.email && (
+                  <div className="flex items-center gap-2 text-slate-200">
+                    <Mail className="h-4 w-4 text-blue-400" />
+                    <span>{data.personalInfo.email}</span>
+                  </div>
+                )}
+                {data.personalInfo.phone && (
+                  <div className="flex items-center gap-2 text-slate-200">
+                    <Phone className="h-4 w-4 text-blue-400" />
+                    <span>{data.personalInfo.phone}</span>
+                  </div>
+                )}
+                {data.personalInfo.location && (
+                  <div className="flex items-center gap-2 text-slate-200">
+                    <MapPin className="h-4 w-4 text-blue-400" />
+                    <span>{data.personalInfo.location}</span>
+                  </div>
+                )}
+                {data.personalInfo.linkedin && (
+                  <div className="flex items-center gap-2 text-slate-200">
+                    <Linkedin className="h-4 w-4 text-blue-400" />
+                    <span className="truncate">{data.personalInfo.linkedin}</span>
+                  </div>
+                )}
+                {data.personalInfo.github && (
+                  <div className="flex items-center gap-2 text-slate-200">
+                    <Github className="h-4 w-4 text-blue-400" />
+                    <span className="truncate">{data.personalInfo.github}</span>
+                  </div>
+                )}
+                {data.personalInfo.website && (
+                  <div className="flex items-center gap-2 text-slate-200">
+                    <Globe className="h-4 w-4 text-blue-400" />
+                    <span className="truncate">{data.personalInfo.website}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Professional Summary */}
-          {data.summary && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-1">
-                PROFESSIONAL SUMMARY
-              </h2>
-              <p className="text-gray-700 leading-relaxed">{data.summary}</p>
-            </div>
-          )}
+          <div className="p-8 space-y-8 max-w-4xl mx-auto">
+            {/* Professional Summary */}
+            {data.summary && (
+              <section>
+                <div className="flex items-center gap-3 mb-4">
+                  <h2 className="text-xl font-semibold text-slate-900 tracking-wide">
+                    PROFESSIONAL SUMMARY
+                  </h2>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-300 to-transparent"></div>
+                </div>
+                <div className="bg-slate-50 p-6 rounded-lg border-l-4 border-blue-500">
+                  <p className="text-slate-700 leading-relaxed text-sm">{data.summary}</p>
+                </div>
+              </section>
+            )}
 
-          {/* Experience */}
-          {data.experience.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-1">
-                EXPERIENCE
-              </h2>
-              <div className="space-y-6">
-                {data.experience.map((exp) => (
-                  <div key={exp.id}>
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{exp.position}</h3>
-                        <p className="text-blue-600 font-medium">{exp.company}</p>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        {formatDateRange(exp.startDate, exp.endDate, exp.current)}
-                      </p>
-                    </div>
-                    {exp.description && (
-                      <p className="text-gray-700 leading-relaxed">{exp.description}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Projects */}
-          {data.projects.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-1">
-                PROJECTS
-              </h2>
-              <div className="space-y-4">
-                {data.projects.map((project) => (
-                  <div key={project.id}>
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900">{project.name}</h3>
-                      {project.link && (
-                        <a href={project.link} className="text-blue-600 text-sm hover:underline">
-                          View Project
-                        </a>
-                      )}
-                    </div>
-                    {project.description && (
-                      <p className="text-gray-700 mb-2">{project.description}</p>
-                    )}
-                    {project.technologies && (
-                      <p className="text-sm text-gray-600">
-                        <span className="font-medium">Technologies:</span> {project.technologies}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Education */}
-          {data.education.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-1">
-                EDUCATION
-              </h2>
-              <div className="space-y-4">
-                {data.education.map((edu) => (
-                  <div key={edu.id}>
-                    <div className="flex justify-between items-start mb-1">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {edu.degree} {edu.field && `in ${edu.field}`}
-                        </h3>
-                        <p className="text-blue-600 font-medium">{edu.institution}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">
-                          {formatDateRange(edu.startDate, edu.endDate, false)}
-                        </p>
-                        {edu.gpa && (
-                          <p className="text-sm text-gray-600">GPA: {edu.gpa}</p>
+            {/* Experience */}
+            {data.experience.length > 0 && (
+              <section>
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 className="text-xl font-semibold text-slate-900 tracking-wide">
+                    PROFESSIONAL EXPERIENCE
+                  </h2>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-300 to-transparent"></div>
+                </div>
+                <div className="space-y-6">
+                  {data.experience.map((exp, index) => (
+                    <div key={exp.id} className="relative">
+                      {index > 0 && <div className="absolute -top-3 left-4 w-px h-3 bg-slate-200"></div>}
+                      <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-slate-900 mb-1">{exp.position}</h3>
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-600 font-medium text-base">{exp.company}</span>
+                              <span className="w-1 h-1 bg-slate-400 rounded-full"></span>
+                              <span className="text-sm text-slate-600 font-medium">
+                                {formatDateRange(exp.startDate, exp.endDate, exp.current)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {exp.description && (
+                          <p className="text-slate-700 leading-relaxed text-sm mt-3">{exp.description}</p>
                         )}
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                  ))}
+                </div>
+              </section>
+            )}
 
-          {/* Skills */}
-          {data.skills.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-1">
-                SKILLS
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {data.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-100 text-gray-800 px-3 py-1 rounded-lg text-sm"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+            {/* Projects */}
+            {data.projects.length > 0 && (
+              <section>
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 className="text-xl font-semibold text-slate-900 tracking-wide">
+                    KEY PROJECTS
+                  </h2>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-300 to-transparent"></div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-1">
+                  {data.projects.map((project) => (
+                    <div key={project.id} className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg font-semibold text-slate-900">{project.name}</h3>
+                        {project.link && (
+                          <a 
+                            href={project.link} 
+                            className="text-blue-600 text-sm font-medium hover:text-blue-800 transition-colors border-b border-blue-200 hover:border-blue-400"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View Project →
+                          </a>
+                        )}
+                      </div>
+                      {project.description && (
+                        <p className="text-slate-700 mb-3 text-sm leading-relaxed">{project.description}</p>
+                      )}
+                      {project.technologies && (
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-xs font-medium text-slate-600 mr-2">Technologies:</span>
+                          {project.technologies.split(',').map((tech, index) => (
+                            <span
+                              key={index}
+                              className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-medium border border-blue-200"
+                            >
+                              {tech.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Education */}
+            {data.education.length > 0 && (
+              <section>
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 className="text-xl font-semibold text-slate-900 tracking-wide">
+                    EDUCATION
+                  </h2>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-300 to-transparent"></div>
+                </div>
+                <div className="space-y-4">
+                  {data.education.map((edu) => (
+                    <div key={edu.id} className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                            {edu.degree} {edu.field && `in ${edu.field}`}
+                          </h3>
+                          <p className="text-blue-600 font-medium">{edu.institution}</p>
+                        </div>
+                        <div className="text-right ml-4">
+                          <p className="text-sm text-slate-600 font-medium">
+                            {formatDateRange(edu.startDate, edu.endDate, false)}
+                          </p>
+                          {edu.gpa && (
+                            <p className="text-sm text-slate-600 mt-1">
+                              <span className="font-medium">GPA:</span> {edu.gpa}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Skills */}
+            {data.skills.length > 0 && (
+              <section>
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 className="text-xl font-semibold text-slate-900 tracking-wide">
+                    TECHNICAL SKILLS
+                  </h2>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-300 to-transparent"></div>
+                </div>
+                <div className="bg-slate-50 p-6 rounded-lg">
+                  <div className="flex flex-wrap gap-2">
+                    {data.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="bg-white text-slate-700 px-4 py-2 rounded-full text-sm font-medium border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
