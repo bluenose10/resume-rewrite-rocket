@@ -3,15 +3,11 @@ import React from 'react';
 
 const WelcomeButton: React.FC = () => {
   return (
-    <div className="inline-flex items-center space-x-3 px-6 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/15 transition-all duration-300 cursor-pointer group">
-      <div className="flex-shrink-0">
-        <img 
-          src="/lovable-uploads/4cb3dfc5-c2e6-46c1-8d89-7e6fcebf82e3.png" 
-          alt="Digital Gringo AI Logo" 
-          className="h-6 w-6"
-        />
-      </div>
-      <span className="text-white text-sm font-medium group-hover:text-brand-cyan transition-colors duration-300">
+    <div className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border border-gray-700/50 shadow-2xl hover:shadow-brand-cyan/20 hover:border-brand-cyan/30 transition-all duration-500 cursor-pointer group relative overflow-hidden">
+      {/* Subtle inner glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      
+      <span className="text-white text-lg font-semibold tracking-wide group-hover:text-brand-cyan transition-colors duration-300 relative z-10">
         Welcome Digital Gringo AI
       </span>
     </div>
