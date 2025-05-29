@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import Logo from '@/components/Logo';
+import PWADownloadBanner from '@/components/pwa/PWADownloadBanner';
 
 interface HeroSectionProps {
   onStartBuilding: () => void;
@@ -37,7 +38,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
           Professional results in minutes, not hours.
         </p>
         
-        <div className="flex justify-center mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Button 
             size="lg" 
             onClick={onStartBuilding}
@@ -45,6 +46,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
           >
             Start Building Now - It's Free
           </Button>
+          <PWADownloadBanner />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
