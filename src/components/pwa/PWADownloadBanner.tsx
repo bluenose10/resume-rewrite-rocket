@@ -23,8 +23,8 @@ const PWADownloadBanner: React.FC<PWADownloadBannerProps> = ({ className = '' })
         <Button 
           onClick={() => setShowInstallPrompt(true)}
           variant="outline" 
-          className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-          size="sm"
+          className="bg-blue-700 hover:bg-blue-800 text-white hover:text-white border-blue-700 text-lg px-8 py-4 h-auto"
+          size="lg"
         >
           <Download className="h-4 w-4 mr-2" />
           Download Our App
