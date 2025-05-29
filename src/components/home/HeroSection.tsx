@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import AnimatedCounter from '@/components/AnimatedCounter';
+import Logo from '@/components/Logo';
 
 interface HeroSectionProps {
   onStartBuilding: () => void;
@@ -11,6 +12,14 @@ interface HeroSectionProps {
 const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes }) => {
   return (
     <section className="relative py-20 px-4 overflow-hidden">
+      {/* Logo at the top */}
+      <div className="container mx-auto relative z-10">
+        <div className="flex justify-center mb-8">
+          <Logo />
+        </div>
+      </div>
+
+      {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full opacity-20"></div>
         <div className="absolute top-20 -left-20 w-60 h-60 bg-indigo-200 rounded-full opacity-20"></div>
