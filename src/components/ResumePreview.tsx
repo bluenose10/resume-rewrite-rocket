@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ResumeData } from '@/types/resume';
@@ -88,11 +87,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
         <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
 
-      <Card className="shadow-lg border border-gray-200 bg-white">
+      <Card className="shadow-xl border-2 border-gray-100 bg-white">
         <CardContent className="p-0" id="resume-content">
           <div className="max-w-4xl mx-auto bg-white text-gray-900">
             <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-            <div className="px-8 py-6">
+            <div className="px-12 py-8">
               {getSectionOrder().map(sectionId => renderSection(sectionId))}
             </div>
           </div>
