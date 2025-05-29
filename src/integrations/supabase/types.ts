@@ -69,6 +69,33 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_stats: {
+        Row: {
+          created_at: string
+          daily_count: number
+          id: string
+          last_reset_date: string
+          total_resumes_created: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          daily_count?: number
+          id?: string
+          last_reset_date?: string
+          total_resumes_created?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          daily_count?: number
+          id?: string
+          last_reset_date?: string
+          total_resumes_created?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -150,9 +177,23 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: undefined
       }
+      get_resume_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_resumes: number
+          daily_count: number
+          last_updated: string
+        }[]
+      }
       has_role: {
         Args: { user_id: string; role: Database["public"]["Enums"]["app_role"] }
         Returns: boolean
+      }
+      increment_resume_count: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          new_total: number
+        }[]
       }
     }
     Enums: {

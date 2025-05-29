@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import SectionLayoutManager from '@/components/SectionLayoutManager';
+import AnimatedCounter from '@/components/AnimatedCounter';
 import { useToast } from '@/hooks/use-toast';
+import { useResumeStats } from '@/hooks/useResumeStats';
 import { optimizeResumeContent } from '@/services/openaiService';
 import { generatePDF } from '@/utils/pdfGenerator';
 import { Button } from '@/components/ui/button';
@@ -29,6 +31,7 @@ const DEFAULT_SECTION_ORDER: SectionConfig[] = [
 
 const Index = () => {
   const { toast } = useToast();
+  const { stats, incrementResumeCount } = useResumeStats();
   const [showBuilder, setShowBuilder] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
@@ -155,6 +158,9 @@ const Index = () => {
       const fileName = `${resumeData.personalInfo.firstName || 'Resume'}_${resumeData.personalInfo.lastName || 'Document'}.pdf`;
       await generatePDF('resume-content', fileName);
       
+      // Increment the resume count when PDF is downloaded
+      await incrementResumeCount();
+      
       toast({
         title: "PDF Downloaded!",
         description: "Your resume has been saved as a PDF file."
@@ -262,7 +268,9 @@ const Index = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">50,000+</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">
+                <AnimatedCounter targetValue={stats.totalResumes} />+
+              </div>
               <div className="text-gray-600">Resumes Created</div>
             </div>
             <div className="text-center">
