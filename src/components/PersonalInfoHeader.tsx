@@ -12,7 +12,7 @@ const PersonalInfoHeader: React.FC<PersonalInfoHeaderProps> = ({ personalInfo, t
   return (
     <div className="bg-white px-8 py-6">
       {/* Name - left aligned, large but not excessive */}
-      <h1 className="text-2xl font-bold mb-3" style={{ color: theme.text }}>
+      <h1 className="text-2xl font-bold mb-3" style={{ color: theme.primary }}>
         {personalInfo.firstName} {personalInfo.lastName}
       </h1>
       
