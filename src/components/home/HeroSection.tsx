@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import AnimatedCounter from '@/components/AnimatedCounter';
-import Logo from '@/components/Logo';
+import WelcomeButton from '@/components/WelcomeButton';
 import PWADownloadBanner from '@/components/pwa/PWADownloadBanner';
 
 interface HeroSectionProps {
@@ -13,10 +13,10 @@ interface HeroSectionProps {
 const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes }) => {
   return (
     <section className="py-20 px-4">
-      {/* Logo at the top */}
+      {/* Welcome Button at the top */}
       <div className="container mx-auto">
         <div className="flex justify-center mb-8">
-          <Logo />
+          <WelcomeButton />
         </div>
       </div>
       
