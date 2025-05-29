@@ -10,54 +10,58 @@ interface PersonalInfoHeaderProps {
 
 const PersonalInfoHeader: React.FC<PersonalInfoHeaderProps> = ({ personalInfo, theme }) => {
   return (
-    <div className="bg-white px-8 py-6 border-b" style={{ borderColor: theme.primary }}>
-      <div className="text-center mb-4">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: theme.text }}>
-          {personalInfo.firstName} {personalInfo.lastName}
-        </h1>
-        <div className="w-16 h-0.5 mx-auto" style={{ backgroundColor: theme.primary }}></div>
-      </div>
+    <div className="bg-white px-8 py-6">
+      {/* Name - left aligned, large but not excessive */}
+      <h1 className="text-2xl font-bold mb-3" style={{ color: theme.text }}>
+        {personalInfo.firstName} {personalInfo.lastName}
+      </h1>
       
-      <div className="max-w-3xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+      {/* Contact Information - horizontal layout */}
+      <div className="text-sm mb-2" style={{ color: theme.text }}>
+        <div className="flex flex-wrap items-center gap-1">
           {personalInfo.email && (
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <Mail className="h-3 w-3" style={{ color: theme.primary }} />
-              <span style={{ color: theme.text }}>{personalInfo.email}</span>
-            </div>
+            <>
+              <span>{personalInfo.email}</span>
+              {(personalInfo.phone || personalInfo.location) && <span className="mx-2">|</span>}
+            </>
           )}
           {personalInfo.phone && (
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <Phone className="h-3 w-3" style={{ color: theme.primary }} />
-              <span style={{ color: theme.text }}>{personalInfo.phone}</span>
-            </div>
+            <>
+              <span>{personalInfo.phone}</span>
+              {personalInfo.location && <span className="mx-2">|</span>}
+            </>
           )}
           {personalInfo.location && (
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <MapPin className="h-3 w-3" style={{ color: theme.primary }} />
-              <span style={{ color: theme.text }}>{personalInfo.location}</span>
-            </div>
-          )}
-          {personalInfo.linkedin && (
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <Linkedin className="h-3 w-3" style={{ color: theme.primary }} />
-              <span className="truncate max-w-40" style={{ color: theme.text }}>{personalInfo.linkedin}</span>
-            </div>
-          )}
-          {personalInfo.github && (
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <Github className="h-3 w-3" style={{ color: theme.primary }} />
-              <span className="truncate max-w-40" style={{ color: theme.text }}>{personalInfo.github}</span>
-            </div>
-          )}
-          {personalInfo.website && (
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <Globe className="h-3 w-3" style={{ color: theme.primary }} />
-              <span className="truncate max-w-40" style={{ color: theme.text }}>{personalInfo.website}</span>
-            </div>
+            <span>{personalInfo.location}</span>
           )}
         </div>
       </div>
+
+      {/* Website/Portfolio Links */}
+      {(personalInfo.linkedin || personalInfo.github || personalInfo.website) && (
+        <div className="text-sm mb-3" style={{ color: theme.text }}>
+          <div className="flex flex-wrap items-center gap-1">
+            {personalInfo.linkedin && (
+              <>
+                <span>{personalInfo.linkedin}</span>
+                {(personalInfo.github || personalInfo.website) && <span className="mx-2">|</span>}
+              </>
+            )}
+            {personalInfo.github && (
+              <>
+                <span>{personalInfo.github}</span>
+                {personalInfo.website && <span className="mx-2">|</span>}
+              </>
+            )}
+            {personalInfo.website && (
+              <span>{personalInfo.website}</span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Clean horizontal separator */}
+      <div className="w-full h-px bg-gray-300"></div>
     </div>
   );
 };
