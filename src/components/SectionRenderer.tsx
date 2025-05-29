@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ResumeSection from './ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
@@ -11,6 +10,23 @@ interface SectionRendererProps {
 }
 
 const SectionRenderer: React.FC<SectionRendererProps> = ({ sectionId, data, theme }) => {
+  const getClassificationDisplay = (classification: string) => {
+    switch (classification) {
+      case 'first':
+        return 'First Class Honours (1st)';
+      case 'upper-second':
+        return 'Upper Second Class Honours (2:1)';
+      case 'lower-second':
+        return 'Lower Second Class Honours (2:2)';
+      case 'third':
+        return 'Third Class Honours (3rd)';
+      case 'pass':
+        return 'Pass';
+      default:
+        return '';
+    }
+  };
+
   const renderSectionContent = () => {
     switch (sectionId) {
       case 'personalStatement':
@@ -108,26 +124,26 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ sectionId, data, them
         return (
           <ResumeSection title="Education" theme={theme}>
             <div className="space-y-2">
-              {data.education.map((edu) => (
-                <div key={edu.id} className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
-                      {edu.degree} {edu.field && `in ${edu.field}`}
-                    </h3>
-                    <p className="text-sm" style={{ color: theme.text }}>
-                      {edu.institution}
-                    </p>
-                    {edu.gpa && (
+              {data.education.map((edu) => {
+                const classificationText = getClassificationDisplay(edu.classification);
+                const degreeText = `${edu.degree}${edu.field ? ` ${edu.field}` : ''}${classificationText ? `, ${classificationText}` : ''}`;
+                
+                return (
+                  <div key={edu.id} className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
+                        {degreeText}
+                      </h3>
                       <p className="text-sm" style={{ color: theme.text }}>
-                        GPA: {edu.gpa}
+                        {edu.institution}
                       </p>
-                    )}
+                    </div>
+                    <div className="text-sm" style={{ color: theme.text }}>
+                      {formatDateRange(edu.startDate, edu.endDate, false)}
+                    </div>
                   </div>
-                  <div className="text-sm" style={{ color: theme.text }}>
-                    {formatDateRange(edu.startDate, edu.endDate, false)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </ResumeSection>
         );

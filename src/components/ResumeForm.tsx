@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -121,7 +120,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOp
       field: '',
       startDate: '',
       endDate: '',
-      gpa: ''
+      classification: ''
     };
     updateData({ education: [...resumeData.education, newEdu] });
   };

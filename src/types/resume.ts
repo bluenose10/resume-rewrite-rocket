@@ -1,4 +1,3 @@
-
 export interface ColorTheme {
   id: string;
   name: string;
@@ -37,7 +36,7 @@ export interface Education {
   field: string;
   startDate: string;
   endDate: string;
-  gpa: string;
+  classification: string;
 }
 
 export interface Project {

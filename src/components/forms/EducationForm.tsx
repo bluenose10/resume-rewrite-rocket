@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Trash2 } from 'lucide-react';
 import { Education } from '@/types/resume';
 
@@ -20,6 +21,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
   onUpdate,
   onRemove
 }) => {
+  const degreeClassifications = [
+    { value: '', label: 'Select classification (optional)' },
+    { value: 'first', label: 'First Class Honours (1st)' },
+    { value: 'upper-second', label: 'Upper Second Class Honours (2:1)' },
+    { value: 'lower-second', label: 'Lower Second Class Honours (2:2)' },
+    { value: 'third', label: 'Third Class Honours (3rd)' },
+    { value: 'pass', label: 'Pass' },
+    { value: 'not-applicable', label: 'Not applicable' }
+  ];
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -58,7 +69,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
                 <Input
                   value={edu.degree}
                   onChange={(e) => onUpdate(edu.id, 'degree', e.target.value)}
-                  placeholder="Bachelor's, Master's, etc."
+                  placeholder="BSc, BA, MSc, etc."
                 />
               </div>
               <div>
@@ -89,12 +100,25 @@ const EducationForm: React.FC<EducationFormProps> = ({
                 />
               </div>
               <div>
-                <Label>GPA (Optional)</Label>
-                <Input
-                  value={edu.gpa}
-                  onChange={(e) => onUpdate(edu.id, 'gpa', e.target.value)}
-                  placeholder="3.8"
-                />
+                <Label>Degree Classification</Label>
+                <Select
+                  value={edu.classification}
+                  onValueChange={(value) => onUpdate(edu.id, 'classification', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select classification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {degreeClassifications.map((classification) => (
+                      <SelectItem key={classification.value} value={classification.value}>
+                        {classification.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Include only 2:1 or higher classifications
+                </p>
               </div>
             </div>
           </div>
