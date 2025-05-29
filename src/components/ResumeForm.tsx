@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import ColorThemeSelector from './ColorThemeSelector';
 import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project, Achievement, Certification, Language, VolunteerExperience, Reference, Publication } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
+import LinkedInImport from './LinkedInImport';
 
 interface ResumeFormProps {
   initialData?: ResumeData;
@@ -66,6 +67,19 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOp
     const updated = { ...resumeData, ...updates };
     setResumeData(updated);
     onDataChange(updated);
+  };
+
+  const handleLinkedInImport = (importedData: Partial<ResumeData>) => {
+    const mergedData = {
+      ...resumeData,
+      ...importedData,
+      personalInfo: {
+        ...resumeData.personalInfo,
+        ...importedData.personalInfo
+      }
+    };
+    setResumeData(mergedData);
+    onDataChange(mergedData);
   };
 
   const updatePersonalInfo = (field: keyof PersonalInfo, value: string) => {
@@ -381,6 +395,9 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOp
         selectedTheme={resumeData.theme || DEFAULT_THEMES[1]}
         onThemeChange={updateTheme}
       />
+
+      {/* LinkedIn Import */}
+      <LinkedInImport onImportData={handleLinkedInImport} />
 
       {/* Personal Information */}
       <Card>
