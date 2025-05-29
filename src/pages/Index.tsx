@@ -230,20 +230,13 @@ const Index = () => {
             Professional results in minutes, not hours.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex justify-center mb-12">
             <Button 
               size="lg" 
               onClick={() => setShowBuilder(true)}
               className="text-lg px-8 py-4 h-auto"
             >
               Start Building Now - It's Free
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="text-lg px-8 py-4 h-auto"
-            >
-              View Sample Resumes
             </Button>
           </div>
 
