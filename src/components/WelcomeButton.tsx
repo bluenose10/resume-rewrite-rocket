@@ -11,7 +11,7 @@ const WelcomeButton: React.FC = () => {
       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-brand-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
       
       <span className="relative text-white text-sm font-medium tracking-normal group-hover:text-gray-100 transition-colors duration-200">
-        Welcome to NextGen.ai
+        Digital Gringo AI
       </span>
     </button>
   );
