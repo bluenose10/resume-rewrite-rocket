@@ -46,9 +46,9 @@ const FeaturesSection: React.FC = () => {
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <FileText className="h-8 w-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Templates</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Professional Template</h3>
               <p className="text-gray-600">
-                Industry-standard layouts designed by hiring managers and career coaches
+                Clean, ATS-optimized layout designed by hiring managers and career coaches
               </p>
             </CardContent>
           </Card>

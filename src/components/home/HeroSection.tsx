@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import AnimatedCounter from '@/components/AnimatedCounter';
@@ -34,7 +33,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
         </h1>
         
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-          Join thousands who landed their dream jobs with our ATS-optimized, AI-powered resume builder. 
+          Build your dream resume with our ATS-optimized, AI-powered resume builder. 
           Professional results in minutes, not hours.
         </p>
         
