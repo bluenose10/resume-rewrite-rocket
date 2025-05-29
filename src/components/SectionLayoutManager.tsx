@@ -7,6 +7,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -37,7 +38,9 @@ const SortableSection: React.FC<SortableSectionProps> = ({ section, onToggleVisi
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: section.id });
+  } = useSortable({ 
+    id: section.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -104,12 +107,12 @@ const SectionLayoutManager: React.FC<SectionLayoutManagerProps> = ({
     })
   );
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (active.id !== over?.id) {
       const oldIndex = sections.findIndex((section) => section.id === active.id);
-      const newIndex = sections.findIndex((section) => section.id === over.id);
+      const newIndex = sections.findIndex((section) => section.id === over?.id);
       
       const newOrder = arrayMove(sections, oldIndex, newIndex);
       onReorder(newOrder);
