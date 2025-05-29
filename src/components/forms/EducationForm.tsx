@@ -22,7 +22,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
   onRemove
 }) => {
   const degreeClassifications = [
-    { value: '', label: 'Select classification (optional)' },
+    { value: 'not-specified', label: 'Select classification (optional)' },
     { value: 'first', label: 'First Class Honours (1st)' },
     { value: 'upper-second', label: 'Upper Second Class Honours (2:1)' },
     { value: 'lower-second', label: 'Lower Second Class Honours (2:2)' },
@@ -102,8 +102,8 @@ const EducationForm: React.FC<EducationFormProps> = ({
               <div>
                 <Label>Degree Classification</Label>
                 <Select
-                  value={edu.classification}
-                  onValueChange={(value) => onUpdate(edu.id, 'classification', value)}
+                  value={edu.classification || 'not-specified'}
+                  onValueChange={(value) => onUpdate(edu.id, 'classification', value === 'not-specified' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select classification" />
