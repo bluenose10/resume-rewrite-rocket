@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ResumeData } from '@/types/resume';
@@ -159,7 +160,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Work Experience */}
-              {data.experience.length > 0 && (
+              {data.experience && data.experience.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -208,7 +209,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Projects */}
-              {data.projects.length > 0 && (
+              {data.projects && data.projects.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -255,7 +256,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Education */}
-              {data.education.length > 0 && (
+              {data.education && data.education.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -292,7 +293,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Achievements & Awards */}
-              {data.achievements.length > 0 && (
+              {data.achievements && data.achievements.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -329,7 +330,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Certifications */}
-              {data.certifications.length > 0 && (
+              {data.certifications && data.certifications.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -371,7 +372,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Languages */}
-              {data.languages.length > 0 && (
+              {data.languages && data.languages.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-2 pb-1"
@@ -398,7 +399,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Volunteer Experience */}
-              {data.volunteerExperience.length > 0 && (
+              {data.volunteerExperience && data.volunteerExperience.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -447,7 +448,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Publications */}
-              {data.publications.length > 0 && (
+              {data.publications && data.publications.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -490,7 +491,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* References */}
-              {data.references.length > 0 && (
+              {data.references && data.references.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
@@ -521,7 +522,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Technical Skills */}
-              {data.skills.length > 0 && (
+              {data.skills && data.skills.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-2 pb-1"
@@ -539,7 +540,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
               )}
 
               {/* Interests & Hobbies */}
-              {data.interests.length > 0 && (
+              {data.interests && data.interests.length > 0 && (
                 <section>
                   <h2 
                     className="text-sm font-bold uppercase tracking-wide mb-2 pb-1"

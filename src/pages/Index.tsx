@@ -7,6 +7,7 @@ import { generatePDF } from '@/utils/pdfGenerator';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle, Wand2, Download, FileText, Zap, Shield, Clock } from 'lucide-react';
+import { ResumeData } from '@/types/resume';
 
 interface PersonalInfo {
   firstName: string;
@@ -49,11 +50,19 @@ interface Project {
 
 interface ResumeData {
   personalInfo: PersonalInfo;
+  personalStatement: string;
   summary: string;
   experience: Experience[];
   education: Education[];
   projects: Project[];
   skills: string[];
+  achievements: string[];
+  certifications: string[];
+  languages: string[];
+  volunteerExperience: string[];
+  references: string[];
+  publications: string[];
+  interests: string[];
 }
 
 const Index = () => {
@@ -70,11 +79,19 @@ const Index = () => {
       github: '',
       website: ''
     },
+    personalStatement: '',
     summary: '',
     experience: [],
     education: [],
     projects: [],
-    skills: []
+    skills: [],
+    achievements: [],
+    certifications: [],
+    languages: [],
+    volunteerExperience: [],
+    references: [],
+    publications: [],
+    interests: []
   });
   
   const [isOptimizing, setIsOptimizing] = useState(false);
