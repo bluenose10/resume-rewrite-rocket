@@ -48,12 +48,72 @@ export interface Project {
   link: string;
 }
 
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  organization: string;
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+  expiryDate: string;
+  credentialId: string;
+}
+
+export interface Language {
+  id: string;
+  language: string;
+  proficiency: 'Beginner' | 'Intermediate' | 'Advanced' | 'Fluent' | 'Native';
+}
+
+export interface VolunteerExperience {
+  id: string;
+  organization: string;
+  role: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+}
+
+export interface Reference {
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  email: string;
+  phone: string;
+  relationship: string;
+}
+
+export interface Publication {
+  id: string;
+  title: string;
+  authors: string;
+  publication: string;
+  date: string;
+  link: string;
+}
+
 export interface ResumeData {
   personalInfo: PersonalInfo;
+  personalStatement: string;
   summary: string;
   experience: Experience[];
   education: Education[];
   projects: Project[];
   skills: string[];
+  achievements: Achievement[];
+  certifications: Certification[];
+  languages: Language[];
+  volunteerExperience: VolunteerExperience[];
+  references: Reference[];
+  publications: Publication[];
+  interests: string[];
   theme?: ColorTheme;
 }
