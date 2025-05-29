@@ -1,18 +1,21 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Download, Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
 import { ResumeData } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
+import ExportOptionsModal from './ExportOptionsModal';
+import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
+import { useToast } from '@/hooks/use-toast';
+import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
 
 interface ResumePreviewProps {
   data: ResumeData;
-  onDownload: () => void;
 }
 
-const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
-  const theme = data.theme || DEFAULT_THEMES[1];
+const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
+  const { toast } = useToast();
+  const theme = data.theme || DEFAULT_THEMES[0];
+  const [isExporting, setIsExporting] = React.useState(false);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
@@ -41,18 +44,33 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
     return sentences;
   };
 
+  const handleExport = async (options: ExportOptions) => {
+    setIsExporting(true);
+    try {
+      const fileName = `${data.personalInfo.firstName || 'Resume'}_${data.personalInfo.lastName || 'Document'}.${options.format}`;
+      await generateEnhancedPDF('resume-content', fileName, options);
+      
+      toast({
+        title: "Export Successful!",
+        description: `Your resume has been exported as ${options.format.toUpperCase()}.`
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export resume. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
-    <div className="space-y-6 font-inter">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Resume Preview</h2>
-        <Button 
-          onClick={onDownload} 
-          className="flex items-center gap-2 shadow-lg"
-          style={{ backgroundColor: theme.primary, color: 'white' }}
-        >
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
+        <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
 
       <Card className="shadow-lg border border-gray-200 bg-white">
