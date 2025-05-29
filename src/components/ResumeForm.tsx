@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,43 +13,54 @@ import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project, A
 import { DEFAULT_THEMES } from '@/constants/themes';
 
 interface ResumeFormProps {
+  initialData?: ResumeData;
   onDataChange: (data: ResumeData) => void;
   onOptimize: () => void;
   isOptimizing: boolean;
 }
 
-const ResumeForm: React.FC<ResumeFormProps> = ({ onDataChange, onOptimize, isOptimizing }) => {
+const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOptimize, isOptimizing }) => {
   const { toast } = useToast();
   
-  const [resumeData, setResumeData] = useState<ResumeData>({
-    personalInfo: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      location: '',
-      linkedin: '',
-      github: '',
-      website: ''
-    },
-    personalStatement: '',
-    summary: '',
-    experience: [],
-    education: [],
-    projects: [],
-    skills: [],
-    achievements: [],
-    certifications: [],
-    languages: [],
-    volunteerExperience: [],
-    references: [],
-    publications: [],
-    interests: [],
-    theme: DEFAULT_THEMES[1]
-  });
+  const getInitialResumeData = (): ResumeData => {
+    return initialData || {
+      personalInfo: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        location: '',
+        linkedin: '',
+        github: '',
+        website: ''
+      },
+      personalStatement: '',
+      summary: '',
+      experience: [],
+      education: [],
+      projects: [],
+      skills: [],
+      achievements: [],
+      certifications: [],
+      languages: [],
+      volunteerExperience: [],
+      references: [],
+      publications: [],
+      interests: [],
+      theme: DEFAULT_THEMES[1]
+    };
+  };
 
+  const [resumeData, setResumeData] = useState<ResumeData>(getInitialResumeData());
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
+
+  // Sync form state when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setResumeData(initialData);
+    }
+  }, [initialData]);
 
   const updateData = (updates: Partial<ResumeData>) => {
     const updated = { ...resumeData, ...updates };

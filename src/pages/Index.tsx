@@ -202,6 +202,7 @@ const Index = () => {
                 </TabsList>
                 <TabsContent value="content" className="space-y-6">
                   <ResumeForm
+                    initialData={resumeData}
                     onDataChange={handleDataChange}
                     onOptimize={handleOptimize}
                     isOptimizing={isOptimizing}
