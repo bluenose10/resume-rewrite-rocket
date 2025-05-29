@@ -3,54 +3,8 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
-
-interface PersonalInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  location: string;
-  linkedin: string;
-  github: string;
-  website: string;
-}
-
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
-  description: string;
-}
-
-interface Education {
-  id: string;
-  institution: string;
-  degree: string;
-  field: string;
-  startDate: string;
-  endDate: string;
-  gpa: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string;
-  link: string;
-}
-
-interface ResumeData {
-  personalInfo: PersonalInfo;
-  summary: string;
-  experience: Experience[];
-  education: Education[];
-  projects: Project[];
-  skills: string[];
-}
+import { ResumeData } from '@/types/resume';
+import { DEFAULT_THEMES } from '@/constants/themes';
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -58,6 +12,8 @@ interface ResumePreviewProps {
 }
 
 const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
+  const theme = data.theme || DEFAULT_THEMES[1];
+
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
     const [year, month] = dateStr.split('-');
@@ -77,7 +33,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
   const formatDescriptionAsBullets = (description: string) => {
     if (!description) return [];
     
-    // Split by periods, semicolons, or line breaks and filter empty strings
     const sentences = description
       .split(/[.;]\s*|\n/)
       .map(s => s.trim())
@@ -90,7 +45,11 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
     <div className="space-y-6 font-inter">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Resume Preview</h2>
-        <Button onClick={onDownload} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white shadow-lg">
+        <Button 
+          onClick={onDownload} 
+          className="flex items-center gap-2 shadow-lg"
+          style={{ backgroundColor: theme.primary, color: 'white' }}
+        >
           <Download className="h-4 w-4" />
           Download PDF
         </Button>
@@ -98,88 +57,111 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
 
       <Card className="shadow-lg border border-gray-200 bg-white">
         <CardContent className="p-0" id="resume-content">
-          <div className="max-w-4xl mx-auto bg-white">
-            {/* Header Section */}
-            <div className="text-center py-8 px-8 border-b border-gray-200">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-wide">
+          <div className="max-w-4xl mx-auto bg-white text-gray-900">
+            {/* Professional Header */}
+            <div className="px-8 py-6 text-center" style={{ borderBottom: `3px solid ${theme.primary}` }}>
+              <h1 className="text-2xl font-bold tracking-wide mb-3" style={{ color: theme.text }}>
                 {data.personalInfo.firstName} {data.personalInfo.lastName}
               </h1>
               
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-600">
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm" style={{ color: theme.text }}>
                 {data.personalInfo.email && (
                   <div className="flex items-center gap-1">
-                    <Mail className="h-4 w-4 text-red-600" />
+                    <Mail className="h-3 w-3" style={{ color: theme.primary }} />
                     <span>{data.personalInfo.email}</span>
                   </div>
                 )}
                 {data.personalInfo.phone && (
                   <div className="flex items-center gap-1">
-                    <Phone className="h-4 w-4 text-red-600" />
+                    <Phone className="h-3 w-3" style={{ color: theme.primary }} />
                     <span>{data.personalInfo.phone}</span>
                   </div>
                 )}
                 {data.personalInfo.location && (
                   <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4 text-red-600" />
+                    <MapPin className="h-3 w-3" style={{ color: theme.primary }} />
                     <span>{data.personalInfo.location}</span>
                   </div>
                 )}
                 {data.personalInfo.linkedin && (
                   <div className="flex items-center gap-1">
-                    <Linkedin className="h-4 w-4 text-red-600" />
-                    <span className="truncate max-w-48">{data.personalInfo.linkedin}</span>
+                    <Linkedin className="h-3 w-3" style={{ color: theme.primary }} />
+                    <span className="truncate max-w-36">{data.personalInfo.linkedin}</span>
                   </div>
                 )}
                 {data.personalInfo.github && (
                   <div className="flex items-center gap-1">
-                    <Github className="h-4 w-4 text-red-600" />
-                    <span className="truncate max-w-48">{data.personalInfo.github}</span>
+                    <Github className="h-3 w-3" style={{ color: theme.primary }} />
+                    <span className="truncate max-w-36">{data.personalInfo.github}</span>
                   </div>
                 )}
                 {data.personalInfo.website && (
                   <div className="flex items-center gap-1">
-                    <Globe className="h-4 w-4 text-red-600" />
-                    <span className="truncate max-w-48">{data.personalInfo.website}</span>
+                    <Globe className="h-3 w-3" style={{ color: theme.primary }} />
+                    <span className="truncate max-w-36">{data.personalInfo.website}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="p-8 space-y-6">
+            <div className="px-8 py-6 space-y-5">
               {/* Professional Summary */}
               {data.summary && (
                 <section>
-                  <h2 className="text-lg font-bold text-gray-900 mb-3 pb-1 border-b-2 border-red-600 inline-block">
-                    PROFESSIONAL SUMMARY
+                  <h2 
+                    className="text-sm font-bold uppercase tracking-wide mb-2 pb-1"
+                    style={{ 
+                      color: theme.primary,
+                      borderBottom: `1px solid ${theme.primary}`
+                    }}
+                  >
+                    Professional Summary
                   </h2>
-                  <p className="text-gray-700 leading-relaxed text-sm">{data.summary}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: theme.text }}>
+                    {data.summary}
+                  </p>
                 </section>
               )}
 
-              {/* Experience */}
+              {/* Work Experience */}
               {data.experience.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-bold text-gray-900 mb-4 pb-1 border-b-2 border-red-600 inline-block">
-                    WORK EXPERIENCE
+                  <h2 
+                    className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
+                    style={{ 
+                      color: theme.primary,
+                      borderBottom: `1px solid ${theme.primary}`
+                    }}
+                  >
+                    Professional Experience
                   </h2>
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                     {data.experience.map((exp) => (
                       <div key={exp.id}>
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex justify-between items-start mb-1">
                           <div>
-                            <h3 className="text-base font-bold text-gray-900">{exp.position}</h3>
-                            <p className="text-sm font-semibold text-gray-700">{exp.company}</p>
+                            <h3 className="text-sm font-bold" style={{ color: theme.text }}>
+                              {exp.position}
+                            </h3>
+                            <p className="text-sm font-semibold" style={{ color: theme.secondary }}>
+                              {exp.company}
+                            </p>
                           </div>
-                          <div className="text-sm text-gray-600 text-right">
+                          <div className="text-xs font-medium" style={{ color: theme.text }}>
                             {formatDateRange(exp.startDate, exp.endDate, exp.current)}
                           </div>
                         </div>
                         {exp.description && (
-                          <ul className="ml-4 space-y-1">
+                          <ul className="ml-4 space-y-0.5">
                             {formatDescriptionAsBullets(exp.description).map((bullet, index) => (
-                              <li key={index} className="text-sm text-gray-700 leading-relaxed flex items-start">
-                                <span className="text-red-600 mr-2 mt-1.5 text-xs">•</span>
-                                <span>{bullet}</span>
+                              <li key={index} className="text-xs leading-relaxed flex items-start">
+                                <span 
+                                  className="mr-2 mt-1.5 text-xs"
+                                  style={{ color: theme.primary }}
+                                >
+                                  •
+                                </span>
+                                <span style={{ color: theme.text }}>{bullet}</span>
                               </li>
                             ))}
                           </ul>
@@ -193,18 +175,27 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
               {/* Projects */}
               {data.projects.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-bold text-gray-900 mb-4 pb-1 border-b-2 border-red-600 inline-block">
-                    PROJECTS
+                  <h2 
+                    className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
+                    style={{ 
+                      color: theme.primary,
+                      borderBottom: `1px solid ${theme.primary}`
+                    }}
+                  >
+                    Projects
                   </h2>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {data.projects.map((project) => (
                       <div key={project.id}>
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="text-base font-bold text-gray-900">{project.name}</h3>
+                        <div className="flex justify-between items-start mb-1">
+                          <h3 className="text-sm font-bold" style={{ color: theme.text }}>
+                            {project.name}
+                          </h3>
                           {project.link && (
                             <a 
                               href={project.link} 
-                              className="text-red-600 text-sm font-medium hover:text-red-800 transition-colors"
+                              className="text-xs font-medium hover:underline transition-colors"
+                              style={{ color: theme.primary }}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -213,10 +204,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
                           )}
                         </div>
                         {project.description && (
-                          <p className="text-sm text-gray-700 mb-2 leading-relaxed">{project.description}</p>
+                          <p className="text-xs leading-relaxed mb-1" style={{ color: theme.text }}>
+                            {project.description}
+                          </p>
                         )}
                         {project.technologies && (
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs" style={{ color: theme.secondary }}>
                             <span className="font-semibold">Technologies:</span> {project.technologies}
                           </p>
                         )}
@@ -229,22 +222,32 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
               {/* Education */}
               {data.education.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-bold text-gray-900 mb-4 pb-1 border-b-2 border-red-600 inline-block">
-                    EDUCATION
+                  <h2 
+                    className="text-sm font-bold uppercase tracking-wide mb-3 pb-1"
+                    style={{ 
+                      color: theme.primary,
+                      borderBottom: `1px solid ${theme.primary}`
+                    }}
+                  >
+                    Education
                   </h2>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {data.education.map((edu) => (
                       <div key={edu.id} className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-base font-bold text-gray-900">
+                          <h3 className="text-sm font-bold" style={{ color: theme.text }}>
                             {edu.degree} {edu.field && `in ${edu.field}`}
                           </h3>
-                          <p className="text-sm font-semibold text-gray-700">{edu.institution}</p>
+                          <p className="text-sm font-semibold" style={{ color: theme.secondary }}>
+                            {edu.institution}
+                          </p>
                           {edu.gpa && (
-                            <p className="text-sm text-gray-600">GPA: {edu.gpa}</p>
+                            <p className="text-xs" style={{ color: theme.text }}>
+                              GPA: {edu.gpa}
+                            </p>
                           )}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-xs font-medium" style={{ color: theme.text }}>
                           {formatDateRange(edu.startDate, edu.endDate, false)}
                         </div>
                       </div>
@@ -253,13 +256,19 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data, onDownload }) => {
                 </section>
               )}
 
-              {/* Skills */}
+              {/* Technical Skills */}
               {data.skills.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-bold text-gray-900 mb-4 pb-1 border-b-2 border-red-600 inline-block">
-                    TECHNICAL SKILLS
+                  <h2 
+                    className="text-sm font-bold uppercase tracking-wide mb-2 pb-1"
+                    style={{ 
+                      color: theme.primary,
+                      borderBottom: `1px solid ${theme.primary}`
+                    }}
+                  >
+                    Technical Skills
                   </h2>
-                  <div className="text-sm text-gray-700 leading-relaxed">
+                  <div className="text-xs leading-relaxed" style={{ color: theme.text }}>
                     {data.skills.join(' • ')}
                   </div>
                 </section>

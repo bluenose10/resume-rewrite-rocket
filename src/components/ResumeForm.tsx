@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,54 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Plus, Trash2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-interface PersonalInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  location: string;
-  linkedin: string;
-  github: string;
-  website: string;
-}
-
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  startDate: string;
-  endDate: string;
-  current: boolean;
-  description: string;
-}
-
-interface Education {
-  id: string;
-  institution: string;
-  degree: string;
-  field: string;
-  startDate: string;
-  endDate: string;
-  gpa: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  technologies: string;
-  link: string;
-}
-
-interface ResumeData {
-  personalInfo: PersonalInfo;
-  summary: string;
-  experience: Experience[];
-  education: Education[];
-  projects: Project[];
-  skills: string[];
-}
+import ColorThemeSelector from './ColorThemeSelector';
+import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project } from '@/types/resume';
+import { DEFAULT_THEMES } from '@/constants/themes';
 
 interface ResumeFormProps {
   onDataChange: (data: ResumeData) => void;
@@ -81,24 +35,30 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onDataChange, onOptimize, isOpt
     experience: [],
     education: [],
     projects: [],
-    skills: []
+    skills: [],
+    theme: DEFAULT_THEMES[1] // Default to Classic Red
   });
 
   const [newSkill, setNewSkill] = useState('');
 
-  const updatePersonalInfo = (field: keyof PersonalInfo, value: string) => {
-    const updated = {
-      ...resumeData,
-      personalInfo: { ...resumeData.personalInfo, [field]: value }
-    };
+  const updateData = (updates: Partial<ResumeData>) => {
+    const updated = { ...resumeData, ...updates };
     setResumeData(updated);
     onDataChange(updated);
   };
 
+  const updatePersonalInfo = (field: keyof PersonalInfo, value: string) => {
+    updateData({
+      personalInfo: { ...resumeData.personalInfo, [field]: value }
+    });
+  };
+
   const updateSummary = (value: string) => {
-    const updated = { ...resumeData, summary: value };
-    setResumeData(updated);
-    onDataChange(updated);
+    updateData({ summary: value });
+  };
+
+  const updateTheme = (theme: ColorTheme) => {
+    updateData({ theme });
   };
 
   const addExperience = () => {
@@ -236,6 +196,12 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onDataChange, onOptimize, isOpt
 
   return (
     <div className="space-y-6 max-w-2xl">
+      {/* Color Theme Selection */}
+      <ColorThemeSelector
+        selectedTheme={resumeData.theme || DEFAULT_THEMES[1]}
+        onThemeChange={updateTheme}
+      />
+
       {/* Personal Information */}
       <Card>
         <CardHeader>
