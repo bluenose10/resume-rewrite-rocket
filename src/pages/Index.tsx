@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
-import APIKeyInput from '@/components/APIKeyInput';
 import { useToast } from '@/hooks/use-toast';
 import { optimizeResumeContent } from '@/services/openaiService';
 import { generatePDF } from '@/utils/pdfGenerator';
@@ -75,7 +74,6 @@ const Index = () => {
     skills: []
   });
   
-  const [apiKey, setApiKey] = useState('');
   const [isOptimizing, setIsOptimizing] = useState(false);
 
   const handleDataChange = (data: ResumeData) => {
@@ -83,15 +81,6 @@ const Index = () => {
   };
 
   const handleOptimize = async () => {
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please enter your OpenAI API key to optimize your resume.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!resumeData.summary && resumeData.experience.length === 0 && resumeData.projects.length === 0) {
       toast({
         title: "No Content to Optimize",
@@ -105,7 +94,7 @@ const Index = () => {
     
     try {
       console.log('Starting resume optimization...');
-      const optimizedContent = await optimizeResumeContent(resumeData, apiKey);
+      const optimizedContent = await optimizeResumeContent(resumeData);
       console.log('Optimization completed:', optimizedContent);
 
       // Update resume data with optimized content
@@ -178,11 +167,6 @@ const Index = () => {
             Create a professional, ATS-friendly resume with AI optimization. 
             Fill in your information and let our AI enhance your content for maximum impact.
           </p>
-        </div>
-
-        {/* API Key Input */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <APIKeyInput onKeyChange={setApiKey} />
         </div>
 
         {/* Main Content */}

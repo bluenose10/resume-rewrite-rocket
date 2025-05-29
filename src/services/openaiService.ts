@@ -46,14 +46,11 @@ export interface OptimizeResponse {
   }>;
 }
 
-export const optimizeResumeContent = async (
-  resumeData: OptimizeRequest,
-  apiKey: string
-): Promise<OptimizeResponse> => {
-  if (!apiKey) {
-    throw new Error('OpenAI API key is required');
-  }
+const OPENAI_API_KEY = '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';
 
+export const optimizeResumeContent = async (
+  resumeData: OptimizeRequest
+): Promise<OptimizeResponse> => {
   const prompt = `
 You are a professional resume optimization expert. Please optimize the following resume content to make it more ATS-friendly, impactful, and professional. Follow these guidelines:
 
@@ -104,7 +101,7 @@ Only return the JSON response, no additional text.
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
