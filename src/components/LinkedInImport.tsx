@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Linkedin, Download, Loader2 } from 'lucide-react';
-import { extractLinkedInData, validateLinkedInUrl, LinkedInImportData } from '@/services/linkedinService';
+import { Linkedin, Upload, Loader2, FileUp } from 'lucide-react';
+import { parseLinkedInArchive, validateLinkedInArchive, LinkedInImportData } from '@/services/linkedinService';
 import { ResumeData } from '@/types/resume';
 
 interface LinkedInImportProps {
@@ -15,26 +15,32 @@ interface LinkedInImportProps {
 }
 
 const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
-  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [previewData, setPreviewData] = useState<LinkedInImportData | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const { toast } = useToast();
 
-  const handleExtractData = async () => {
-    if (!linkedinUrl.trim()) {
-      toast({
-        title: "LinkedIn URL Required",
-        description: "Please enter a LinkedIn profile URL",
-        variant: "destructive"
-      });
-      return;
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!validateLinkedInArchive(file)) {
+        toast({
+          title: "Invalid File Type",
+          description: "Please upload a ZIP file from your LinkedIn data export.",
+          variant: "destructive"
+        });
+        return;
+      }
+      setSelectedFile(file);
     }
+  };
 
-    if (!validateLinkedInUrl(linkedinUrl)) {
+  const handleExtractData = async () => {
+    if (!selectedFile) {
       toast({
-        title: "Invalid LinkedIn URL",
-        description: "Please enter a valid LinkedIn profile URL (e.g., https://linkedin.com/in/username)",
+        title: "File Required",
+        description: "Please select your LinkedIn data archive ZIP file",
         variant: "destructive"
       });
       return;
@@ -42,7 +48,7 @@ const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
 
     setIsImporting(true);
     try {
-      const extractedData = await extractLinkedInData(linkedinUrl);
+      const extractedData = await parseLinkedInArchive(selectedFile);
       setPreviewData(extractedData);
       setShowPreview(true);
       
@@ -54,7 +60,7 @@ const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
       console.error('LinkedIn import error:', error);
       toast({
         title: "Import Failed",
-        description: error instanceof Error ? error.message : "Failed to extract LinkedIn data. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to parse LinkedIn archive. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -92,8 +98,12 @@ const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
 
     onImportData(resumeUpdate);
     setShowPreview(false);
-    setLinkedinUrl('');
+    setSelectedFile(null);
     setPreviewData(null);
+
+    // Reset file input
+    const fileInput = document.getElementById('linkedin-archive') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
 
     toast({
       title: "LinkedIn Data Imported!",
@@ -111,37 +121,48 @@ const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="linkedin-url">LinkedIn Profile URL</Label>
+          <Label htmlFor="linkedin-archive">LinkedIn Data Archive (ZIP file)</Label>
           <Input
-            id="linkedin-url"
-            value={linkedinUrl}
-            onChange={(e) => setLinkedinUrl(e.target.value)}
-            placeholder="https://linkedin.com/in/your-profile"
+            id="linkedin-archive"
+            type="file"
+            accept=".zip"
+            onChange={handleFileSelect}
             className="mt-1"
           />
+          {selectedFile && (
+            <p className="text-sm text-green-600 mt-1">
+              Selected: {selectedFile.name}
+            </p>
+          )}
         </div>
         
         <Button 
           onClick={handleExtractData}
-          disabled={isImporting}
+          disabled={isImporting || !selectedFile}
           className="w-full bg-blue-600 hover:bg-blue-700"
         >
           {isImporting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Extracting Data...
+              Parsing Archive...
             </>
           ) : (
             <>
-              <Download className="h-4 w-4 mr-2" />
-              Extract LinkedIn Data
+              <FileUp className="h-4 w-4 mr-2" />
+              Parse LinkedIn Data
             </>
           )}
         </Button>
 
-        <p className="text-xs text-blue-600">
-          Our AI will extract your professional information from your LinkedIn profile and optimize it for your resume.
-        </p>
+        <div className="text-xs text-blue-600 space-y-2">
+          <p className="font-medium">How to get your LinkedIn data:</p>
+          <ol className="list-decimal list-inside space-y-1 text-xs">
+            <li>Go to LinkedIn → Settings & Privacy → Data Privacy</li>
+            <li>Click "Get a copy of your data"</li>
+            <li>Click "Request archive" (wait 24-72 hours for email)</li>
+            <li>Download the ZIP file and upload it here</li>
+          </ol>
+        </div>
 
         {/* Preview Dialog */}
         <Dialog open={showPreview} onOpenChange={setShowPreview}>
@@ -160,7 +181,7 @@ const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
 
                 <div>
                   <h3 className="font-semibold text-sm text-gray-700">Professional Summary</h3>
-                  <p className="text-sm">{previewData.summary}</p>
+                  <p className="text-sm">{previewData.summary || 'No summary found'}</p>
                 </div>
 
                 <div>
@@ -173,6 +194,19 @@ const LinkedInImport: React.FC<LinkedInImportProps> = ({ onImportData }) => {
                   ))}
                   {previewData.experience.length > 2 && (
                     <p className="text-sm text-gray-600">...and {previewData.experience.length - 2} more</p>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-sm text-gray-700">Education ({previewData.education.length} entries)</h3>
+                  {previewData.education.slice(0, 2).map((edu, index) => (
+                    <div key={index} className="text-sm border-l-2 border-gray-200 pl-3 mb-2">
+                      <p className="font-medium">{edu.degree} in {edu.field}</p>
+                      <p className="text-gray-600">{edu.institution}</p>
+                    </div>
+                  ))}
+                  {previewData.education.length > 2 && (
+                    <p className="text-sm text-gray-600">...and {previewData.education.length - 2} more</p>
                   )}
                 </div>
 
