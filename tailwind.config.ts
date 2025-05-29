@@ -66,6 +66,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Brand colors from the NextGen.ai inspired palette
+				brand: {
+					cyan: 'hsl(var(--brand-cyan))',
+					'dark-navy': 'hsl(var(--brand-dark-navy))',
+					'medium-blue': 'hsl(var(--brand-medium-blue))',
+					dark: 'hsl(var(--brand-dark))',
+					white: 'hsl(var(--brand-white))'
 				}
 			},
 			borderRadius: {
