@@ -22,13 +22,11 @@ const EducationForm: React.FC<EducationFormProps> = ({
   onRemove
 }) => {
   const degreeClassifications = [
-    { value: 'not-specified', label: 'Select classification (optional)' },
-    { value: 'first', label: 'First Class Honours (1st)' },
-    { value: 'upper-second', label: 'Upper Second Class Honours (2:1)' },
-    { value: 'lower-second', label: 'Lower Second Class Honours (2:2)' },
-    { value: 'third', label: 'Third Class Honours (3rd)' },
-    { value: 'pass', label: 'Pass' },
-    { value: 'not-applicable', label: 'Not applicable' }
+    { value: 'first', label: '1st' },
+    { value: 'upper-second', label: '2:1' },
+    { value: 'lower-second', label: '2:2' },
+    { value: 'third', label: '3rd' },
+    { value: 'pass', label: 'Pass' }
   ];
 
   return (
@@ -102,11 +100,11 @@ const EducationForm: React.FC<EducationFormProps> = ({
               <div>
                 <Label>Degree Classification</Label>
                 <Select
-                  value={edu.classification || 'not-specified'}
-                  onValueChange={(value) => onUpdate(edu.id, 'classification', value === 'not-specified' ? '' : value)}
+                  value={edu.classification || ''}
+                  onValueChange={(value) => onUpdate(edu.id, 'classification', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select classification" />
+                    <SelectValue placeholder="Optional" />
                   </SelectTrigger>
                   <SelectContent>
                     {degreeClassifications.map((classification) => (
@@ -116,9 +114,6 @@ const EducationForm: React.FC<EducationFormProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Include only 2:1 or higher classifications
-                </p>
               </div>
             </div>
           </div>

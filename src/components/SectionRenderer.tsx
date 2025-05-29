@@ -13,13 +13,13 @@ const SectionRenderer: React.FC<SectionRendererProps> = ({ sectionId, data, them
   const getClassificationDisplay = (classification: string) => {
     switch (classification) {
       case 'first':
-        return 'First Class Honours (1st)';
+        return '1st';
       case 'upper-second':
-        return 'Upper Second Class Honours (2:1)';
+        return '2:1';
       case 'lower-second':
-        return 'Lower Second Class Honours (2:2)';
+        return '2:2';
       case 'third':
-        return 'Third Class Honours (3rd)';
+        return '3rd';
       case 'pass':
         return 'Pass';
       default:
