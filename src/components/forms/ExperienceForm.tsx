@@ -98,9 +98,12 @@ const ExperienceForm: React.FC<ExperienceFormProps> = ({
               <Textarea
                 value={exp.description}
                 onChange={(e) => onUpdate(exp.id, 'description', e.target.value)}
-                placeholder="Describe your role, responsibilities, and achievements..."
+                placeholder="Describe your role, responsibilities, and achievements. You can use bullet points (•) or line breaks to format your content as desired."
                 className="min-h-[100px]"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Tip: Format your content however you like - use bullet points, paragraphs, or line breaks.
+              </p>
             </div>
           </div>
         ))}

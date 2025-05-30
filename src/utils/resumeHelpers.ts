@@ -15,13 +15,8 @@ export const formatDateRange = (startDate: string, endDate: string, current: boo
   return `${start} - ${end}`;
 };
 
-export const formatDescriptionAsBullets = (description: string) => {
-  if (!description) return [];
-  
-  const sentences = description
-    .split(/[.;]\s*|\n/)
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
-  
-  return sentences;
+export const preserveUserFormatting = (description: string) => {
+  if (!description) return '';
+  // Simply return the description as-is, preserving all user formatting
+  return description.trim();
 };

@@ -107,9 +107,12 @@ const VolunteerExperienceForm: React.FC<VolunteerExperienceFormProps> = ({
                   id={`vol-description-${volunteer.id}`}
                   value={volunteer.description}
                   onChange={(e) => onUpdate(volunteer.id, 'description', e.target.value)}
-                  placeholder="Describe your volunteer activities and achievements..."
+                  placeholder="Describe your volunteer activities and achievements. Format your content however you like - use bullet points, paragraphs, or line breaks."
                   rows={3}
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Tip: You have full control over formatting - the content will appear exactly as you type it.
+                </p>
               </div>
             </div>
           </div>

@@ -1,7 +1,8 @@
+
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { formatDateRange, formatDescriptionAsBullets } from '@/utils/resumeHelpers';
+import { formatDateRange, preserveUserFormatting } from '@/utils/resumeHelpers';
 
 interface ExperienceSectionProps {
   data: ResumeData;
@@ -28,14 +29,11 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, theme }) =>
               </div>
             </div>
             {exp.description && (
-              <ul className="mt-1 space-y-0.5">
-                {formatDescriptionAsBullets(exp.description).map((bullet, index) => (
-                  <li key={index} className="text-sm leading-normal flex items-start">
-                    <span className="mr-2 mt-1 w-1 h-1 bg-black rounded-full flex-shrink-0"></span>
-                    <span style={{ color: theme.text }}>{bullet}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-1">
+                <p className="text-sm leading-normal whitespace-pre-line" style={{ color: theme.text }}>
+                  {preserveUserFormatting(exp.description)}
+                </p>
+              </div>
             )}
           </div>
         ))}
