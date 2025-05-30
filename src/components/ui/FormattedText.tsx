@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface FormattedTextProps {
@@ -11,6 +12,11 @@ const FormattedText: React.FC<FormattedTextProps> = ({
   className = '',
   style = {} 
 }) => {
+  // Debug logging to understand content processing
+  console.log('FormattedText received content:', content);
+  console.log('Content type:', typeof content);
+  console.log('Content length:', content?.length);
+
   // Basic HTML sanitization - remove potentially dangerous tags
   const sanitizeHtml = (html: string): string => {
     const allowedTags = ['p', 'br', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li'];
@@ -52,11 +58,28 @@ const FormattedText: React.FC<FormattedTextProps> = ({
 
   // If content is empty or just whitespace, return null
   if (!content || content.trim() === '') {
+    console.log('FormattedText: Empty content, returning null');
     return null;
   }
 
+  // Improved HTML detection - check for common HTML patterns
+  const hasHtml = content.includes('<') && (
+    content.includes('<p>') || 
+    content.includes('<br>') || 
+    content.includes('<ul>') || 
+    content.includes('<ol>') || 
+    content.includes('<li>') || 
+    content.includes('<strong>') || 
+    content.includes('<b>') || 
+    content.includes('<em>') || 
+    content.includes('<i>')
+  );
+
+  console.log('FormattedText: Has HTML detected:', hasHtml);
+
   // If content has no HTML tags, treat as plain text
-  if (!content.includes('<')) {
+  if (!hasHtml) {
+    console.log('FormattedText: Rendering as plain text with line breaks');
     return (
       <div 
         className={className}
@@ -67,12 +90,16 @@ const FormattedText: React.FC<FormattedTextProps> = ({
     );
   }
 
+  console.log('FormattedText: Rendering as HTML');
+  const sanitizedContent = sanitizeHtml(content);
+  console.log('FormattedText: Sanitized content:', sanitizedContent);
+
   return (
     <div
       className={className}
       style={style}
       dangerouslySetInnerHTML={{ 
-        __html: sanitizeHtml(content) 
+        __html: sanitizedContent 
       }}
     />
   );

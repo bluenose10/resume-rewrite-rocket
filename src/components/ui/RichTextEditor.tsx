@@ -19,21 +19,40 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const execCommand = useCallback((command: string, value?: string) => {
     document.execCommand(command, false, value);
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      const newContent = editorRef.current.innerHTML;
+      console.log('RichTextEditor: Command executed:', command, 'New content:', newContent);
+      onChange(newContent);
     }
   }, [onChange]);
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      const newContent = editorRef.current.innerHTML;
+      console.log('RichTextEditor: Input changed, new content:', newContent);
+      onChange(newContent);
     }
   }, [onChange]);
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
+    console.log('RichTextEditor: Pasting text:', text);
     document.execCommand('insertText', false, text);
   }, []);
+
+  // Convert plain text to HTML if needed
+  const getDisplayValue = () => {
+    if (!value) return '';
+    
+    // If value doesn't contain HTML tags, convert line breaks to <br> tags
+    if (!value.includes('<')) {
+      console.log('RichTextEditor: Converting plain text to HTML');
+      return value.replace(/\n/g, '<br>');
+    }
+    
+    console.log('RichTextEditor: Using HTML value as-is');
+    return value;
+  };
 
   return (
     <div style={{ border: '1px solid #d1d5db', borderRadius: '6px', overflow: 'hidden' }}>
@@ -131,7 +150,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         contentEditable
         onInput={handleInput}
         onPaste={handlePaste}
-        dangerouslySetInnerHTML={{ __html: value || '' }}
+        dangerouslySetInnerHTML={{ __html: getDisplayValue() }}
         style={{
           minHeight,
           padding: '12px',
