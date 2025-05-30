@@ -1,11 +1,10 @@
-
 import { ExportOptions } from '@/types/export';
 import { QUALITY_SETTINGS } from './pdf/pdfConfig';
 import { addPageBreakStyles, removePageBreakStyles } from './pdf/pageBreakUtils';
 import { createAllPagesCanvas, generatePageCanvas } from './pdf/canvasUtils';
 import { createPDFDocument, addImageToPDF, addPDFMetadata } from './pdf/pdfUtils';
 
-export { ExportOptions } from '@/types/export';
+export type { ExportOptions } from '@/types/export';
 export { optimizeResumeForPrint } from './pdf/pageBreakUtils';
 
 export const generateEnhancedPDF = async (
