@@ -3,7 +3,8 @@ import React from 'react';
 import { ResumeData } from '@/types/resume';
 import ExportOptionsModal from './ExportOptionsModal';
 import SimpleResumePreview from './SimpleResumePreview';
-import { generateSimplePDF, ExportOptions } from '@/utils/simplePdfGenerator';
+import { generateSimplePDF } from '@/utils/simplePdfGenerator';
+import { ExportOptions } from '@/types/export';
 import { useToast } from '@/hooks/use-toast';
 
 interface ResumePreviewProps {
