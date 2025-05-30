@@ -1,5 +1,4 @@
 
-
 import React, { useRef, useCallback } from 'react';
 
 interface RichTextEditorProps {
@@ -20,8 +19,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const execCommand = useCallback((command: string, value?: string) => {
     document.execCommand(command, false, value);
     if (editorRef.current) {
-      const newContent = editorRef.current.innerHTML;
-      console.log('RichTextEditor: Command executed:', command, 'New content:', newContent);
+      let newContent = editorRef.current.innerHTML;
+      // Convert div tags to p tags for better compatibility
+      newContent = newContent.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
       onChange(newContent);
     }
   }, [onChange]);
@@ -29,11 +29,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handleInput = useCallback(() => {
     if (editorRef.current) {
       let newContent = editorRef.current.innerHTML;
-      
       // Convert div tags to p tags for better compatibility
       newContent = newContent.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
-      
-      console.log('RichTextEditor: Input changed, new content:', newContent);
       onChange(newContent);
     }
   }, [onChange]);
@@ -41,7 +38,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
-    console.log('RichTextEditor: Pasting text:', text);
     document.execCommand('insertText', false, text);
   }, []);
 
@@ -49,13 +45,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const getDisplayValue = () => {
     if (!value) return '';
     
-    // If value doesn't contain HTML tags, convert line breaks to <br> tags
+    // If value doesn't contain HTML tags, convert line breaks to <p> tags
     if (!value.includes('<')) {
-      console.log('RichTextEditor: Converting plain text to HTML');
-      return value.replace(/\n/g, '<br>');
+      // Split by double line breaks for paragraphs, single line breaks for <br>
+      const paragraphs = value.split('\n\n').filter(p => p.trim() !== '');
+      if (paragraphs.length > 1) {
+        return paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+      } else {
+        return `<p>${value.replace(/\n/g, '<br>')}</p>`;
+      }
     }
     
-    console.log('RichTextEditor: Using HTML value as-is');
     return value;
   };
 
@@ -181,4 +181,3 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 };
 
 export default RichTextEditor;
-
