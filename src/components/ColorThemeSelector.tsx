@@ -17,6 +17,9 @@ const ColorThemeSelector: React.FC<ColorThemeSelectorProps> = ({
   selectedTheme,
   onThemeChange
 }) => {
+  // Fallback to default theme if selectedTheme is undefined
+  const currentTheme = selectedTheme || DEFAULT_THEMES[1];
+
   const handlePresetThemeChange = (themeId: string) => {
     const theme = DEFAULT_THEMES.find(t => t.id === themeId);
     if (theme) {
@@ -28,7 +31,7 @@ const ColorThemeSelector: React.FC<ColorThemeSelectorProps> = ({
     if (colorType === 'id' || colorType === 'name') return;
     
     const customTheme: ColorTheme = {
-      ...selectedTheme,
+      ...currentTheme,
       id: 'custom',
       name: 'Custom',
       [colorType]: value
@@ -49,7 +52,7 @@ const ColorThemeSelector: React.FC<ColorThemeSelectorProps> = ({
         <div>
           <Label className="text-sm font-medium mb-3 block">Preset Themes</Label>
           <RadioGroup
-            value={selectedTheme.id}
+            value={currentTheme.id}
             onValueChange={handlePresetThemeChange}
             className="grid grid-cols-1 gap-3"
           >
@@ -88,12 +91,12 @@ const ColorThemeSelector: React.FC<ColorThemeSelectorProps> = ({
                 <Input
                   id="primary-color"
                   type="color"
-                  value={selectedTheme.primary}
+                  value={currentTheme.primary}
                   onChange={(e) => handleCustomColorChange('primary', e.target.value)}
                   className="w-12 h-10 p-1 border rounded"
                 />
                 <Input
-                  value={selectedTheme.primary}
+                  value={currentTheme.primary}
                   onChange={(e) => handleCustomColorChange('primary', e.target.value)}
                   placeholder="#1e40af"
                   className="flex-1"
@@ -107,12 +110,12 @@ const ColorThemeSelector: React.FC<ColorThemeSelectorProps> = ({
                 <Input
                   id="secondary-color"
                   type="color"
-                  value={selectedTheme.secondary}
+                  value={currentTheme.secondary}
                   onChange={(e) => handleCustomColorChange('secondary', e.target.value)}
                   className="w-12 h-10 p-1 border rounded"
                 />
                 <Input
-                  value={selectedTheme.secondary}
+                  value={currentTheme.secondary}
                   onChange={(e) => handleCustomColorChange('secondary', e.target.value)}
                   placeholder="#3b82f6"
                   className="flex-1"

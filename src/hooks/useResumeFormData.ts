@@ -38,13 +38,24 @@ export const useResumeFormData = ({ initialData, onDataChange }: UseResumeFormDa
     };
   };
 
-  const [resumeData, setResumeData] = useState<ResumeData>(getInitialResumeData());
+  const [resumeData, setResumeData] = useState<ResumeData>(() => {
+    const initial = getInitialResumeData();
+    // Ensure theme is always set
+    if (!initial.theme) {
+      initial.theme = DEFAULT_THEMES[1];
+    }
+    return initial;
+  });
   const [newSkill, setNewSkill] = useState('');
   const [newInterest, setNewInterest] = useState('');
 
   useEffect(() => {
     if (initialData) {
-      setResumeData(initialData);
+      const dataWithTheme = {
+        ...initialData,
+        theme: initialData.theme || DEFAULT_THEMES[1]
+      };
+      setResumeData(dataWithTheme);
     }
   }, [initialData]);
 
