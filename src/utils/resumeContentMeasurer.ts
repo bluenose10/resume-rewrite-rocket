@@ -29,24 +29,32 @@ export const measureResumeContent = async (
   const { createRoot } = await import('react-dom/client');
   const root = createRoot(measuringContainer);
 
-  // Render all content for measurement
-  const MeasuringContent = () => (
-    <div className="space-y-6" style={{ padding: `${PAGE_MARGIN}px` }}>
-      <div ref={(el) => el && el.setAttribute('data-section', 'header')}>
-        <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-      </div>
-      {visibleSections.map((sectionConfig) => {
-        if (hasSectionContent(sectionConfig.id, data)) {
-          return (
-            <div key={sectionConfig.id} ref={(el) => el && el.setAttribute('data-section', sectionConfig.id)}>
-              <SectionRenderer sectionId={sectionConfig.id} data={data} theme={theme} />
-            </div>
-          );
-        }
-        return null;
-      })}
-    </div>
-  );
+  // Render all content for measurement using React.createElement
+  const MeasuringContent = () => React.createElement('div', {
+    className: "space-y-6",
+    style: { padding: `${PAGE_MARGIN}px` }
+  }, [
+    React.createElement('div', {
+      key: 'header',
+      ref: (el: HTMLElement | null) => el && el.setAttribute('data-section', 'header')
+    }, React.createElement(PersonalInfoHeader, {
+      personalInfo: data.personalInfo,
+      theme: theme
+    })),
+    ...visibleSections.map((sectionConfig) => {
+      if (hasSectionContent(sectionConfig.id, data)) {
+        return React.createElement('div', {
+          key: sectionConfig.id,
+          ref: (el: HTMLElement | null) => el && el.setAttribute('data-section', sectionConfig.id)
+        }, React.createElement(SectionRenderer, {
+          sectionId: sectionConfig.id,
+          data: data,
+          theme: theme
+        }));
+      }
+      return null;
+    }).filter(Boolean)
+  ]);
 
   root.render(React.createElement(MeasuringContent));
 
