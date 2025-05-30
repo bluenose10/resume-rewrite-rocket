@@ -2,7 +2,6 @@
 import React from 'react';
 import { ResumeData } from '@/types/resume';
 import ExportOptionsModal from './ExportOptionsModal';
-import ResumeLengthIndicator from './ResumeLengthIndicator';
 import MultiPageResumePreview from './MultiPageResumePreview';
 import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
@@ -43,9 +42,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Resume Preview</h2>
         <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
-
-      {/* Resume Length Indicator */}
-      <ResumeLengthIndicator data={data} />
 
       {/* Multi-page resume preview */}
       <div id="resume-content">
