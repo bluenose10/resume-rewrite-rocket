@@ -57,7 +57,7 @@ const SimpleResumePreview: React.FC<SimpleResumePreviewProps> = ({ data }) => {
 
   return (
     <div className="resume-container">
-      <style jsx>{`
+      <style>{`
         @media print {
           .resume-container {
             width: 794px !important;
