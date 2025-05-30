@@ -8,7 +8,6 @@ import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import SectionLayoutManager from '@/components/SectionLayoutManager';
 import ResumeHelpModal from '@/components/help/ResumeHelpModal';
-import QuickHelpPanel from '@/components/help/QuickHelpPanel';
 import { ResumeData, SectionConfig } from '@/types/resume';
 
 interface ResumeBuilderProps {
@@ -52,7 +51,6 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             {/* Help buttons */}
             <div className="flex items-center gap-2">
               <div className="hidden sm:flex items-center gap-2">
-                <QuickHelpPanel />
                 <ResumeHelpModal />
               </div>
               
@@ -77,7 +75,6 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
           
           {/* Mobile help buttons */}
           <div className="sm:hidden flex items-center gap-2 mt-3">
-            <QuickHelpPanel />
             <ResumeHelpModal />
           </div>
         </div>
