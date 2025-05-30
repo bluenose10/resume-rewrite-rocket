@@ -57,6 +57,7 @@ export const useResumeFormData = ({ initialData, onDataChange }: UseResumeFormDa
     return initial;
   });
 
+  // Sync with external changes from initialData
   useEffect(() => {
     if (initialData) {
       const dataWithTheme = {

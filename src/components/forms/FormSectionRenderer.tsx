@@ -28,18 +28,24 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
 }) => {
   const isSectionVisible = (sectionId: string) => {
     const section = sectionConfig.find(s => s.id === sectionId);
+    console.log(`Section visibility check for ${sectionId}:`, section?.visible);
     return section ? section.visible : true;
   };
 
   const renderSection = (sectionId: string, component: React.ReactNode) => {
-    return isSectionVisible(sectionId) ? component : null;
+    const isVisible = isSectionVisible(sectionId);
+    console.log(`Rendering section ${sectionId}: ${isVisible ? 'visible' : 'hidden'}`);
+    return isVisible ? component : null;
   };
+
+  // Log the current section config for debugging
+  console.log('FormSectionRenderer - Current sectionConfig:', sectionConfig);
 
   return (
     <>
       {/* Personal Statement */}
       {renderSection('personalStatement', (
-        <Card>
+        <Card key="personalStatement">
           <CardHeader>
             <CardTitle>Personal Statement</CardTitle>
           </CardHeader>
@@ -60,7 +66,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
 
       {/* Summary */}
       {renderSection('summary', (
-        <Card>
+        <Card key="summary">
           <CardHeader>
             <CardTitle>Professional Summary</CardTitle>
           </CardHeader>
@@ -82,6 +88,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Experience */}
       {renderSection('experience', (
         <ExperienceForm
+          key="experience"
           experience={formData.resumeData.experience}
           onAdd={formData.addExperience}
           onUpdate={formData.updateExperience}
@@ -92,6 +99,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Education */}
       {renderSection('education', (
         <EducationForm
+          key="education"
           education={formData.resumeData.education}
           onAdd={formData.addEducation}
           onUpdate={formData.updateEducation}
@@ -102,6 +110,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Projects */}
       {renderSection('projects', (
         <ProjectsForm
+          key="projects"
           projects={formData.resumeData.projects}
           onAdd={formData.addProject}
           onUpdate={formData.updateProject}
@@ -111,7 +120,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
 
       {/* Skills */}
       {renderSection('skills', (
-        <Card>
+        <Card key="skills">
           <CardHeader>
             <CardTitle>Technical Skills</CardTitle>
           </CardHeader>
@@ -135,6 +144,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Achievements */}
       {renderSection('achievements', (
         <AchievementsForm
+          key="achievements"
           achievements={formData.resumeData.achievements}
           onAdd={formData.addAchievement}
           onUpdate={formData.updateAchievement}
@@ -145,6 +155,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Certifications */}
       {renderSection('certifications', (
         <CertificationsForm
+          key="certifications"
           certifications={formData.resumeData.certifications}
           onAdd={formData.addCertification}
           onUpdate={formData.updateCertification}
@@ -155,6 +166,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Languages */}
       {renderSection('languages', (
         <LanguagesForm
+          key="languages"
           languages={formData.resumeData.languages}
           onAdd={formData.addLanguage}
           onUpdate={formData.updateLanguage}
@@ -165,6 +177,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Volunteer Experience */}
       {renderSection('volunteerExperience', (
         <VolunteerExperienceForm
+          key="volunteerExperience"
           volunteerExperience={formData.resumeData.volunteerExperience}
           onAdd={formData.addVolunteerExperience}
           onUpdate={formData.updateVolunteerExperience}
@@ -175,6 +188,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* Publications */}
       {renderSection('publications', (
         <PublicationsForm
+          key="publications"
           publications={formData.resumeData.publications}
           onAdd={formData.addPublication}
           onUpdate={formData.updatePublication}
@@ -185,6 +199,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       {/* References */}
       {renderSection('references', (
         <ReferencesForm
+          key="references"
           references={formData.resumeData.references}
           onAdd={formData.addReference}
           onUpdate={formData.updateReference}
@@ -194,7 +209,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
 
       {/* Interests */}
       {renderSection('interests', (
-        <Card>
+        <Card key="interests">
           <CardHeader>
             <CardTitle>Interests & Hobbies</CardTitle>
           </CardHeader>

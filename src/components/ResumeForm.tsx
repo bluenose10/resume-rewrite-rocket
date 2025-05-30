@@ -26,6 +26,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
 }) => {
   const formData = useResumeFormData({ initialData, onDataChange });
 
+  // Use the sectionConfig from props (which comes from the parent's state)
+  // rather than the one from formData to ensure immediate updates
+  const currentSectionConfig = sectionConfig.length > 0 ? sectionConfig : formData.resumeData.sectionConfig || [];
+
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Color Theme Selection - Always visible */}
@@ -42,7 +46,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
 
       {/* Dynamic Sections based on visibility */}
       <FormSectionRenderer
-        sectionConfig={sectionConfig}
+        sectionConfig={currentSectionConfig}
         formData={formData}
       />
 
