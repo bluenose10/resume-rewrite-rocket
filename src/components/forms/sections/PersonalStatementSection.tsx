@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
 interface PersonalStatementSectionProps {
@@ -21,17 +21,13 @@ const PersonalStatementSection: React.FC<PersonalStatementSectionProps> = ({
       <CardContent>
         <div>
           <Label htmlFor="personal-statement">Personal Statement</Label>
-          <div className="mt-2">
-            <RichTextEditor
-              id="personal-statement"
-              value={value}
-              onChange={onChange}
-              placeholder="Write a compelling personal statement that highlights your passion and goals. Use bold, italic, bullet points, and paragraphs to format your content."
-            />
-          </div>
-          <p className="text-xs text-gray-500 mt-2">
-            Tip: Use the formatting toolbar to add bold text, italics, bullet points, and numbered lists.
-          </p>
+          <Textarea
+            id="personal-statement"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Write a compelling personal statement that highlights your passion and goals"
+            rows={4}
+          />
         </div>
       </CardContent>
     </Card>

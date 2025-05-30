@@ -2,8 +2,7 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { formatDateRange } from '@/utils/resumeHelpers';
-import { sanitizeHtml, isHtmlContent } from '@/utils/htmlUtils';
+import { formatDateRange, preserveUserFormatting } from '@/utils/resumeHelpers';
 
 interface VolunteerExperienceSectionProps {
   data: ResumeData;
@@ -11,26 +10,6 @@ interface VolunteerExperienceSectionProps {
 }
 
 const VolunteerExperienceSection: React.FC<VolunteerExperienceSectionProps> = ({ data, theme }) => {
-  const renderDescription = (description: string) => {
-    if (isHtmlContent(description)) {
-      return (
-        <div 
-          className="text-sm leading-normal resume-content mt-1" 
-          style={{ color: theme.text }}
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
-        />
-      );
-    }
-    
-    return (
-      <div className="mt-1">
-        <p className="text-sm leading-normal whitespace-pre-line" style={{ color: theme.text }}>
-          {description}
-        </p>
-      </div>
-    );
-  };
-
   return (
     <ResumeSection title="Volunteer Experience" theme={theme}>
       <div className="space-y-3">
@@ -49,7 +28,13 @@ const VolunteerExperienceSection: React.FC<VolunteerExperienceSectionProps> = ({
                 {formatDateRange(vol.startDate, vol.endDate, vol.current)}
               </div>
             </div>
-            {vol.description && renderDescription(vol.description)}
+            {vol.description && (
+              <div className="mt-1">
+                <p className="text-sm leading-normal whitespace-pre-line" style={{ color: theme.text }}>
+                  {preserveUserFormatting(vol.description)}
+                </p>
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import SectionTooltip from '@/components/help/SectionTooltip';
 
@@ -25,17 +25,13 @@ const SummarySection: React.FC<SummarySectionProps> = ({
       <CardContent>
         <div>
           <Label htmlFor="summary">Professional Summary</Label>
-          <div className="mt-2">
-            <RichTextEditor
-              id="summary"
-              value={value}
-              onChange={onChange}
-              placeholder="Example: 'Experienced Frontend Developer with 3+ years building React applications that improved user engagement by 40%. Specialized in creating responsive, accessible interfaces with TypeScript and modern CSS frameworks.'"
-            />
-          </div>
-          <p className="text-xs text-gray-500 mt-2">
-            Tip: Use formatting to highlight key achievements and skills.
-          </p>
+          <Textarea
+            id="summary"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Example: 'Experienced Frontend Developer with 3+ years building React applications that improved user engagement by 40%. Specialized in creating responsive, accessible interfaces with TypeScript and modern CSS frameworks.'"
+            rows={4}
+          />
         </div>
       </CardContent>
     </Card>
