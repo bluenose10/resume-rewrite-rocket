@@ -5,8 +5,8 @@ import { ResumeData } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 import PersonalInfoHeader from './PersonalInfoHeader';
 import SectionRenderer from './SectionRenderer';
-import { calculateOptimalPageBreaks } from '@/utils/pageBreakCalculator';
-import { useContentMeasurement } from '@/hooks/useContentMeasurement';
+import { calculateSmartPageBreaks } from '@/utils/smartPageBreakCalculator';
+import { useRealContentMeasurement } from '@/hooks/useRealContentMeasurement';
 
 interface MultiPageResumePreviewProps {
   data: ResumeData;
@@ -17,8 +17,10 @@ interface PageContent {
   sections: Array<{
     sectionId: string;
     items?: string[];
-    estimatedHeight: number;
-    canSplit: boolean;
+    height: number;
+    isPartial?: boolean;
+    startIndex?: number;
+    endIndex?: number;
   }>;
   totalHeight: number;
   hasHeader: boolean;
@@ -27,7 +29,6 @@ interface PageContent {
 const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data }) => {
   const theme = data.theme || DEFAULT_THEMES[0];
   const [pages, setPages] = useState<PageContent[]>([]);
-  const { measurements } = useContentMeasurement();
   const A4_HEIGHT_PX = 1123;
 
   const isVisible = (sectionId: string) => {
@@ -71,20 +72,54 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
     );
   };
 
+  const visibleSections = getVisibleSections();
+  const { measurements, isReady } = useRealContentMeasurement(data, visibleSections);
+
   useEffect(() => {
+    if (!isReady || measurements.size === 0) return;
+
     const calculatePages = () => {
-      const visibleSections = getVisibleSections();
-      const pageLayouts = calculateOptimalPageBreaks(data, visibleSections, measurements);
+      const pageLayouts = calculateSmartPageBreaks(data, visibleSections, measurements);
       setPages(pageLayouts);
     };
 
     calculatePages();
-  }, [data, measurements]);
+  }, [data, measurements, isReady, visibleSections]);
 
-  if (pages.length === 0) {
+  // Show loading state while measurements are being calculated
+  if (!isReady || pages.length === 0) {
     return (
-      <div className="text-center py-8">
-        <div className="text-gray-600">Loading resume preview...</div>
+      <div className="space-y-6">
+        <div className="text-center text-sm text-gray-600 mb-4">
+          Calculating optimal page layout...
+        </div>
+        
+        <Card className="shadow-lg border border-gray-200 bg-white">
+          <CardContent className="p-0">
+            <div 
+              className="bg-white text-gray-900 mx-auto relative resume-page animate-pulse"
+              style={{ 
+                width: '794px', 
+                minHeight: `${A4_HEIGHT_PX}px`,
+                maxWidth: '100%'
+              }}
+            >
+              <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
+              <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                    <div className="h-px bg-gray-200"></div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-gray-100 rounded w-full"></div>
+                      <div className="h-3 bg-gray-100 rounded w-4/5"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -92,7 +127,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
   return (
     <div className="space-y-6">
       <div className="text-center text-sm text-gray-600 mb-4">
-        Showing {pages.length} page{pages.length > 1 ? 's' : ''}
+        Showing {pages.length} page{pages.length > 1 ? 's' : ''} with smart content breaks
       </div>
       
       <div className="space-y-8">
@@ -121,7 +156,14 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
                       key={`${sectionData.sectionId}-${sectionIndex}`} 
                       className="resume-section"
                     >
-                      <SectionRenderer sectionId={sectionData.sectionId} data={data} theme={theme} />
+                      <SectionRenderer 
+                        sectionId={sectionData.sectionId} 
+                        data={data} 
+                        theme={theme}
+                        items={sectionData.items}
+                        startIndex={sectionData.startIndex}
+                        endIndex={sectionData.endIndex}
+                      />
                     </div>
                   ))}
                 </div>
