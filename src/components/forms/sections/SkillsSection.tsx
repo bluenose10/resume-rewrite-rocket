@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import SkillsForm from '../SkillsForm';
+import SkillsOnlyForm from '../SkillsOnlyForm';
 
 interface SkillsSectionProps {
   skills: string[];
@@ -19,25 +18,13 @@ const SkillsSection: React.FC<SkillsSectionProps> = ({
   onRemoveSkill
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Technical Skills</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <SkillsForm
-          skills={skills}
-          interests={[]}
-          newSkill={newSkill}
-          newInterest=""
-          onNewSkillChange={onNewSkillChange}
-          onNewInterestChange={() => {}}
-          onAddSkill={onAddSkill}
-          onAddInterest={() => {}}
-          onRemoveSkill={onRemoveSkill}
-          onRemoveInterest={() => {}}
-        />
-      </CardContent>
-    </Card>
+    <SkillsOnlyForm
+      skills={skills}
+      newSkill={newSkill}
+      onNewSkillChange={onNewSkillChange}
+      onAddSkill={onAddSkill}
+      onRemoveSkill={onRemoveSkill}
+    />
   );
 };
 

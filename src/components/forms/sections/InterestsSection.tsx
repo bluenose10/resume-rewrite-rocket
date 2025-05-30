@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import SkillsForm from '../SkillsForm';
+import InterestsForm from '../InterestsForm';
 
 interface InterestsSectionProps {
   interests: string[];
@@ -19,25 +18,13 @@ const InterestsSection: React.FC<InterestsSectionProps> = ({
   onRemoveInterest
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Interests & Hobbies</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <SkillsForm
-          skills={[]}
-          interests={interests}
-          newSkill=""
-          newInterest={newInterest}
-          onNewSkillChange={() => {}}
-          onNewInterestChange={onNewInterestChange}
-          onAddSkill={() => {}}
-          onAddInterest={onAddInterest}
-          onRemoveSkill={() => {}}
-          onRemoveInterest={onRemoveInterest}
-        />
-      </CardContent>
-    </Card>
+    <InterestsForm
+      interests={interests}
+      newInterest={newInterest}
+      onNewInterestChange={onNewInterestChange}
+      onAddInterest={onAddInterest}
+      onRemoveInterest={onRemoveInterest}
+    />
   );
 };
 
