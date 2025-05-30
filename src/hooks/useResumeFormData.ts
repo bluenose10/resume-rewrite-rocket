@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project, Achievement } from '@/types/resume';
+import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project, Achievement, Certification, Language, VolunteerExperience, Publication, Reference } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 
 interface UseResumeFormDataProps {
@@ -209,6 +208,140 @@ export const useResumeFormData = ({ initialData, onDataChange }: UseResumeFormDa
     updateData({ interests: resumeData.interests.filter((_, i) => i !== index) });
   };
 
+  // Certification functions
+  const addCertification = () => {
+    const newCertification: Certification = {
+      id: Date.now().toString(),
+      name: '',
+      issuer: '',
+      date: '',
+      expiryDate: '',
+      credentialId: ''
+    };
+    updateData({ certifications: [...resumeData.certifications, newCertification] });
+  };
+
+  const updateCertification = (id: string, field: keyof Certification, value: string) => {
+    updateData({
+      certifications: resumeData.certifications.map(cert => 
+        cert.id === id ? { ...cert, [field]: value } : cert
+      )
+    });
+  };
+
+  const removeCertification = (id: string) => {
+    updateData({
+      certifications: resumeData.certifications.filter(cert => cert.id !== id)
+    });
+  };
+
+  // Language functions
+  const addLanguage = () => {
+    const newLanguage: Language = {
+      id: Date.now().toString(),
+      language: '',
+      proficiency: 'Beginner'
+    };
+    updateData({ languages: [...resumeData.languages, newLanguage] });
+  };
+
+  const updateLanguage = (id: string, field: keyof Language, value: string) => {
+    updateData({
+      languages: resumeData.languages.map(lang => 
+        lang.id === id ? { ...lang, [field]: value } : lang
+      )
+    });
+  };
+
+  const removeLanguage = (id: string) => {
+    updateData({
+      languages: resumeData.languages.filter(lang => lang.id !== id)
+    });
+  };
+
+  // Volunteer Experience functions
+  const addVolunteerExperience = () => {
+    const newVolunteer: VolunteerExperience = {
+      id: Date.now().toString(),
+      organization: '',
+      role: '',
+      startDate: '',
+      endDate: '',
+      current: false,
+      description: ''
+    };
+    updateData({ volunteerExperience: [...resumeData.volunteerExperience, newVolunteer] });
+  };
+
+  const updateVolunteerExperience = (id: string, field: keyof VolunteerExperience, value: string | boolean) => {
+    updateData({
+      volunteerExperience: resumeData.volunteerExperience.map(vol => 
+        vol.id === id ? { ...vol, [field]: value } : vol
+      )
+    });
+  };
+
+  const removeVolunteerExperience = (id: string) => {
+    updateData({
+      volunteerExperience: resumeData.volunteerExperience.filter(vol => vol.id !== id)
+    });
+  };
+
+  // Publication functions
+  const addPublication = () => {
+    const newPublication: Publication = {
+      id: Date.now().toString(),
+      title: '',
+      authors: '',
+      publication: '',
+      date: '',
+      link: ''
+    };
+    updateData({ publications: [...resumeData.publications, newPublication] });
+  };
+
+  const updatePublication = (id: string, field: keyof Publication, value: string) => {
+    updateData({
+      publications: resumeData.publications.map(pub => 
+        pub.id === id ? { ...pub, [field]: value } : pub
+      )
+    });
+  };
+
+  const removePublication = (id: string) => {
+    updateData({
+      publications: resumeData.publications.filter(pub => pub.id !== id)
+    });
+  };
+
+  // Reference functions
+  const addReference = () => {
+    const newReference: Reference = {
+      id: Date.now().toString(),
+      name: '',
+      title: '',
+      company: '',
+      email: '',
+      phone: '',
+      relationship: ''
+    };
+    updateData({ references: [...resumeData.references, newReference] });
+  };
+
+  const updateReference = (id: string, field: keyof Reference, value: string) => {
+    updateData({
+      references: resumeData.references.map(ref => 
+        ref.id === id ? { ...ref, [field]: value } : ref
+      )
+    });
+  };
+
+  const removeReference = (id: string) => {
+    updateData({
+      references: resumeData.references.filter(ref => ref.id !== id)
+    });
+  };
+
   return {
     resumeData,
     newSkill,
@@ -234,6 +367,21 @@ export const useResumeFormData = ({ initialData, onDataChange }: UseResumeFormDa
     addSkill,
     removeSkill,
     addInterest,
-    removeInterest
+    removeInterest,
+    addCertification,
+    updateCertification,
+    removeCertification,
+    addLanguage,
+    updateLanguage,
+    removeLanguage,
+    addVolunteerExperience,
+    updateVolunteerExperience,
+    removeVolunteerExperience,
+    addPublication,
+    updatePublication,
+    removePublication,
+    addReference,
+    updateReference,
+    removeReference
   };
 };

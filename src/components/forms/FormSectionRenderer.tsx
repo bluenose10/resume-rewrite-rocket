@@ -7,7 +7,15 @@ import EducationForm from './EducationForm';
 import ProjectsForm from './ProjectsForm';
 import SkillsForm from './SkillsForm';
 import AchievementsForm from './AchievementsForm';
+import CertificationsForm from './CertificationsForm';
+import LanguagesForm from './LanguagesForm';
+import VolunteerExperienceForm from './VolunteerExperienceForm';
+import PublicationsForm from './PublicationsForm';
+import ReferencesForm from './ReferencesForm';
 import { useResumeFormData } from '@/hooks/useResumeFormData';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface FormSectionRendererProps {
   sectionConfig: SectionConfig[];
@@ -29,15 +37,47 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
 
   return (
     <>
-      {/* Personal Statement and Summary */}
-      {(isSectionVisible('personalStatement') || isSectionVisible('summary')) && (
-        <PersonalStatementForm
-          personalStatement={formData.resumeData.personalStatement}
-          summary={formData.resumeData.summary}
-          onPersonalStatementChange={formData.updatePersonalStatement}
-          onSummaryChange={formData.updateSummary}
-        />
-      )}
+      {/* Personal Statement */}
+      {renderSection('personalStatement', (
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Statement</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label htmlFor="personal-statement">Personal Statement</Label>
+              <Textarea
+                id="personal-statement"
+                value={formData.resumeData.personalStatement}
+                onChange={(e) => formData.updatePersonalStatement(e.target.value)}
+                placeholder="Write a compelling personal statement that highlights your passion and goals"
+                rows={4}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {/* Summary */}
+      {renderSection('summary', (
+        <Card>
+          <CardHeader>
+            <CardTitle>Professional Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label htmlFor="summary">Professional Summary</Label>
+              <Textarea
+                id="summary"
+                value={formData.resumeData.summary}
+                onChange={(e) => formData.updateSummary(e.target.value)}
+                placeholder="Write a brief summary of your professional background, key skills, and achievements"
+                rows={4}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
 
       {/* Experience */}
       {renderSection('experience', (
@@ -69,21 +109,28 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
         />
       ))}
 
-      {/* Skills and Interests */}
-      {(isSectionVisible('skills') || isSectionVisible('interests')) && (
-        <SkillsForm
-          skills={formData.resumeData.skills}
-          interests={formData.resumeData.interests}
-          newSkill={formData.newSkill}
-          newInterest={formData.newInterest}
-          onNewSkillChange={formData.setNewSkill}
-          onNewInterestChange={formData.setNewInterest}
-          onAddSkill={formData.addSkill}
-          onAddInterest={formData.addInterest}
-          onRemoveSkill={formData.removeSkill}
-          onRemoveInterest={formData.removeInterest}
-        />
-      )}
+      {/* Skills */}
+      {renderSection('skills', (
+        <Card>
+          <CardHeader>
+            <CardTitle>Technical Skills</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SkillsForm
+              skills={formData.resumeData.skills}
+              interests={[]}
+              newSkill={formData.newSkill}
+              newInterest=""
+              onNewSkillChange={formData.setNewSkill}
+              onNewInterestChange={() => {}}
+              onAddSkill={formData.addSkill}
+              onAddInterest={() => {}}
+              onRemoveSkill={formData.removeSkill}
+              onRemoveInterest={() => {}}
+            />
+          </CardContent>
+        </Card>
+      ))}
 
       {/* Achievements */}
       {renderSection('achievements', (
@@ -93,6 +140,79 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
           onUpdate={formData.updateAchievement}
           onRemove={formData.removeAchievement}
         />
+      ))}
+
+      {/* Certifications */}
+      {renderSection('certifications', (
+        <CertificationsForm
+          certifications={formData.resumeData.certifications}
+          onAdd={formData.addCertification}
+          onUpdate={formData.updateCertification}
+          onRemove={formData.removeCertification}
+        />
+      ))}
+
+      {/* Languages */}
+      {renderSection('languages', (
+        <LanguagesForm
+          languages={formData.resumeData.languages}
+          onAdd={formData.addLanguage}
+          onUpdate={formData.updateLanguage}
+          onRemove={formData.removeLanguage}
+        />
+      ))}
+
+      {/* Volunteer Experience */}
+      {renderSection('volunteerExperience', (
+        <VolunteerExperienceForm
+          volunteerExperience={formData.resumeData.volunteerExperience}
+          onAdd={formData.addVolunteerExperience}
+          onUpdate={formData.updateVolunteerExperience}
+          onRemove={formData.removeVolunteerExperience}
+        />
+      ))}
+
+      {/* Publications */}
+      {renderSection('publications', (
+        <PublicationsForm
+          publications={formData.resumeData.publications}
+          onAdd={formData.addPublication}
+          onUpdate={formData.updatePublication}
+          onRemove={formData.removePublication}
+        />
+      ))}
+
+      {/* References */}
+      {renderSection('references', (
+        <ReferencesForm
+          references={formData.resumeData.references}
+          onAdd={formData.addReference}
+          onUpdate={formData.updateReference}
+          onRemove={formData.removeReference}
+        />
+      ))}
+
+      {/* Interests */}
+      {renderSection('interests', (
+        <Card>
+          <CardHeader>
+            <CardTitle>Interests & Hobbies</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SkillsForm
+              skills={[]}
+              interests={formData.resumeData.interests}
+              newSkill=""
+              newInterest={formData.newInterest}
+              onNewSkillChange={() => {}}
+              onNewInterestChange={formData.setNewInterest}
+              onAddSkill={() => {}}
+              onAddInterest={formData.addInterest}
+              onRemoveSkill={() => {}}
+              onRemoveInterest={formData.removeInterest}
+            />
+          </CardContent>
+        </Card>
       ))}
     </>
   );
