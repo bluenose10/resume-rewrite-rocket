@@ -78,6 +78,7 @@ You are a professional resume optimization expert. Please optimize the following
 4. Use industry-standard keywords
 5. Ensure ATS compatibility
 6. Maintain professional tone
+7. Return descriptions as formatted strings with bullet points using "• " prefix
 
 Here's the resume data to optimize:
 
@@ -98,17 +99,19 @@ Technologies: ${proj.technologies}
 Description: ${proj.description}
 `).join('\n')}
 
+IMPORTANT: For experience and project descriptions, format them as single strings with bullet points using "• " at the start of each line. Do NOT return arrays.
+
 Please return the optimized content in the following JSON format:
 {
-  "summary": "optimized professional summary",
+  "summary": "optimized professional summary as a single paragraph",
   "experience": [
     {
-      "description": "optimized experience description"
+      "description": "• First achievement or responsibility\n• Second achievement with metrics\n• Third accomplishment with impact"
     }
   ],
   "projects": [
     {
-      "description": "optimized project description"
+      "description": "• Project outcome or achievement\n• Technical implementation details\n• Impact or results achieved"
     }
   ]
 }
@@ -129,7 +132,7 @@ Only return the JSON response, no additional text.
         messages: [
           {
             role: 'system',
-            content: 'You are a professional resume optimization expert. Always respond with valid JSON only.'
+            content: 'You are a professional resume optimization expert. Always respond with valid JSON only. Format descriptions as single strings with bullet points using "• " prefix, not as arrays.'
           },
           {
             role: 'user',
@@ -161,6 +164,31 @@ Only return the JSON response, no additional text.
 
     try {
       const optimizedContent: OptimizeResponse = JSON.parse(content);
+      
+      // Validate that descriptions are strings, not arrays
+      if (optimizedContent.experience) {
+        optimizedContent.experience.forEach((exp, index) => {
+          if (Array.isArray(exp.description)) {
+            console.warn(`Converting array description to string for experience ${index}`);
+            exp.description = exp.description.join('\n• ');
+            if (!exp.description.startsWith('• ')) {
+              exp.description = '• ' + exp.description;
+            }
+          }
+        });
+      }
+      
+      if (optimizedContent.projects) {
+        optimizedContent.projects.forEach((proj, index) => {
+          if (Array.isArray(proj.description)) {
+            console.warn(`Converting array description to string for project ${index}`);
+            proj.description = proj.description.join('\n• ');
+            if (!proj.description.startsWith('• ')) {
+              proj.description = '• ' + proj.description;
+            }
+          }
+        });
+      }
       
       return new Response(JSON.stringify(optimizedContent), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
