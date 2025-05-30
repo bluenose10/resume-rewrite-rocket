@@ -10,17 +10,17 @@ interface ResumeSectionProps {
 
 const ResumeSection: React.FC<ResumeSectionProps> = ({ title, theme, children }) => {
   return (
-    <section className="mb-5">
+    <section className="mb-6 resume-section">
       {/* Section title - ALL CAPS, small size, with clean line */}
-      <div className="mb-3">
-        <h2 className="text-sm font-bold uppercase tracking-wide mb-1" style={{ color: theme.primary }}>
+      <div className="mb-4">
+        <h2 className="text-sm font-bold uppercase tracking-wide mb-2" style={{ color: theme.primary }}>
           {title}
         </h2>
         <div className="w-full h-px bg-gray-300"></div>
       </div>
       
-      {/* Content */}
-      <div>
+      {/* Content with better spacing */}
+      <div className="space-y-3">
         {children}
       </div>
     </section>

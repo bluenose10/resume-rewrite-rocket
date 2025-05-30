@@ -7,7 +7,7 @@ import ExportOptionsModal from './ExportOptionsModal';
 import PersonalInfoHeader from './PersonalInfoHeader';
 import SectionRenderer from './SectionRenderer';
 import ResumeLengthIndicator from './ResumeLengthIndicator';
-import PageBreakIndicator from './PageBreakIndicator';
+import SmartPageBreakIndicator from './SmartPageBreakIndicator';
 import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
 
@@ -70,11 +70,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
     if (!isVisible(sectionId) || !hasContent(sectionId)) return null;
     
     return (
-      <React.Fragment key={sectionId}>
+      <div key={sectionId} className="resume-section">
         <SectionRenderer sectionId={sectionId} data={data} theme={theme} />
-        {/* Add page break indicator after certain sections to help users visualize page breaks */}
-        {(index === 2 || index === 5) && <PageBreakIndicator />}
-      </React.Fragment>
+      </div>
     );
   };
 
@@ -104,9 +102,12 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         <CardContent className="p-0" id="resume-content">
           <div className="max-w-4xl mx-auto bg-white text-gray-900">
             <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-            <div className="px-4 sm:px-6 lg:px-8 py-4">
+            <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
               {getSectionOrder().map((sectionId, index) => renderSection(sectionId, index))}
             </div>
+            
+            {/* Smart page break indicator that calculates actual content height */}
+            <SmartPageBreakIndicator />
           </div>
         </CardContent>
       </Card>
