@@ -2,6 +2,7 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
+import FormattedText from '@/components/ui/FormattedText';
 
 interface SummarySectionProps {
   data: ResumeData;
@@ -11,9 +12,11 @@ interface SummarySectionProps {
 const SummarySection: React.FC<SummarySectionProps> = ({ data, theme }) => {
   return (
     <ResumeSection title="Professional Summary" theme={theme}>
-      <p className="text-sm leading-normal" style={{ color: theme.text }}>
-        {data.summary}
-      </p>
+      <FormattedText 
+        content={data.summary}
+        className="text-sm leading-normal"
+        style={{ color: theme.text }}
+      />
     </ResumeSection>
   );
 };

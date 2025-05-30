@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 interface PersonalStatementFormProps {
   personalStatement: string;
@@ -26,13 +26,14 @@ const PersonalStatementForm: React.FC<PersonalStatementFormProps> = ({
         <CardContent>
           <div>
             <Label htmlFor="personal-statement">Personal Statement</Label>
-            <Textarea
-              id="personal-statement"
-              value={personalStatement}
-              onChange={(e) => onPersonalStatementChange(e.target.value)}
-              placeholder="Write a compelling personal statement that highlights your passion and goals"
-              rows={4}
-            />
+            <div className="mt-2">
+              <RichTextEditor
+                value={personalStatement}
+                onChange={onPersonalStatementChange}
+                placeholder="Write a compelling personal statement that highlights your passion and goals. Use the toolbar to format with bullet points, bold text, and paragraphs."
+                minHeight="120px"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -44,13 +45,14 @@ const PersonalStatementForm: React.FC<PersonalStatementFormProps> = ({
         <CardContent>
           <div>
             <Label htmlFor="summary">Professional Summary</Label>
-            <Textarea
-              id="summary"
-              value={summary}
-              onChange={(e) => onSummaryChange(e.target.value)}
-              placeholder="Write a brief summary of your professional background, key skills, and achievements"
-              rows={4}
-            />
+            <div className="mt-2">
+              <RichTextEditor
+                value={summary}
+                onChange={onSummaryChange}
+                placeholder="Write a brief summary of your professional background, key skills, and achievements. Format with bullet points and emphasis as needed."
+                minHeight="120px"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

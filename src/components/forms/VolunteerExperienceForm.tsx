@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, Plus } from 'lucide-react';
 import { VolunteerExperience } from '@/types/resume';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 interface VolunteerExperienceFormProps {
   volunteerExperience: VolunteerExperience[];
@@ -103,15 +103,16 @@ const VolunteerExperienceForm: React.FC<VolunteerExperienceFormProps> = ({
               
               <div className="md:col-span-2">
                 <Label htmlFor={`vol-description-${volunteer.id}`}>Description</Label>
-                <Textarea
-                  id={`vol-description-${volunteer.id}`}
-                  value={volunteer.description}
-                  onChange={(e) => onUpdate(volunteer.id, 'description', e.target.value)}
-                  placeholder="Describe your volunteer activities and achievements. Format your content however you like - use bullet points, paragraphs, or line breaks."
-                  rows={3}
-                />
+                <div className="mt-2">
+                  <RichTextEditor
+                    value={volunteer.description}
+                    onChange={(value) => onUpdate(volunteer.id, 'description', value)}
+                    placeholder="Describe your volunteer activities and achievements. Use formatting to highlight your impact and responsibilities."
+                    minHeight="100px"
+                  />
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Tip: You have full control over formatting - the content will appear exactly as you type it.
+                  Tip: Use the formatting toolbar to organize your content with bullet points and emphasis.
                 </p>
               </div>
             </div>

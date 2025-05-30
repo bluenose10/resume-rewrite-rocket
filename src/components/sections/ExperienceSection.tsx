@@ -2,7 +2,8 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { formatDateRange, preserveUserFormatting } from '@/utils/resumeHelpers';
+import { formatDateRange } from '@/utils/resumeHelpers';
+import FormattedText from '@/components/ui/FormattedText';
 
 interface ExperienceSectionProps {
   data: ResumeData;
@@ -30,9 +31,11 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, theme }) =>
             </div>
             {exp.description && (
               <div className="mt-1">
-                <p className="text-sm leading-normal whitespace-pre-line" style={{ color: theme.text }}>
-                  {preserveUserFormatting(exp.description)}
-                </p>
+                <FormattedText 
+                  content={exp.description}
+                  className="text-sm leading-normal"
+                  style={{ color: theme.text }}
+                />
               </div>
             )}
           </div>

@@ -2,6 +2,7 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
+import FormattedText from '@/components/ui/FormattedText';
 
 interface ProjectsSectionProps {
   data: ResumeData;
@@ -31,9 +32,13 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
               )}
             </div>
             {project.description && (
-              <p className="text-sm leading-normal mb-1" style={{ color: theme.text }}>
-                {project.description}
-              </p>
+              <div className="mb-1">
+                <FormattedText 
+                  content={project.description}
+                  className="text-sm leading-normal"
+                  style={{ color: theme.text }}
+                />
+              </div>
             )}
             {project.technologies && (
               <p className="text-sm" style={{ color: theme.text }}>
