@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2 } from 'lucide-react';
 import { Experience } from '@/types/resume';
-import RichTextEditor from '@/components/ui/RichTextEditor';
 
 interface ExperienceFormProps {
   experience: Experience[];
@@ -96,15 +96,15 @@ const ExperienceForm: React.FC<ExperienceFormProps> = ({
             <div>
               <Label>Description</Label>
               <div className="mt-2">
-                <RichTextEditor
+                <Textarea
                   value={exp.description}
-                  onChange={(value) => onUpdate(exp.id, 'description', value)}
+                  onChange={(e) => onUpdate(exp.id, 'description', e.target.value)}
                   placeholder="Describe your role, responsibilities, and achievements. Use bullet points and formatting to make your experience stand out."
-                  minHeight="120px"
+                  className="min-h-[120px] resize-y"
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Tip: Use the formatting toolbar to create bullet points, bold text, and organized content.
+                Tip: Use line breaks and bullet points (•) to organize your content clearly.
               </p>
             </div>
           </div>
