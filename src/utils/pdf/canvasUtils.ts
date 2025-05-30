@@ -17,7 +17,7 @@ export const createAllPagesCanvas = async (
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
   for (let i = 0; i < pageCards.length; i++) {
-    const pageContent = pageCards[i].querySelector('[style*="width: 794px"]') as HTMLElement;
+    const pageContent = pageCards[i].querySelector('.resume-page') as HTMLElement;
     if (pageContent) {
       const pageCanvas = await html2canvas(pageContent, {
         scale: qualitySettings.scale,
@@ -25,7 +25,14 @@ export const createAllPagesCanvas = async (
         allowTaint: true,
         backgroundColor: '#ffffff',
         width: 794,
-        height: 1123
+        height: 1123,
+        scrollX: 0,
+        scrollY: 0,
+        ignoreElements: (element) => {
+          return element.classList.contains('no-print') || 
+                 element.classList.contains('absolute') ||
+                 element.tagName === 'BUTTON';
+        }
       });
       
       ctx.drawImage(pageCanvas, 0, i * 1123 * qualitySettings.scale);
@@ -50,6 +57,11 @@ export const generatePageCanvas = async (
     scrollY: 0,
     removeContainer: false,
     imageTimeout: 15000,
-    logging: false
+    logging: false,
+    ignoreElements: (element) => {
+      return element.classList.contains('no-print') || 
+             element.classList.contains('absolute') ||
+             element.tagName === 'BUTTON';
+    }
   });
 };

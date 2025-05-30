@@ -5,6 +5,8 @@ import { ResumeData } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 import PersonalInfoHeader from './PersonalInfoHeader';
 import SectionRenderer from './SectionRenderer';
+import { calculateOptimalPageBreaks } from '@/utils/pageBreakCalculator';
+import { useContentMeasurement } from '@/hooks/useContentMeasurement';
 
 interface MultiPageResumePreviewProps {
   data: ResumeData;
@@ -12,16 +14,22 @@ interface MultiPageResumePreviewProps {
 
 interface PageContent {
   pageNumber: number;
-  sections: string[];
-  height: number;
+  sections: Array<{
+    sectionId: string;
+    items?: string[];
+    estimatedHeight: number;
+    canSplit: boolean;
+  }>;
+  totalHeight: number;
+  hasHeader: boolean;
 }
 
 const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data }) => {
   const theme = data.theme || DEFAULT_THEMES[0];
   const [pages, setPages] = useState<PageContent[]>([]);
-  const A4_HEIGHT_PX = 1123; // A4 height in pixels at 96 DPI
-  const PAGE_PADDING = 40; // Padding for each page
-  const USABLE_HEIGHT = A4_HEIGHT_PX - (PAGE_PADDING * 2);
+  const { measureContent, measurements } = useContentMeasurement();
+  const A4_HEIGHT_PX = 1123;
+  const PAGE_PADDING = 40;
 
   const isVisible = (sectionId: string) => {
     const sectionConfig = data.sectionConfig?.find(s => s.id === sectionId);
@@ -66,123 +74,110 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
 
   useEffect(() => {
     const calculatePages = () => {
-      const sections = getVisibleSections();
-      const newPages: PageContent[] = [];
-      let currentPage: PageContent = { pageNumber: 1, sections: [], height: 180 }; // Start with header height
-      
-      // Add header to first page
-      sections.forEach((sectionId, index) => {
-        const estimatedSectionHeight = estimateSectionHeight(sectionId);
-        
-        // Check if section fits on current page (with some buffer)
-        if (currentPage.height + estimatedSectionHeight + 50 > USABLE_HEIGHT && currentPage.sections.length > 0) {
-          // Start new page
-          newPages.push(currentPage);
-          currentPage = { 
-            pageNumber: newPages.length + 1, 
-            sections: [sectionId], 
-            height: estimatedSectionHeight + 20 
-          };
-        } else {
-          // Add to current page
-          currentPage.sections.push(sectionId);
-          currentPage.height += estimatedSectionHeight + 20;
-        }
-      });
-      
-      // Add the last page if it has content
-      if (currentPage.sections.length > 0) {
-        newPages.push(currentPage);
-      }
-      
-      setPages(newPages);
+      const visibleSections = getVisibleSections();
+      const pageLayouts = calculateOptimalPageBreaks(data, visibleSections, measurements);
+      setPages(pageLayouts);
     };
 
     calculatePages();
-  }, [data]);
+  }, [data, measurements]);
 
-  const estimateSectionHeight = (sectionId: string): number => {
-    // Estimate section heights based on content
-    const baseHeight = 80; // Title + spacing
-    
-    switch (sectionId) {
-      case 'personalStatement':
-      case 'summary':
-        return baseHeight + 60; // Text content
-      case 'experience':
-        return baseHeight + (data.experience?.length || 0) * 120;
-      case 'projects':
-        return baseHeight + (data.projects?.length || 0) * 100;
-      case 'education':
-        return baseHeight + (data.education?.length || 0) * 80;
-      case 'skills':
-        return baseHeight + 60;
-      case 'achievements':
-        return baseHeight + (data.achievements?.length || 0) * 40;
-      case 'certifications':
-        return baseHeight + (data.certifications?.length || 0) * 60;
-      case 'languages':
-        return baseHeight + (data.languages?.length || 0) * 30;
-      case 'volunteerExperience':
-        return baseHeight + (data.volunteerExperience?.length || 0) * 100;
-      case 'publications':
-        return baseHeight + (data.publications?.length || 0) * 80;
-      case 'references':
-        return baseHeight + (data.references?.length || 0) * 120;
-      case 'interests':
-        return baseHeight + 60;
-      default:
-        return baseHeight;
+  const renderSectionWithItems = (sectionId: string, items?: string[]) => {
+    if (!items) {
+      return <SectionRenderer sectionId={sectionId} data={data} theme={theme} />;
     }
+
+    // Create filtered data for partial section rendering
+    const filteredData = { ...data };
+    const itemIndices = items.map(item => parseInt(item));
+
+    switch (sectionId) {
+      case 'experience':
+        filteredData.experience = data.experience?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'projects':
+        filteredData.projects = data.projects?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'education':
+        filteredData.education = data.education?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'volunteerExperience':
+        filteredData.volunteerExperience = data.volunteerExperience?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'achievements':
+        filteredData.achievements = data.achievements?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'certifications':
+        filteredData.certifications = data.certifications?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'publications':
+        filteredData.publications = data.publications?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+      case 'references':
+        filteredData.references = data.references?.filter((_, index) => itemIndices.includes(index)) || [];
+        break;
+    }
+
+    return <SectionRenderer sectionId={sectionId} data={filteredData} theme={theme} />;
   };
 
   if (pages.length === 0) {
-    return <div className="text-center py-8">Loading preview...</div>;
+    return <div className="text-center py-8">Calculating optimal page layout...</div>;
   }
 
   return (
     <div className="space-y-6">
       {/* Page counter */}
       <div className="text-center text-sm text-gray-600 mb-4">
-        Showing {pages.length} page{pages.length > 1 ? 's' : ''}
+        Showing {pages.length} page{pages.length > 1 ? 's' : ''} - Optimized for printing
       </div>
       
       {/* Render each page */}
       <div className="space-y-8">
         {pages.map((page, pageIndex) => (
-          <Card key={page.pageNumber} className="shadow-lg border border-gray-200 bg-white relative">
+          <Card key={page.pageNumber} className="shadow-lg border border-gray-200 bg-white relative page-break-after">
             <CardContent className="p-0">
               {/* Page number indicator */}
               <div className="absolute -top-6 right-0 text-xs text-gray-500 bg-white px-2 py-1 rounded border">
                 Page {page.pageNumber} of {pages.length}
               </div>
               
-              {/* A4-sized page container */}
+              {/* A4-sized page container with improved CSS */}
               <div 
-                className="bg-white text-gray-900 mx-auto relative"
+                className="bg-white text-gray-900 mx-auto relative resume-page"
                 style={{ 
                   width: '794px', 
                   minHeight: `${A4_HEIGHT_PX}px`,
-                  maxWidth: '100%'
+                  maxWidth: '100%',
+                  pageBreakAfter: pageIndex < pages.length - 1 ? 'always' : 'auto',
+                  pageBreakInside: 'avoid'
                 }}
               >
                 {/* Header only on first page */}
-                {pageIndex === 0 && (
+                {page.hasHeader && (
                   <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
                 )}
                 
-                {/* Page content */}
+                {/* Page content with better spacing */}
                 <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-                  {page.sections.map((sectionId) => (
-                    <div key={sectionId} className="resume-section">
-                      <SectionRenderer sectionId={sectionId} data={data} theme={theme} />
+                  {page.sections.map((sectionData, sectionIndex) => (
+                    <div 
+                      key={`${sectionData.sectionId}-${sectionIndex}`} 
+                      className="resume-section page-break-inside-avoid"
+                      style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
+                    >
+                      {renderSectionWithItems(sectionData.sectionId, sectionData.items)}
                     </div>
                   ))}
                 </div>
                 
-                {/* Page break line (except for last page) */}
+                {/* Page break indicator (except for last page) */}
                 {pageIndex < pages.length - 1 && (
-                  <div className="absolute bottom-0 left-0 right-0 border-b-2 border-dashed border-blue-300"></div>
+                  <div className="absolute bottom-0 left-0 right-0 border-b-2 border-dashed border-blue-300 no-print">
+                    <div className="text-center text-xs text-blue-500 bg-white px-2 -mb-2 mx-auto w-20">
+                      Page Break
+                    </div>
+                  </div>
                 )}
               </div>
             </CardContent>

@@ -4,25 +4,57 @@ export const addPageBreakStyles = (): HTMLElement => {
   style.id = 'page-break-styles';
   style.textContent = `
     .resume-section {
-      page-break-inside: avoid;
-      break-inside: avoid;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
       margin-bottom: 24px;
     }
     
     .resume-item {
-      page-break-inside: avoid;
-      break-inside: avoid;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
       margin-bottom: 16px;
     }
     
     .page-break-before {
-      page-break-before: always;
-      break-before: page;
+      page-break-before: always !important;
+      break-before: page !important;
+    }
+    
+    .page-break-after {
+      page-break-after: always !important;
+      break-after: page !important;
+    }
+    
+    .page-break-inside-avoid {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     
     .no-page-break {
-      page-break-inside: avoid;
-      break-inside: avoid;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    
+    .resume-page {
+      page-break-after: always !important;
+      break-after: page !important;
+    }
+    
+    .resume-page:last-child {
+      page-break-after: auto !important;
+      break-after: auto !important;
+    }
+    
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      .resume-page {
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
   `;
   
