@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,6 +7,8 @@ import { Menu, Eye, Edit3 } from 'lucide-react';
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import SectionLayoutManager from '@/components/SectionLayoutManager';
+import ResumeHelpModal from '@/components/help/ResumeHelpModal';
+import QuickHelpPanel from '@/components/help/QuickHelpPanel';
 import { ResumeData, SectionConfig } from '@/types/resume';
 
 interface ResumeBuilderProps {
@@ -46,22 +49,36 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
               ← Back to Home
             </Button>
             
-            {/* Mobile Preview Toggle */}
-            <div className="lg:hidden">
-              <Sheet open={showPreview} onOpenChange={setShowPreview}>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-2" />
-                    Preview
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-full sm:w-[90vw] p-0">
-                  <div className="h-full overflow-y-auto p-4">
-                    <ResumePreview data={resumeData} />
-                  </div>
-                </SheetContent>
-              </Sheet>
+            {/* Help buttons */}
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
+                <QuickHelpPanel />
+                <ResumeHelpModal />
+              </div>
+              
+              {/* Mobile Preview Toggle */}
+              <div className="lg:hidden">
+                <Sheet open={showPreview} onOpenChange={setShowPreview}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Preview
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-full sm:w-[90vw] p-0">
+                    <div className="h-full overflow-y-auto p-4">
+                      <ResumePreview data={resumeData} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
             </div>
+          </div>
+          
+          {/* Mobile help buttons */}
+          <div className="sm:hidden flex items-center gap-2 mt-3">
+            <QuickHelpPanel />
+            <ResumeHelpModal />
           </div>
         </div>
 
