@@ -30,6 +30,13 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    
+    /* Brand colors */
+    --brand-cyan: 189 100% 50%;
+    --brand-dark-navy: 210 100% 8%;
+    --brand-medium-blue: 217 91% 60%;
+    --brand-dark: 0 0% 7%;
+    --brand-white: 0 0% 100%;
   }
 
   .dark {
@@ -67,6 +74,41 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Hero gradient background */
+.hero-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--brand-dark-navy)) 0%, 
+    hsl(var(--brand-medium-blue)) 50%, 
+    hsl(var(--brand-dark-navy)) 100%);
+}
+
+/* Text glow effects */
+.text-glow {
+  text-shadow: 0 0 10px hsl(var(--brand-cyan) / 0.5), 
+               0 0 20px hsl(var(--brand-cyan) / 0.3),
+               0 0 30px hsl(var(--brand-cyan) / 0.2);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 10px hsl(var(--brand-cyan) / 0.3),
+              0 0 20px hsl(var(--brand-cyan) / 0.2),
+              0 0 30px hsl(var(--brand-cyan) / 0.1);
+}
+
+/* Floating animation for background particles */
+@keyframes floating {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.floating-particle {
+  animation: floating 6s ease-in-out infinite;
 }
 
 /* Rich text editor styles for resume content */
