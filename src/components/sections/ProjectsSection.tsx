@@ -2,7 +2,6 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import FormattedText from '@/components/ui/FormattedText';
 
 interface ProjectsSectionProps {
   data: ResumeData;
@@ -14,7 +13,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
     <ResumeSection title="Projects" theme={theme}>
       <div className="space-y-3">
         {data.projects.map((project) => (
-          <div key={project.id}>
+          <div key={project.id} className="section-item">
             <div className="flex justify-between items-start mb-1">
               <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
                 {project.name}
@@ -22,8 +21,8 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
               {project.link && (
                 <a 
                   href={project.link} 
-                  className="text-sm hover:underline"
-                  style={{ color: theme.text }}
+                  className="text-sm underline"
+                  style={{ color: theme.primary }}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -31,15 +30,13 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
                 </a>
               )}
             </div>
+            
             {project.description && (
-              <div className="mb-1">
-                <FormattedText 
-                  content={project.description}
-                  className="text-sm leading-normal"
-                  style={{ color: theme.text }}
-                />
-              </div>
+              <p className="text-sm leading-normal mb-2" style={{ color: theme.text }}>
+                {project.description}
+              </p>
             )}
+            
             {project.technologies && (
               <p className="text-sm" style={{ color: theme.text }}>
                 <span className="font-medium">Technologies:</span> {project.technologies}

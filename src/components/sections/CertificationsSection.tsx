@@ -14,29 +14,31 @@ const CertificationsSection: React.FC<CertificationsSectionProps> = ({ data, the
     <ResumeSection title="Certifications & Licenses" theme={theme}>
       <div className="space-y-2">
         {data.certifications.map((cert) => (
-          <div key={cert.id} className="flex justify-between items-start">
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
-                {cert.name}
-              </h3>
-              <p className="text-sm" style={{ color: theme.text }}>
-                {cert.issuer}
-              </p>
-              {cert.credentialId && (
+          <div key={cert.id} className="section-item">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
+                  {cert.name}
+                </h3>
                 <p className="text-sm" style={{ color: theme.text }}>
-                  Credential ID: {cert.credentialId}
+                  {cert.issuer}
                 </p>
-              )}
-            </div>
-            <div className="text-sm text-right">
-              <div style={{ color: theme.text }}>
-                {formatDate(cert.date)}
+                {cert.credentialId && (
+                  <p className="text-sm" style={{ color: theme.text }}>
+                    Credential ID: {cert.credentialId}
+                  </p>
+                )}
               </div>
-              {cert.expiryDate && (
+              <div className="text-sm text-right">
                 <div style={{ color: theme.text }}>
-                  Expires: {formatDate(cert.expiryDate)}
+                  {formatDate(cert.date)}
                 </div>
-              )}
+                {cert.expiryDate && (
+                  <div style={{ color: theme.text }}>
+                    Expires: {formatDate(cert.expiryDate)}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}

@@ -2,8 +2,7 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { formatDateRange } from '@/utils/resumeHelpers';
-import FormattedText from '@/components/ui/FormattedText';
+import { formatDateRange, preserveUserFormatting } from '@/utils/resumeHelpers';
 
 interface ExperienceSectionProps {
   data: ResumeData;
@@ -12,16 +11,16 @@ interface ExperienceSectionProps {
 
 const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, theme }) => {
   return (
-    <ResumeSection title="Work Experience" theme={theme}>
-      <div className="space-y-3">
+    <ResumeSection title="Professional Experience" theme={theme}>
+      <div className="space-y-4">
         {data.experience.map((exp) => (
-          <div key={exp.id}>
+          <div key={exp.id} className="section-item">
             <div className="flex justify-between items-start mb-1">
               <div className="flex-1">
                 <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
                   {exp.position}
                 </h3>
-                <p className="text-sm" style={{ color: theme.text }}>
+                <p className="text-sm font-medium" style={{ color: theme.primary }}>
                   {exp.company}
                 </p>
               </div>
@@ -29,13 +28,10 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, theme }) =>
                 {formatDateRange(exp.startDate, exp.endDate, exp.current)}
               </div>
             </div>
+            
             {exp.description && (
-              <div className="mt-1">
-                <FormattedText 
-                  content={exp.description}
-                  className="text-sm leading-normal"
-                  style={{ color: theme.text }}
-                />
+              <div className="text-sm leading-normal whitespace-pre-line" style={{ color: theme.text }}>
+                {preserveUserFormatting(exp.description)}
               </div>
             )}
           </div>

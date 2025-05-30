@@ -14,7 +14,7 @@ const AchievementsSection: React.FC<AchievementsSectionProps> = ({ data, theme }
     <ResumeSection title="Achievements & Awards" theme={theme}>
       <div className="space-y-2">
         {data.achievements.map((achievement) => (
-          <div key={achievement.id}>
+          <div key={achievement.id} className="section-item">
             <div className="flex justify-between items-start mb-1">
               <h3 className="text-sm font-semibold" style={{ color: theme.text }}>
                 {achievement.title}
