@@ -82,9 +82,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Resume Preview</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Resume Preview</h2>
         <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
 
@@ -92,7 +92,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
         <CardContent className="p-0" id="resume-content">
           <div className="max-w-4xl mx-auto bg-white text-gray-900">
             <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-            <div className="px-8 py-4">
+            <div className="px-4 sm:px-6 lg:px-8 py-4">
               {getSectionOrder().map(sectionId => renderSection(sectionId))}
             </div>
           </div>

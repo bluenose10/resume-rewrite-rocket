@@ -8,19 +8,19 @@ interface CTASectionProps {
 
 const CTASection: React.FC<CTASectionProps> = ({ onStartBuilding }) => {
   return (
-    <section className="py-20 px-4">
+    <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
       <div className="container mx-auto text-center">
-        <h2 className="text-4xl font-bold text-white mb-6">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 sm:mb-6 px-2">
           Ready to Land Your Dream Job?
         </h2>
-        <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+        <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
           Create a professional resume that gets you noticed by recruiters and passes ATS systems
         </p>
         <Button 
           size="lg" 
           variant="default"
           onClick={onStartBuilding}
-          className="text-lg px-8 py-4 h-auto font-semibold"
+          className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto min-h-[44px] touch-manipulation"
         >
           Create Your Resume Now - Free
         </Button>

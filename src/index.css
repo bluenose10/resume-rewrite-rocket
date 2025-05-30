@@ -98,6 +98,25 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Mobile-first font size adjustments */
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Mobile-optimized touch targets */
+  button, 
+  [role="button"], 
+  input[type="submit"], 
+  input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Mobile-friendly form inputs */
+  input, 
+  textarea, 
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 }
 
@@ -119,10 +138,17 @@
   text-shadow: 0 0 20px hsl(var(--brand-cyan) / 0.5);
 }
 
-/* Animated background particles */
+/* Mobile-optimized animated background particles */
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
+  50% { transform: translateY(-10px) rotate(180deg); }
+}
+
+@media (min-width: 640px) {
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+  }
 }
 
 .floating-particle {
@@ -135,4 +161,72 @@
 
 .floating-particle:nth-child(3) {
   animation-delay: 4s;
+}
+
+/* Mobile-specific touch interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Smooth scrolling for mobile */
+@media (max-width: 768px) {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Improved mobile typography */
+  h1 {
+    line-height: 1.2;
+  }
+  
+  h2 {
+    line-height: 1.3;
+  }
+  
+  p {
+    line-height: 1.6;
+  }
+}
+
+/* Mobile-first responsive utilities */
+@layer utilities {
+  .text-responsive-xl {
+    @apply text-2xl;
+  }
+  
+  .text-responsive-2xl {
+    @apply text-3xl;
+  }
+  
+  .text-responsive-3xl {
+    @apply text-4xl;
+  }
+  
+  @screen sm {
+    .text-responsive-xl {
+      @apply text-3xl;
+    }
+    
+    .text-responsive-2xl {
+      @apply text-4xl;
+    }
+    
+    .text-responsive-3xl {
+      @apply text-5xl;
+    }
+  }
+  
+  @screen lg {
+    .text-responsive-xl {
+      @apply text-4xl;
+    }
+    
+    .text-responsive-2xl {
+      @apply text-5xl;
+    }
+    
+    .text-responsive-3xl {
+      @apply text-6xl;
+    }
+  }
 }
