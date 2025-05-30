@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 interface FormattedTextProps {
@@ -19,7 +20,7 @@ const FormattedText: React.FC<FormattedTextProps> = ({
 
   // Basic HTML sanitization - remove potentially dangerous tags
   const sanitizeHtml = (html: string): string => {
-    const allowedTags = ['p', 'br', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li'];
+    const allowedTags = ['p', 'br', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li', 'div'];
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
     
@@ -72,7 +73,8 @@ const FormattedText: React.FC<FormattedTextProps> = ({
     content.includes('<strong>') || 
     content.includes('<b>') || 
     content.includes('<em>') || 
-    content.includes('<i>')
+    content.includes('<i>') ||
+    content.includes('<div>')
   );
 
   console.log('FormattedText: Has HTML detected:', hasHtml);
@@ -106,3 +108,4 @@ const FormattedText: React.FC<FormattedTextProps> = ({
 };
 
 export default FormattedText;
+

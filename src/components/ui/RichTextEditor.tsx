@@ -1,4 +1,5 @@
 
+
 import React, { useRef, useCallback } from 'react';
 
 interface RichTextEditorProps {
@@ -27,7 +28,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const handleInput = useCallback(() => {
     if (editorRef.current) {
-      const newContent = editorRef.current.innerHTML;
+      let newContent = editorRef.current.innerHTML;
+      
+      // Convert div tags to p tags for better compatibility
+      newContent = newContent.replace(/<div>/g, '<p>').replace(/<\/div>/g, '</p>');
+      
       console.log('RichTextEditor: Input changed, new content:', newContent);
       onChange(newContent);
     }
@@ -176,3 +181,4 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 };
 
 export default RichTextEditor;
+
