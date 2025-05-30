@@ -2,7 +2,7 @@
 import React from 'react';
 import { ResumeData } from '@/types/resume';
 import ExportOptionsModal from './ExportOptionsModal';
-import SimpleResumePreview from './SimpleResumePreview';
+import MultiPageResumePreview from './MultiPageResumePreview';
 import { generateSimplePDF } from '@/utils/simplePdfGenerator';
 import { ExportOptions } from '@/types/export';
 import { useToast } from '@/hooks/use-toast';
@@ -44,8 +44,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
 
-      <div id="resume-content">
-        <SimpleResumePreview data={data} />
+      <div id="resume-content" className="overflow-x-auto">
+        <MultiPageResumePreview data={data} />
       </div>
     </div>
   );
