@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useResumeStats } from '@/hooks/useResumeStats';
@@ -14,7 +15,7 @@ import ResumeBuilder from '@/components/home/ResumeBuilder';
 const DEFAULT_SECTION_ORDER: SectionConfig[] = [
   { id: 'personalStatement', title: 'Personal Statement', visible: true },
   { id: 'summary', title: 'Professional Summary', visible: true },
-  { id: 'experience', title: 'Professional Experience', visible: true, required: true },
+  { id: 'experience', title: 'Work Experience', visible: true, required: true },
   { id: 'projects', title: 'Projects', visible: true },
   { id: 'education', title: 'Education', visible: true, required: true },
   { id: 'skills', title: 'Technical Skills', visible: true },

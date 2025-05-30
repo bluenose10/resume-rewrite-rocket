@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
@@ -11,7 +10,7 @@ interface ExperienceSectionProps {
 
 const ExperienceSection: React.FC<ExperienceSectionProps> = ({ data, theme }) => {
   return (
-    <ResumeSection title="Professional Experience" theme={theme}>
+    <ResumeSection title="Work Experience" theme={theme}>
       <div className="space-y-3">
         {data.experience.map((exp) => (
           <div key={exp.id}>
