@@ -87,6 +87,7 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
               <TabsContent value="content" className="space-y-6">
                 <ResumeForm
                   initialData={resumeData}
+                  sectionConfig={resumeData.sectionConfig}
                   onDataChange={onDataChange}
                   onOptimize={onOptimize}
                   isOptimizing={isOptimizing}
@@ -127,6 +128,7 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             <TabsContent value="content" className="space-y-6">
               <ResumeForm
                 initialData={resumeData}
+                sectionConfig={resumeData.sectionConfig}
                 onDataChange={onDataChange}
                 onOptimize={onOptimize}
                 isOptimizing={isOptimizing}

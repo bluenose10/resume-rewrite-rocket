@@ -5,20 +5,30 @@ import { Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ColorThemeSelector from './ColorThemeSelector';
 import PersonalInfoForm from './forms/PersonalInfoForm';
+import PersonalStatementForm from './forms/PersonalStatementForm';
 import ExperienceForm from './forms/ExperienceForm';
 import EducationForm from './forms/EducationForm';
 import SkillsForm from './forms/SkillsForm';
-import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project, Achievement, Certification, Language, VolunteerExperience, Reference, Publication } from '@/types/resume';
+import ProjectsForm from './forms/ProjectsForm';
+import AchievementsForm from './forms/AchievementsForm';
+import { ResumeData, ColorTheme, PersonalInfo, Experience, Education, Project, Achievement, SectionConfig } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 
 interface ResumeFormProps {
   initialData?: ResumeData;
+  sectionConfig?: SectionConfig[];
   onDataChange: (data: ResumeData) => void;
   onOptimize: () => void;
   isOptimizing: boolean;
 }
 
-const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOptimize, isOptimizing }) => {
+const ResumeForm: React.FC<ResumeFormProps> = ({ 
+  initialData, 
+  sectionConfig = [],
+  onDataChange, 
+  onOptimize, 
+  isOptimizing 
+}) => {
   const { toast } = useToast();
   
   const getInitialResumeData = (): ResumeData => {
@@ -139,6 +149,56 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOp
     });
   };
 
+  const addProject = () => {
+    const newProject: Project = {
+      id: Date.now().toString(),
+      name: '',
+      description: '',
+      technologies: '',
+      link: ''
+    };
+    updateData({ projects: [...resumeData.projects, newProject] });
+  };
+
+  const updateProject = (id: string, field: keyof Project, value: string) => {
+    updateData({
+      projects: resumeData.projects.map(proj => 
+        proj.id === id ? { ...proj, [field]: value } : proj
+      )
+    });
+  };
+
+  const removeProject = (id: string) => {
+    updateData({
+      projects: resumeData.projects.filter(proj => proj.id !== id)
+    });
+  };
+
+  const addAchievement = () => {
+    const newAchievement: Achievement = {
+      id: Date.now().toString(),
+      title: '',
+      description: '',
+      date: '',
+      organization: ''
+    };
+    updateData({ achievements: [...resumeData.achievements, newAchievement] });
+  };
+
+  const updateAchievement = (id: string, field: keyof Achievement, value: string) => {
+    updateData({
+      achievements: resumeData.achievements.map(ach => 
+        ach.id === id ? { ...ach, [field]: value } : ach
+      )
+    });
+  };
+
+  const removeAchievement = (id: string) => {
+    updateData({
+      achievements: resumeData.achievements.filter(ach => ach.id !== id)
+    });
+  };
+
   const addSkill = () => {
     if (newSkill.trim()) {
       updateData({ skills: [...resumeData.skills, newSkill.trim()] });
@@ -161,53 +221,96 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ initialData, onDataChange, onOp
     updateData({ interests: resumeData.interests.filter((_, i) => i !== index) });
   };
 
+  // Helper function to check if section is visible
+  const isSectionVisible = (sectionId: string) => {
+    const section = sectionConfig.find(s => s.id === sectionId);
+    return section ? section.visible : true; // Default to visible if not found
+  };
+
+  // Render section based on visibility
+  const renderSection = (sectionId: string, component: React.ReactNode) => {
+    return isSectionVisible(sectionId) ? component : null;
+  };
+
   return (
     <div className="space-y-6 max-w-2xl">
-      {/* Color Theme Selection */}
+      {/* Color Theme Selection - Always visible */}
       <ColorThemeSelector
         selectedTheme={resumeData.theme || DEFAULT_THEMES[1]}
         onThemeChange={updateTheme}
       />
 
-      {/* Personal Information, Statement, and Summary */}
+      {/* Personal Information - Always visible */}
       <PersonalInfoForm
         personalInfo={resumeData.personalInfo}
-        personalStatement={resumeData.personalStatement}
-        summary={resumeData.summary}
         onPersonalInfoChange={updatePersonalInfo}
-        onPersonalStatementChange={updatePersonalStatement}
-        onSummaryChange={updateSummary}
       />
 
-      {/* Experience */}
-      <ExperienceForm
-        experience={resumeData.experience}
-        onAdd={addExperience}
-        onUpdate={updateExperience}
-        onRemove={removeExperience}
-      />
+      {/* Personal Statement and Summary */}
+      {(isSectionVisible('personalStatement') || isSectionVisible('summary')) && (
+        <PersonalStatementForm
+          personalStatement={resumeData.personalStatement}
+          summary={resumeData.summary}
+          onPersonalStatementChange={updatePersonalStatement}
+          onSummaryChange={updateSummary}
+        />
+      )}
 
-      {/* Education */}
-      <EducationForm
-        education={resumeData.education}
-        onAdd={addEducation}
-        onUpdate={updateEducation}
-        onRemove={removeEducation}
-      />
+      {/* Experience - Required section */}
+      {renderSection('experience', (
+        <ExperienceForm
+          experience={resumeData.experience}
+          onAdd={addExperience}
+          onUpdate={updateExperience}
+          onRemove={removeExperience}
+        />
+      ))}
+
+      {/* Education - Required section */}
+      {renderSection('education', (
+        <EducationForm
+          education={resumeData.education}
+          onAdd={addEducation}
+          onUpdate={updateEducation}
+          onRemove={removeEducation}
+        />
+      ))}
+
+      {/* Projects */}
+      {renderSection('projects', (
+        <ProjectsForm
+          projects={resumeData.projects}
+          onAdd={addProject}
+          onUpdate={updateProject}
+          onRemove={removeProject}
+        />
+      ))}
 
       {/* Skills and Interests */}
-      <SkillsForm
-        skills={resumeData.skills}
-        interests={resumeData.interests}
-        newSkill={newSkill}
-        newInterest={newInterest}
-        onNewSkillChange={setNewSkill}
-        onNewInterestChange={setNewInterest}
-        onAddSkill={addSkill}
-        onAddInterest={addInterest}
-        onRemoveSkill={removeSkill}
-        onRemoveInterest={removeInterest}
-      />
+      {(isSectionVisible('skills') || isSectionVisible('interests')) && (
+        <SkillsForm
+          skills={resumeData.skills}
+          interests={resumeData.interests}
+          newSkill={newSkill}
+          newInterest={newInterest}
+          onNewSkillChange={setNewSkill}
+          onNewInterestChange={setNewInterest}
+          onAddSkill={addSkill}
+          onAddInterest={addInterest}
+          onRemoveSkill={removeSkill}
+          onRemoveInterest={removeInterest}
+        />
+      )}
+
+      {/* Achievements */}
+      {renderSection('achievements', (
+        <AchievementsForm
+          achievements={resumeData.achievements}
+          onAdd={addAchievement}
+          onUpdate={updateAchievement}
+          onRemove={removeAchievement}
+        />
+      ))}
 
       {/* Optimize Button */}
       <Card>
