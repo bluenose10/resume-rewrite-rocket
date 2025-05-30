@@ -2,7 +2,6 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { sanitizeHtml } from '@/utils/htmlSanitizer';
 
 interface ProjectsSectionProps {
   data: ResumeData;
@@ -32,11 +31,9 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
               )}
             </div>
             {project.description && (
-              <div 
-                className="text-sm leading-normal mb-1"
-                style={{ color: theme.text }}
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(project.description) }}
-              />
+              <p className="text-sm leading-normal mb-1" style={{ color: theme.text }}>
+                {project.description}
+              </p>
             )}
             {project.technologies && (
               <p className="text-sm" style={{ color: theme.text }}>

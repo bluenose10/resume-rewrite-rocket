@@ -2,8 +2,7 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { formatDateRange } from '@/utils/resumeHelpers';
-import { sanitizeHtml } from '@/utils/htmlSanitizer';
+import { formatDateRange, preserveUserFormatting } from '@/utils/resumeHelpers';
 
 interface VolunteerExperienceSectionProps {
   data: ResumeData;
@@ -31,11 +30,9 @@ const VolunteerExperienceSection: React.FC<VolunteerExperienceSectionProps> = ({
             </div>
             {vol.description && (
               <div className="mt-1">
-                <div 
-                  className="text-sm leading-normal"
-                  style={{ color: theme.text }}
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(vol.description) }}
-                />
+                <p className="text-sm leading-normal whitespace-pre-line" style={{ color: theme.text }}>
+                  {preserveUserFormatting(vol.description)}
+                </p>
               </div>
             )}
           </div>

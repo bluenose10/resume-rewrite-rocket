@@ -2,7 +2,6 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
-import { sanitizeHtml } from '@/utils/htmlSanitizer';
 
 interface PersonalStatementSectionProps {
   data: ResumeData;
@@ -10,15 +9,11 @@ interface PersonalStatementSectionProps {
 }
 
 const PersonalStatementSection: React.FC<PersonalStatementSectionProps> = ({ data, theme }) => {
-  const sanitizedContent = sanitizeHtml(data.personalStatement);
-  
   return (
     <ResumeSection title="Personal Statement" theme={theme}>
-      <div 
-        className="text-sm leading-normal" 
-        style={{ color: theme.text }}
-        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-      />
+      <p className="text-sm leading-normal" style={{ color: theme.text }}>
+        {data.personalStatement}
+      </p>
     </ResumeSection>
   );
 };
