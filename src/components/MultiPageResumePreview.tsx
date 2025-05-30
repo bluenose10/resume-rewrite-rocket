@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { ResumeData, ColorTheme } from '@/types/resume';
 import PersonalInfoHeader from './PersonalInfoHeader';
@@ -175,7 +174,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
             <div className="space-y-6">
               {/* Personal info header on first page */}
               {pageIndex === 0 && (
-                <PersonalInfoHeader data={data} theme={theme} />
+                <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
               )}
 
               {/* Page sections */}
