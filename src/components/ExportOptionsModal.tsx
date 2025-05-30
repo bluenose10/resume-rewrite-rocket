@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Image, Printer } from 'lucide-react';
-import { ExportOptions } from '@/utils/enhancedPdfGenerator';
+import { ExportOptions } from '@/types/export';
 
 interface ExportOptionsModalProps {
   onExport: (options: ExportOptions) => void;

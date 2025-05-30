@@ -1,8 +1,9 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useResumeStats } from '@/hooks/useResumeStats';
 import { optimizeResumeContent } from '@/services/openaiService';
-import { generateEnhancedPDF } from '@/utils/enhancedPdfGenerator';
+import { generateSimplePDF } from '@/utils/simplePdfGenerator';
 import { ResumeData, SectionConfig } from '@/types/resume';
 import { DEFAULT_SECTION_ORDER } from '@/constants/sectionConfig';
 
@@ -156,7 +157,12 @@ export const ResumeDataProvider: React.FC<ResumeDataProviderProps> = ({ children
   const handleDownload = async () => {
     try {
       const fileName = `${resumeData.personalInfo.firstName || 'Resume'}_${resumeData.personalInfo.lastName || 'Document'}.pdf`;
-      await generateEnhancedPDF('resume-content', fileName);
+      await generateSimplePDF('resume-content', fileName, {
+        format: 'pdf',
+        quality: 'high',
+        paperSize: 'a4',
+        margins: 'medium'
+      });
       
       await incrementResumeCount();
       
