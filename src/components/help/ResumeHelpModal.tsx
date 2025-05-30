@@ -49,42 +49,6 @@ const ResumeHelpModal: React.FC<ResumeHelpModalProps> = ({ children }) => {
 
             <Separator />
 
-            {/* Resume Length Guidelines */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold flex items-center gap-2">
-                📏 Resume Length Guidelines
-              </h3>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="font-semibold text-blue-800">✨ You have complete control over your resume length</p>
-                <p className="text-blue-700 mt-2">Add as much detail as you need to showcase your experience and skills effectively.</p>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="font-semibold text-green-800">📄 1 Page (Great for many roles)</p>
-                  <ul className="text-green-700 mt-2 space-y-1 text-sm">
-                    <li>• Entry-level to mid-level professionals (0-8 years)</li>
-                    <li>• Career changers or new graduates</li>
-                    <li>• Roles where conciseness is valued</li>
-                  </ul>
-                </div>
-                
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <p className="font-semibold text-purple-800">📋 2+ Pages (Perfect when you have substantial experience)</p>
-                  <ul className="text-purple-700 mt-2 space-y-1 text-sm">
-                    <li>• Senior professionals (8+ years experience)</li>
-                    <li>• Academic or research positions</li>
-                    <li>• Extensive technical certifications and projects</li>
-                    <li>• Multiple relevant publications or achievements</li>
-                    <li>• Leadership roles with significant accomplishments</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
             {/* Resume Guidelines */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold flex items-center gap-2">
@@ -94,8 +58,8 @@ const ResumeHelpModal: React.FC<ResumeHelpModalProps> = ({ children }) => {
               
               <ul className="space-y-3 list-none">
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
-                  <span><strong>Prioritize relevance and impact.</strong> Quality content matters more than arbitrary length limits.</span>
+                  <span className="text-red-600 font-bold">•</span>
+                  <span><strong>Limit it to 1 PAGE. No exceptions.</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
