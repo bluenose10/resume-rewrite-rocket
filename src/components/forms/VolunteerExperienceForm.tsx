@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trash2, Plus } from 'lucide-react';
 import { VolunteerExperience } from '@/types/resume';
@@ -103,15 +103,15 @@ const VolunteerExperienceForm: React.FC<VolunteerExperienceFormProps> = ({
               
               <div className="md:col-span-2">
                 <Label htmlFor={`vol-description-${volunteer.id}`}>Description</Label>
-                <Textarea
+                <RichTextEditor
                   id={`vol-description-${volunteer.id}`}
                   value={volunteer.description}
-                  onChange={(e) => onUpdate(volunteer.id, 'description', e.target.value)}
-                  placeholder="Describe your volunteer activities and achievements. Format your content however you like - use bullet points, paragraphs, or line breaks."
-                  rows={3}
+                  onChange={(value) => onUpdate(volunteer.id, 'description', value)}
+                  placeholder="Describe your volunteer activities and achievements. Use formatting to highlight your impact and contributions."
+                  className="mt-2"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Tip: You have full control over formatting - the content will appear exactly as you type it.
+                  Tip: Use bullet points to list specific achievements and bold text for key skills or results.
                 </p>
               </div>
             </div>

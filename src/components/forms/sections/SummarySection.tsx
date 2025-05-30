@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Label } from '@/components/ui/label';
 import SectionTooltip from '@/components/help/SectionTooltip';
 
@@ -25,12 +25,12 @@ const SummarySection: React.FC<SummarySectionProps> = ({
       <CardContent>
         <div>
           <Label htmlFor="summary">Professional Summary</Label>
-          <Textarea
+          <RichTextEditor
             id="summary"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={onChange}
             placeholder="Example: 'Experienced Frontend Developer with 3+ years building React applications that improved user engagement by 40%. Specialized in creating responsive, accessible interfaces with TypeScript and modern CSS frameworks.'"
-            rows={4}
+            className="mt-2"
           />
         </div>
       </CardContent>
