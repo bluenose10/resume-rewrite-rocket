@@ -150,9 +150,9 @@ const getSectionContent = (sectionId: string, data: ResumeData): string => {
               <h3 class="text-sm font-semibold">${edu.degree}</h3>
               <p class="text-sm">${edu.institution}</p>
             </div>
-            <div class="text-sm">${edu.graduationDate}</div>
+            <div class="text-sm">${edu.startDate} - ${edu.endDate}</div>
           </div>
-          ${edu.gpa ? `<p class="text-sm">GPA: ${edu.gpa}</p>` : ''}
+          ${edu.classification ? `<p class="text-sm">Classification: ${edu.classification}</p>` : ''}
         </div>
       `).join('') || '';
     default:
