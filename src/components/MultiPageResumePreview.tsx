@@ -28,31 +28,29 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
     const createPages = () => {
       const newPages: React.ReactNode[] = [];
       let currentPageContent: React.ReactNode[] = [];
-      let currentPageHeight = 0;
+      let estimatedHeight = 0;
 
       // Add header to first page
-      const headerHeight = 120; // Estimated header height
+      const headerHeight = 120;
       currentPageContent.push(
         <PersonalInfoHeader key="header" personalInfo={data.personalInfo} theme={theme} />
       );
-      currentPageHeight += headerHeight;
+      estimatedHeight += headerHeight;
 
       // Add each visible section
       visibleSections.forEach((sectionConfig) => {
         const sectionId = sectionConfig.id;
         
-        // Skip if section has no content
         if (!hasSectionContent(sectionId, data)) return;
 
-        // Estimate section height based on content
-        const sectionHeight = estimateSectionHeight(sectionId, data);
+        const sectionHeight = estimateContentHeight(sectionId, data);
 
         // Check if section fits on current page
-        if (currentPageHeight + sectionHeight > CONTENT_HEIGHT && currentPageContent.length > 1) {
+        if (estimatedHeight + sectionHeight > CONTENT_HEIGHT && currentPageContent.length > 1) {
           // Create current page and start new one
           newPages.push(createPage(currentPageContent, newPages.length));
           currentPageContent = [];
-          currentPageHeight = 0;
+          estimatedHeight = 0;
         }
 
         // Add section to current page
@@ -64,7 +62,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
             theme={theme}
           />
         );
-        currentPageHeight += sectionHeight;
+        estimatedHeight += sectionHeight;
       });
 
       // Add the last page if it has content
@@ -86,7 +84,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
   const createPage = (content: React.ReactNode[], pageIndex: number) => (
     <div
       key={pageIndex}
-      className="relative bg-white shadow-lg border border-gray-200 mx-auto"
+      className="resume-page relative bg-white shadow-lg border border-gray-200 mx-auto"
       style={{
         width: `${PAGE_WIDTH}px`,
         minHeight: `${PAGE_HEIGHT}px`,
@@ -110,7 +108,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
   const createEmptyPage = () => (
     <div
       key="empty"
-      className="bg-white shadow-lg border border-gray-200 mx-auto flex items-center justify-center text-gray-500"
+      className="resume-page bg-white shadow-lg border border-gray-200 mx-auto flex items-center justify-center text-gray-500"
       style={{
         width: `${PAGE_WIDTH}px`,
         height: `${PAGE_HEIGHT}px`,
@@ -156,37 +154,36 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
     }
   };
 
-  const estimateSectionHeight = (sectionId: string, data: ResumeData): number => {
-    // Simplified height estimates
-    const baseHeight = 80; // Section title + spacing
+  const estimateContentHeight = (sectionId: string, data: ResumeData): number => {
+    const baseHeight = 60;
     
     switch (sectionId) {
       case 'personalStatement':
       case 'summary':
         const text = data[sectionId as keyof ResumeData] as string;
-        return baseHeight + Math.ceil((text?.length || 0) / 80) * 20;
+        return baseHeight + Math.ceil((text?.length || 0) / 100) * 20;
       case 'experience':
-        return baseHeight + data.experience.length * 100;
+        return baseHeight + data.experience.length * 80;
       case 'education':
-        return baseHeight + data.education.length * 60;
+        return baseHeight + data.education.length * 50;
       case 'projects':
-        return baseHeight + data.projects.length * 80;
+        return baseHeight + data.projects.length * 70;
       case 'skills':
-        return baseHeight + Math.ceil(data.skills.length / 8) * 25;
+        return baseHeight + Math.ceil(data.skills.length / 6) * 25;
       case 'achievements':
-        return baseHeight + data.achievements.length * 50;
+        return baseHeight + data.achievements.length * 40;
       case 'certifications':
-        return baseHeight + data.certifications.length * 50;
+        return baseHeight + data.certifications.length * 40;
       case 'languages':
-        return baseHeight + Math.ceil(data.languages.length / 3) * 25;
+        return baseHeight + Math.ceil(data.languages.length / 4) * 25;
       case 'volunteerExperience':
-        return baseHeight + data.volunteerExperience.length * 80;
+        return baseHeight + data.volunteerExperience.length * 70;
       case 'publications':
-        return baseHeight + data.publications.length * 60;
+        return baseHeight + data.publications.length * 50;
       case 'references':
-        return baseHeight + data.references.length * 60;
+        return baseHeight + data.references.length * 50;
       case 'interests':
-        return baseHeight + Math.ceil(data.interests.length / 10) * 20;
+        return baseHeight + Math.ceil(data.interests.length / 8) * 20;
       default:
         return baseHeight;
     }

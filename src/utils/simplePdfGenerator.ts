@@ -17,8 +17,10 @@ export const generateSimplePDF = async (
   const scale = options.quality === 'ultra' ? 3 : options.quality === 'high' ? 2 : 1;
   
   try {
-    // Find all page elements within the resume content
-    const pageElements = element.querySelectorAll('[style*="794px"]');
+    // Find all resume pages using the correct class selector
+    const pageElements = element.querySelectorAll('.resume-page');
+    
+    console.log(`Found ${pageElements.length} resume pages for export`);
     
     if (pageElements.length === 0) {
       throw new Error('No resume pages found');
@@ -48,6 +50,8 @@ export const generateSimplePDF = async (
     // Process each page
     for (let i = 0; i < pageElements.length; i++) {
       const pageElement = pageElements[i] as HTMLElement;
+      
+      console.log(`Processing page ${i + 1} of ${pageElements.length}`);
       
       const canvas = await html2canvas(pageElement, {
         scale,
@@ -84,6 +88,7 @@ export const generateSimplePDF = async (
       link.href = canvas.toDataURL(`image/${options.format}`, 0.9);
       link.click();
     } else {
+      console.log(`Saving PDF with ${pageElements.length} pages`);
       pdf.save(fileName);
     }
   } catch (error) {
