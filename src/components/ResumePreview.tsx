@@ -2,8 +2,8 @@
 import React from 'react';
 import { ResumeData } from '@/types/resume';
 import ExportOptionsModal from './ExportOptionsModal';
-import MultiPageResumePreview from './MultiPageResumePreview';
-import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
+import SimpleResumePreview from './SimpleResumePreview';
+import { generateSimplePDF, ExportOptions } from '@/utils/simplePdfGenerator';
 import { useToast } from '@/hooks/use-toast';
 
 interface ResumePreviewProps {
@@ -18,7 +18,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
     setIsExporting(true);
     try {
       const fileName = `${data.personalInfo.firstName || 'Resume'}_${data.personalInfo.lastName || 'Document'}.${options.format}`;
-      await generateEnhancedPDF('resume-content', fileName, options);
+      await generateSimplePDF('resume-content', fileName, options);
       
       toast({
         title: "Export Successful!",
@@ -43,9 +43,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
 
-      {/* Multi-page resume preview */}
       <div id="resume-content">
-        <MultiPageResumePreview data={data} />
+        <SimpleResumePreview data={data} />
       </div>
     </div>
   );
