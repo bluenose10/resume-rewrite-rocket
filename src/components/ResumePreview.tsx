@@ -7,6 +7,7 @@ import ExportOptionsModal from './ExportOptionsModal';
 import PersonalInfoHeader from './PersonalInfoHeader';
 import SectionRenderer from './SectionRenderer';
 import ResumeLengthIndicator from './ResumeLengthIndicator';
+import PageBreakIndicator from './PageBreakIndicator';
 import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
 
@@ -65,9 +66,16 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
     }
   };
 
-  const renderSection = (sectionId: string) => {
+  const renderSection = (sectionId: string, index: number) => {
     if (!isVisible(sectionId) || !hasContent(sectionId)) return null;
-    return <SectionRenderer key={sectionId} sectionId={sectionId} data={data} theme={theme} />;
+    
+    return (
+      <React.Fragment key={sectionId}>
+        <SectionRenderer sectionId={sectionId} data={data} theme={theme} />
+        {/* Add page break indicator after certain sections to help users visualize page breaks */}
+        {(index === 2 || index === 5) && <PageBreakIndicator />}
+      </React.Fragment>
+    );
   };
 
   const getSectionOrder = () => {
@@ -97,7 +105,7 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
           <div className="max-w-4xl mx-auto bg-white text-gray-900">
             <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
             <div className="px-4 sm:px-6 lg:px-8 py-4">
-              {getSectionOrder().map(sectionId => renderSection(sectionId))}
+              {getSectionOrder().map((sectionId, index) => renderSection(sectionId, index))}
             </div>
           </div>
         </CardContent>

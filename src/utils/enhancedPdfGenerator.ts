@@ -1,4 +1,3 @@
-
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -81,7 +80,7 @@ export const generateEnhancedPDF = async (
       return;
     }
 
-    // Generate PDF
+    // Generate PDF with multi-page support
     const imgData = canvas.toDataURL('image/png', qualitySettings.compression);
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -95,26 +94,50 @@ export const generateEnhancedPDF = async (
     const imgWidth = canvas.width;
     const imgHeight = canvas.height;
     
-    // Calculate optimal scaling
-    const scale = Math.min(
-      pdfWidth / (imgWidth * 0.264583),
-      pdfHeight / (imgHeight * 0.264583)
-    );
+    // Calculate how many pages we need
+    const pageHeightInPixels = (pdfHeight / (imgWidth * 0.264583)) * imgHeight;
+    const totalPages = Math.ceil(imgHeight / pageHeightInPixels);
     
-    const scaledWidth = (imgWidth * 0.264583) * scale;
-    const scaledHeight = (imgHeight * 0.264583) * scale;
+    // Add each page
+    for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+      if (pageIndex > 0) {
+        pdf.addPage();
+      }
+      
+      const yOffset = -(pageIndex * pageHeightInPixels);
+      const scaledWidth = pdfWidth;
+      const scaledHeight = (imgHeight * 0.264583) * (pdfWidth / (imgWidth * 0.264583));
+      
+      pdf.addImage(
+        imgData, 
+        'PNG', 
+        margin, 
+        margin + yOffset * 0.264583, 
+        scaledWidth, 
+        scaledHeight, 
+        undefined, 
+        'FAST'
+      );
+      
+      // Add page number for multi-page documents
+      if (totalPages > 1) {
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(
+          `Page ${pageIndex + 1} of ${totalPages}`, 
+          paperSize.width / 2, 
+          paperSize.height - 5, 
+          { align: 'center' }
+        );
+      }
+    }
     
-    // Center content with margins
-    const x = margin + (pdfWidth - scaledWidth) / 2;
-    const y = margin;
-
     // Add watermark for professional touch
+    pdf.setPage(1);
     pdf.setFontSize(8);
     pdf.setTextColor(200, 200, 200);
     pdf.text('Generated with AI Resume Builder', margin, paperSize.height - 5);
 
-    pdf.addImage(imgData, 'PNG', x, y, scaledWidth, scaledHeight, undefined, 'FAST');
-    
     // Add metadata
     pdf.setProperties({
       title: filename.replace('.pdf', ''),

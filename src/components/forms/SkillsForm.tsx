@@ -30,6 +30,8 @@ const SkillsForm: React.FC<SkillsFormProps> = ({
   onRemoveSkill,
   onRemoveInterest
 }) => {
+  console.log('SkillsForm props:', { skills, interests, newSkill, newInterest }); // Debug log
+
   return (
     <>
       {/* Skills */}
@@ -78,11 +80,23 @@ const SkillsForm: React.FC<SkillsFormProps> = ({
           <div className="flex gap-2">
             <Input
               value={newInterest}
-              onChange={(e) => onNewInterestChange(e.target.value)}
+              onChange={(e) => {
+                console.log('Interests input onChange:', e.target.value); // Debug log
+                onNewInterestChange(e.target.value);
+              }}
               placeholder="Add an interest..."
-              onKeyDown={(e) => e.key === 'Enter' && onAddInterest()}
+              onKeyDown={(e) => {
+                console.log('Interests input onKeyDown:', e.key); // Debug log
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  onAddInterest();
+                }
+              }}
             />
-            <Button onClick={onAddInterest} size="sm">
+            <Button onClick={() => {
+              console.log('Add interest button clicked'); // Debug log
+              onAddInterest();
+            }} size="sm">
               <Plus className="h-4 w-4" />
             </Button>
           </div>

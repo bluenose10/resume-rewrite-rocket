@@ -36,51 +36,55 @@ const ResumeLengthIndicator: React.FC<ResumeLengthIndicatorProps> = ({ data }) =
 
   const estimatedPages = calculateEstimatedPages();
   
-  const getAdvice = () => {
+  const getInfo = () => {
     if (estimatedPages === 1) {
-      return {
-        color: 'text-green-600',
-        bgColor: 'bg-green-50',
-        borderColor: 'border-green-200',
-        icon: '✅',
-        message: 'Perfect length! This resume should fit nicely on one page.'
-      };
-    } else if (estimatedPages === 2) {
       return {
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         borderColor: 'border-blue-200',
         icon: '📄',
-        message: '2-page resume. Consider if all content is essential, or if you have 10+ years of experience, this length is appropriate.'
+        message: 'Your resume will fit on one page - concise and focused.'
+      };
+    } else if (estimatedPages === 2) {
+      return {
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+        borderColor: 'border-green-200',
+        icon: '📋',
+        message: 'Your resume spans 2 pages - good for experienced professionals with substantial content.'
       };
     } else {
       return {
-        color: 'text-amber-600',
-        bgColor: 'bg-amber-50',
-        borderColor: 'border-amber-200',
-        icon: '⚠️',
-        message: 'This resume may be too long. Consider prioritizing your most relevant and impactful experiences.'
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+        borderColor: 'border-purple-200',
+        icon: '📚',
+        message: `Your resume spans ${estimatedPages} pages - comprehensive and detailed.`
       };
     }
   };
 
-  const advice = getAdvice();
+  const info = getInfo();
 
   return (
-    <Card className={`${advice.bgColor} ${advice.borderColor}`}>
+    <Card className={`${info.bgColor} ${info.borderColor}`}>
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
-          <FileText className={`h-5 w-5 ${advice.color} mt-0.5`} />
+          <FileText className={`h-5 w-5 ${info.color} mt-0.5`} />
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-medium text-sm">Estimated Length:</span>
-              <span className={`font-bold ${advice.color}`}>
+              <span className={`font-bold ${info.color}`}>
                 {estimatedPages} page{estimatedPages > 1 ? 's' : ''}
               </span>
             </div>
-            <div className={`text-sm ${advice.color} flex items-start gap-2`}>
-              <span>{advice.icon}</span>
-              <span>{advice.message}</span>
+            <div className={`text-sm ${info.color} flex items-start gap-2`}>
+              <span>{info.icon}</span>
+              <span>{info.message}</span>
+            </div>
+            <div className="mt-2 text-xs text-gray-600">
+              <Info className="h-3 w-3 inline mr-1" />
+              You have complete control over your resume length - add as much detail as you need.
             </div>
           </div>
         </div>

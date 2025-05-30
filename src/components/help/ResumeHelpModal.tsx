@@ -55,23 +55,29 @@ const ResumeHelpModal: React.FC<ResumeHelpModalProps> = ({ children }) => {
                 📏 Resume Length Guidelines
               </h3>
               
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="font-semibold text-blue-800">✨ You have complete control over your resume length</p>
+                <p className="text-blue-700 mt-2">Add as much detail as you need to showcase your experience and skills effectively.</p>
+              </div>
+              
               <div className="space-y-3">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="font-semibold text-green-800">🎯 1 Page (Recommended for most people)</p>
+                  <p className="font-semibold text-green-800">📄 1 Page (Great for many roles)</p>
                   <ul className="text-green-700 mt-2 space-y-1 text-sm">
-                    <li>• Entry-level to mid-level professionals (0-10 years)</li>
+                    <li>• Entry-level to mid-level professionals (0-8 years)</li>
                     <li>• Career changers or new graduates</li>
-                    <li>• Most industry positions</li>
+                    <li>• Roles where conciseness is valued</li>
                   </ul>
                 </div>
                 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="font-semibold text-blue-800">📄 2 Pages (When appropriate)</p>
-                  <ul className="text-blue-700 mt-2 space-y-1 text-sm">
-                    <li>• Senior professionals (10+ years experience)</li>
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <p className="font-semibold text-purple-800">📋 2+ Pages (Perfect when you have substantial experience)</p>
+                  <ul className="text-purple-700 mt-2 space-y-1 text-sm">
+                    <li>• Senior professionals (8+ years experience)</li>
                     <li>• Academic or research positions</li>
-                    <li>• Extensive technical certifications</li>
-                    <li>• Multiple relevant publications</li>
+                    <li>• Extensive technical certifications and projects</li>
+                    <li>• Multiple relevant publications or achievements</li>
+                    <li>• Leadership roles with significant accomplishments</li>
                   </ul>
                 </div>
               </div>
@@ -89,7 +95,7 @@ const ResumeHelpModal: React.FC<ResumeHelpModalProps> = ({ children }) => {
               <ul className="space-y-3 list-none">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
-                  <span><strong>Prioritize relevance over length.</strong> Quality content matters more than fitting everything on one page.</span>
+                  <span><strong>Prioritize relevance and impact.</strong> Quality content matters more than arbitrary length limits.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
