@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { ResumeData, ColorTheme } from '@/types/resume';
 import PersonalInfoHeader from './PersonalInfoHeader';
@@ -8,14 +9,9 @@ interface MultiPageResumePreviewProps {
   data: ResumeData;
 }
 
-interface PageContent {
-  sections: string[];
-  height: number;
-}
-
 const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data }) => {
-  const [pages, setPages] = useState<PageContent[]>([]);
-  const measureRef = useRef<HTMLDivElement>(null);
+  const [pages, setPages] = useState<React.ReactNode[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
   const theme = data.theme || DEFAULT_THEMES[0];
 
   // A4 dimensions at 96 DPI: 794px × 1123px
@@ -27,67 +23,105 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
   const visibleSections = data.sectionConfig?.filter(section => section.visible) || [];
 
   useEffect(() => {
-    if (!measureRef.current) return;
+    if (!contentRef.current) return;
 
-    const calculatePages = () => {
-      const newPages: PageContent[] = [];
-      let currentPage: PageContent = { sections: [], height: 0 };
+    const createPages = () => {
+      const newPages: React.ReactNode[] = [];
+      let currentPageContent: React.ReactNode[] = [];
+      let currentPageHeight = 0;
 
-      // Always start with personal info header
+      // Add header to first page
       const headerHeight = 120; // Estimated header height
-      currentPage.height += headerHeight;
+      currentPageContent.push(
+        <PersonalInfoHeader key="header" personalInfo={data.personalInfo} theme={theme} />
+      );
+      currentPageHeight += headerHeight;
 
+      // Add each visible section
       visibleSections.forEach((sectionConfig) => {
         const sectionId = sectionConfig.id;
         
         // Skip if section has no content
         if (!hasSectionContent(sectionId, data)) return;
 
-        // Create a temporary element to measure section height
-        const tempDiv = document.createElement('div');
-        tempDiv.style.width = `${PAGE_WIDTH - (PAGE_MARGIN * 2)}px`;
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.visibility = 'hidden';
-        tempDiv.style.top = '-9999px';
-        
-        // Render section content to measure
-        const sectionElement = document.createElement('div');
-        sectionElement.className = 'space-y-3';
-        tempDiv.appendChild(sectionElement);
-        document.body.appendChild(tempDiv);
-
-        // Estimate section height (this is a simplified calculation)
-        const estimatedHeight = estimateSectionHeight(sectionId, data);
-        
-        document.body.removeChild(tempDiv);
+        // Estimate section height based on content
+        const sectionHeight = estimateSectionHeight(sectionId, data);
 
         // Check if section fits on current page
-        if (currentPage.height + estimatedHeight > CONTENT_HEIGHT && currentPage.sections.length > 0) {
-          // Start new page
-          newPages.push(currentPage);
-          currentPage = { sections: [sectionId], height: estimatedHeight };
-        } else {
-          // Add to current page
-          currentPage.sections.push(sectionId);
-          currentPage.height += estimatedHeight;
+        if (currentPageHeight + sectionHeight > CONTENT_HEIGHT && currentPageContent.length > 1) {
+          // Create current page and start new one
+          newPages.push(createPage(currentPageContent, newPages.length));
+          currentPageContent = [];
+          currentPageHeight = 0;
         }
+
+        // Add section to current page
+        currentPageContent.push(
+          <SectionRenderer
+            key={sectionId}
+            sectionId={sectionId}
+            data={data}
+            theme={theme}
+          />
+        );
+        currentPageHeight += sectionHeight;
       });
 
       // Add the last page if it has content
-      if (currentPage.sections.length > 0) {
-        newPages.push(currentPage);
+      if (currentPageContent.length > 0) {
+        newPages.push(createPage(currentPageContent, newPages.length));
       }
 
-      // Ensure at least one page
+      // Ensure at least one page exists
       if (newPages.length === 0) {
-        newPages.push({ sections: [], height: 0 });
+        newPages.push(createEmptyPage());
       }
 
       setPages(newPages);
     };
 
-    calculatePages();
-  }, [data, visibleSections]);
+    createPages();
+  }, [data, visibleSections, theme]);
+
+  const createPage = (content: React.ReactNode[], pageIndex: number) => (
+    <div
+      key={pageIndex}
+      className="relative bg-white shadow-lg border border-gray-200 mx-auto"
+      style={{
+        width: `${PAGE_WIDTH}px`,
+        minHeight: `${PAGE_HEIGHT}px`,
+        padding: `${PAGE_MARGIN}px`,
+      }}
+    >
+      <div className="space-y-6">
+        {content}
+      </div>
+      
+      {/* Page number */}
+      <div 
+        className="absolute bottom-4 right-4 text-xs text-gray-400"
+        style={{ color: theme.text }}
+      >
+        Page {pageIndex + 1}
+      </div>
+    </div>
+  );
+
+  const createEmptyPage = () => (
+    <div
+      key="empty"
+      className="bg-white shadow-lg border border-gray-200 mx-auto flex items-center justify-center text-gray-500"
+      style={{
+        width: `${PAGE_WIDTH}px`,
+        height: `${PAGE_HEIGHT}px`,
+      }}
+    >
+      <div className="text-center">
+        <p className="text-lg">Start adding content to see your resume preview</p>
+        <p className="text-sm mt-2">Fill in the form on the left to begin</p>
+      </div>
+    </div>
+  );
 
   const hasSectionContent = (sectionId: string, data: ResumeData): boolean => {
     switch (sectionId) {
@@ -123,98 +157,44 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
   };
 
   const estimateSectionHeight = (sectionId: string, data: ResumeData): number => {
-    // Rough height estimates for different sections
-    const baseHeight = 60; // Section title + spacing
+    // Simplified height estimates
+    const baseHeight = 80; // Section title + spacing
     
     switch (sectionId) {
       case 'personalStatement':
       case 'summary':
-        return baseHeight + Math.ceil((data[sectionId]?.length || 0) / 100) * 20;
+        const text = data[sectionId as keyof ResumeData] as string;
+        return baseHeight + Math.ceil((text?.length || 0) / 80) * 20;
       case 'experience':
-        return baseHeight + data.experience.length * 120;
+        return baseHeight + data.experience.length * 100;
       case 'education':
-        return baseHeight + data.education.length * 80;
+        return baseHeight + data.education.length * 60;
       case 'projects':
-        return baseHeight + data.projects.length * 100;
+        return baseHeight + data.projects.length * 80;
       case 'skills':
-        return baseHeight + Math.ceil(data.skills.length / 6) * 30;
+        return baseHeight + Math.ceil(data.skills.length / 8) * 25;
       case 'achievements':
-        return baseHeight + data.achievements.length * 70;
+        return baseHeight + data.achievements.length * 50;
       case 'certifications':
-        return baseHeight + data.certifications.length * 60;
+        return baseHeight + data.certifications.length * 50;
       case 'languages':
-        return baseHeight + Math.ceil(data.languages.length / 2) * 30;
+        return baseHeight + Math.ceil(data.languages.length / 3) * 25;
       case 'volunteerExperience':
-        return baseHeight + data.volunteerExperience.length * 100;
+        return baseHeight + data.volunteerExperience.length * 80;
       case 'publications':
-        return baseHeight + data.publications.length * 80;
+        return baseHeight + data.publications.length * 60;
       case 'references':
-        return baseHeight + data.references.length * 80;
+        return baseHeight + data.references.length * 60;
       case 'interests':
-        return baseHeight + Math.ceil(data.interests.length / 8) * 25;
+        return baseHeight + Math.ceil(data.interests.length / 10) * 20;
       default:
         return baseHeight;
     }
   };
 
   return (
-    <div className="space-y-8">
-      <div ref={measureRef} className="space-y-8">
-        {pages.map((page, pageIndex) => (
-          <div
-            key={pageIndex}
-            className="relative bg-white shadow-lg border border-gray-200 mx-auto"
-            style={{
-              width: `${PAGE_WIDTH}px`,
-              minHeight: `${PAGE_HEIGHT}px`,
-              padding: `${PAGE_MARGIN}px`,
-            }}
-          >
-            {/* Page content */}
-            <div className="space-y-6">
-              {/* Personal info header on first page */}
-              {pageIndex === 0 && (
-                <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-              )}
-
-              {/* Page sections */}
-              <div className="space-y-4">
-                {page.sections.map((sectionId) => (
-                  <SectionRenderer
-                    key={sectionId}
-                    sectionId={sectionId}
-                    data={data}
-                    theme={theme}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Page number */}
-            <div 
-              className="absolute bottom-4 right-4 text-xs text-gray-400"
-              style={{ color: theme.text }}
-            >
-              Page {pageIndex + 1} of {pages.length}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {pages.length === 0 && (
-        <div
-          className="bg-white shadow-lg border border-gray-200 mx-auto flex items-center justify-center text-gray-500"
-          style={{
-            width: `${PAGE_WIDTH}px`,
-            height: `${PAGE_HEIGHT}px`,
-          }}
-        >
-          <div className="text-center">
-            <p className="text-lg">Start adding content to see your resume preview</p>
-            <p className="text-sm mt-2">Fill in the form on the left to begin</p>
-          </div>
-        </div>
-      )}
+    <div className="space-y-8" ref={contentRef}>
+      {pages}
     </div>
   );
 };
