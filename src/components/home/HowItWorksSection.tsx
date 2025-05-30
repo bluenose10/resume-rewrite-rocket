@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Wand2, Download, Zap } from 'lucide-react';
@@ -65,9 +64,9 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onStartBuilding }
           <Button 
             size="lg" 
             onClick={onStartBuilding}
-            className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-auto shadow-2xl w-full sm:w-auto min-h-[44px] touch-manipulation"
+            className="shadow-2xl w-full sm:w-auto"
           >
-            <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+            <Zap className="h-4 w-4 mr-2" />
             Start Building Your Resume Now
           </Button>
         </div>

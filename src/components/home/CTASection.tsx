@@ -20,7 +20,7 @@ const CTASection: React.FC<CTASectionProps> = ({ onStartBuilding }) => {
           size="lg" 
           variant="default"
           onClick={onStartBuilding}
-          className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto min-h-[44px] touch-manipulation"
+          className="font-semibold w-full sm:w-auto"
         >
           Create Your Resume Now - Free
         </Button>

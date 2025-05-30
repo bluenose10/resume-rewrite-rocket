@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import AnimatedCounter from '@/components/AnimatedCounter';
@@ -35,7 +34,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
           <Button 
             size="lg" 
             onClick={onStartBuilding}
-            className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto min-h-[44px] touch-manipulation"
+            className="font-semibold w-full sm:w-auto"
           >
             Start Building Now - It's Free
           </Button>

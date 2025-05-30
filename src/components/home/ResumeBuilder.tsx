@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -42,7 +41,7 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             <Button 
               variant="outline" 
               onClick={onBack}
-              className="flex items-center gap-2 text-sm sm:text-base min-h-[44px]"
+              className="flex items-center gap-2"
             >
               ← Back to Home
             </Button>
@@ -51,7 +50,7 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             <div className="lg:hidden">
               <Sheet open={showPreview} onOpenChange={setShowPreview}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="min-h-[44px]">
+                  <Button variant="outline" size="sm">
                     <Eye className="h-4 w-4 mr-2" />
                     Preview
                   </Button>
@@ -113,12 +112,12 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
         <div className="lg:hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="content" className="text-sm flex items-center gap-2 min-h-[44px]">
+              <TabsTrigger value="content" className="text-sm flex items-center gap-2">
                 <Edit3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Content</span>
                 <span className="sm:hidden">Edit</span>
               </TabsTrigger>
-              <TabsTrigger value="layout" className="text-sm flex items-center gap-2 min-h-[44px]">
+              <TabsTrigger value="layout" className="text-sm flex items-center gap-2">
                 <Menu className="h-4 w-4" />
                 <span className="hidden sm:inline">Layout</span>
                 <span className="sm:hidden">Layout</span>
