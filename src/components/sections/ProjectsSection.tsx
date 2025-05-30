@@ -2,6 +2,7 @@
 import React from 'react';
 import ResumeSection from '../ResumeSection';
 import { ResumeData, ColorTheme } from '@/types/resume';
+import { sanitizeHtml, isHtmlContent } from '@/utils/htmlUtils';
 
 interface ProjectsSectionProps {
   data: ResumeData;
@@ -9,6 +10,24 @@ interface ProjectsSectionProps {
 }
 
 const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
+  const renderDescription = (description: string) => {
+    if (isHtmlContent(description)) {
+      return (
+        <div 
+          className="text-sm leading-normal resume-content mb-1" 
+          style={{ color: theme.text }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
+        />
+      );
+    }
+    
+    return (
+      <p className="text-sm leading-normal mb-1" style={{ color: theme.text }}>
+        {description}
+      </p>
+    );
+  };
+
   return (
     <ResumeSection title="Projects" theme={theme}>
       <div className="space-y-3">
@@ -30,11 +49,7 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ data, theme }) => {
                 </a>
               )}
             </div>
-            {project.description && (
-              <p className="text-sm leading-normal mb-1" style={{ color: theme.text }}>
-                {project.description}
-              </p>
-            )}
+            {project.description && renderDescription(project.description)}
             {project.technologies && (
               <p className="text-sm" style={{ color: theme.text }}>
                 <span className="font-medium">Technologies:</span> {project.technologies}

@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2 } from 'lucide-react';
 import { Project } from '@/types/resume';
@@ -69,13 +68,14 @@ const ProjectsForm: React.FC<ProjectsFormProps> = ({
             
             <div>
               <Label htmlFor={`project-description-${project.id}`}>Description</Label>
-              <Textarea
-                id={`project-description-${project.id}`}
-                value={project.description}
-                onChange={(e) => onUpdate(project.id, 'description', e.target.value)}
-                placeholder="Describe the project and your contributions"
-                rows={3}
-              />
+              <div className="mt-2">
+                <RichTextEditor
+                  id={`project-description-${project.id}`}
+                  value={project.description}
+                  onChange={(value) => onUpdate(project.id, 'description', value)}
+                  placeholder="Describe the project and your contributions. Use bullet points to highlight key features or achievements."
+                />
+              </div>
             </div>
             
             <div>

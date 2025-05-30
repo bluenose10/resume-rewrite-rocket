@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2 } from 'lucide-react';
 import { Experience } from '@/types/resume';
@@ -95,14 +95,15 @@ const ExperienceForm: React.FC<ExperienceFormProps> = ({
 
             <div>
               <Label>Description</Label>
-              <Textarea
-                value={exp.description}
-                onChange={(e) => onUpdate(exp.id, 'description', e.target.value)}
-                placeholder="Describe your role, responsibilities, and achievements. You can use bullet points (•) or line breaks to format your content as desired."
-                className="min-h-[100px]"
-              />
+              <div className="mt-2">
+                <RichTextEditor
+                  value={exp.description}
+                  onChange={(value) => onUpdate(exp.id, 'description', value)}
+                  placeholder="Describe your role, responsibilities, and achievements. Use bullet points to highlight key accomplishments."
+                />
+              </div>
               <p className="text-xs text-gray-500 mt-1">
-                Tip: Format your content however you like - use bullet points, paragraphs, or line breaks.
+                Tip: Use bullet points for achievements and bold text to emphasize key skills or results.
               </p>
             </div>
           </div>
