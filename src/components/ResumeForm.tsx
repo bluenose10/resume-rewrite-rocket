@@ -6,8 +6,10 @@ import { Wand2 } from 'lucide-react';
 import ColorThemeSelector from './ColorThemeSelector';
 import PersonalInfoForm from './forms/PersonalInfoForm';
 import FormSectionRenderer from './forms/FormSectionRenderer';
+import LoadingSkeleton from './LoadingSkeleton';
 import { ResumeData, SectionConfig } from '@/types/resume';
 import { useResumeFormData } from '@/hooks/useResumeFormData';
+import { useAutoSave } from '@/hooks/useAutoSave';
 
 interface ResumeFormProps {
   initialData?: ResumeData;
@@ -25,10 +27,25 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
   isOptimizing 
 }) => {
   const formData = useResumeFormData({ initialData, onDataChange });
+  
+  // Auto-save functionality
+  useAutoSave({ data: formData.resumeData });
 
   // Use the sectionConfig from props (which comes from the parent's state)
   // rather than the one from formData to ensure immediate updates
   const currentSectionConfig = sectionConfig.length > 0 ? sectionConfig : formData.resumeData.sectionConfig || [];
+
+  if (isOptimizing) {
+    return (
+      <div className="space-y-6 max-w-2xl">
+        <LoadingSkeleton type="optimization" />
+        <div className="text-center text-gray-600">
+          <p>Our AI is optimizing your resume content...</p>
+          <p className="text-sm mt-1">This usually takes 10-30 seconds</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-2xl">

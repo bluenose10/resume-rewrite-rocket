@@ -13,7 +13,7 @@ interface ResumePreviewProps {
   data: ResumeData;
 }
 
-const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
+const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   const { toast } = useToast();
   const theme = data.theme || DEFAULT_THEMES[0];
   const [isExporting, setIsExporting] = React.useState(false);
@@ -100,6 +100,8 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({ data }) => {
       </Card>
     </div>
   );
-};
+});
+
+ResumePreview.displayName = 'ResumePreview';
 
 export default ResumePreview;
