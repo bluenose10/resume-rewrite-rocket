@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useResumeStats } from '@/hooks/useResumeStats';
 import { optimizeResumeContent } from '@/services/openaiService';
 import { generatePDF } from '@/utils/pdfGenerator';
 import { ResumeData, SectionConfig } from '@/types/resume';
-import { useAutoSave } from '@/hooks/useAutoSave';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturesSection from '@/components/home/FeaturesSection';
@@ -62,31 +62,6 @@ const Index = () => {
   });
   
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const { loadAutoSave } = useAutoSave({ data: resumeData });
-
-  // Load auto-saved data on component mount
-  useEffect(() => {
-    const autoSavedData = loadAutoSave();
-    if (autoSavedData && showBuilder) {
-      // Only show the restore prompt if there's meaningful data
-      const hasContent = autoSavedData.personalInfo.firstName || 
-                        autoSavedData.summary || 
-                        autoSavedData.experience.length > 0;
-      
-      if (hasContent) {
-        const shouldRestore = window.confirm(
-          'We found auto-saved resume data. Would you like to restore it?'
-        );
-        if (shouldRestore) {
-          setResumeData(autoSavedData);
-          toast({
-            title: "Data Restored",
-            description: "Your auto-saved resume data has been restored."
-          });
-        }
-      }
-    }
-  }, [showBuilder, loadAutoSave, toast]);
 
   const handleDataChange = (data: ResumeData) => {
     setResumeData(data);

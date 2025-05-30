@@ -39,25 +39,4 @@ export const useAutoSave = ({ data, delay = 2000 }: UseAutoSaveProps) => {
       }
     };
   }, [data, delay]);
-
-  const loadAutoSave = (): ResumeData | null => {
-    try {
-      const saved = localStorage.getItem('resume-auto-save');
-      return saved ? JSON.parse(saved) : null;
-    } catch (error) {
-      console.warn('Failed to load auto-saved resume:', error);
-      return null;
-    }
-  };
-
-  const clearAutoSave = () => {
-    try {
-      localStorage.removeItem('resume-auto-save');
-      lastSavedRef.current = '';
-    } catch (error) {
-      console.warn('Failed to clear auto-save:', error);
-    }
-  };
-
-  return { loadAutoSave, clearAutoSave };
 };
