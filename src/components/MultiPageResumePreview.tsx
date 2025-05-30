@@ -5,8 +5,7 @@ import { ResumeData } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 import PersonalInfoHeader from './PersonalInfoHeader';
 import SectionRenderer from './SectionRenderer';
-import { calculateSmartPageBreaks } from '@/utils/smartPageBreakCalculator';
-import { useRealContentMeasurement } from '@/hooks/useRealContentMeasurement';
+import { calculateOptimalPageBreaks } from '@/utils/pageBreakCalculator';
 
 interface MultiPageResumePreviewProps {
   data: ResumeData;
@@ -17,10 +16,8 @@ interface PageContent {
   sections: Array<{
     sectionId: string;
     items?: string[];
-    height: number;
-    isPartial?: boolean;
-    startIndex?: number;
-    endIndex?: number;
+    estimatedHeight: number;
+    canSplit: boolean;
   }>;
   totalHeight: number;
   hasHeader: boolean;
@@ -72,32 +69,22 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
     );
   };
 
-  const visibleSections = getVisibleSections();
-  const { measurements, isReady } = useRealContentMeasurement(data, visibleSections);
-
   useEffect(() => {
-    if (!isReady || measurements.size === 0) return;
+    const visibleSections = getVisibleSections();
+    
+    // Fast calculation with no async operations
+    const pageLayouts = calculateOptimalPageBreaks(data, visibleSections);
+    setPages(pageLayouts);
+  }, [data]);
 
-    const calculatePages = () => {
-      const pageLayouts = calculateSmartPageBreaks(data, visibleSections, measurements);
-      setPages(pageLayouts);
-    };
-
-    calculatePages();
-  }, [data, measurements, isReady, visibleSections]);
-
-  // Show loading state while measurements are being calculated
-  if (!isReady || pages.length === 0) {
+  // Show minimal loading while pages are being calculated
+  if (pages.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="text-center text-sm text-gray-600 mb-4">
-          Calculating optimal page layout...
-        </div>
-        
         <Card className="shadow-lg border border-gray-200 bg-white">
           <CardContent className="p-0">
             <div 
-              className="bg-white text-gray-900 mx-auto relative resume-page animate-pulse"
+              className="bg-white text-gray-900 mx-auto relative resume-page"
               style={{ 
                 width: '794px', 
                 minHeight: `${A4_HEIGHT_PX}px`,
@@ -106,16 +93,9 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
             >
               <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
               <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                    <div className="h-px bg-gray-200"></div>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-gray-100 rounded w-full"></div>
-                      <div className="h-3 bg-gray-100 rounded w-4/5"></div>
-                    </div>
-                  </div>
-                ))}
+                <div className="text-center text-sm text-gray-600">
+                  Loading resume...
+                </div>
               </div>
             </div>
           </CardContent>
@@ -127,7 +107,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
   return (
     <div className="space-y-6">
       <div className="text-center text-sm text-gray-600 mb-4">
-        Showing {pages.length} page{pages.length > 1 ? 's' : ''} with smart content breaks
+        Showing {pages.length} page{pages.length > 1 ? 's' : ''} with optimized layout
       </div>
       
       <div className="space-y-8">
@@ -150,7 +130,7 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
                   <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
                 )}
                 
-                <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+                <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-8">
                   {page.sections.map((sectionData, sectionIndex) => (
                     <div 
                       key={`${sectionData.sectionId}-${sectionIndex}`} 
@@ -160,9 +140,6 @@ const MultiPageResumePreview: React.FC<MultiPageResumePreviewProps> = ({ data })
                         sectionId={sectionData.sectionId} 
                         data={data} 
                         theme={theme}
-                        items={sectionData.items}
-                        startIndex={sectionData.startIndex}
-                        endIndex={sectionData.endIndex}
                       />
                     </div>
                   ))}

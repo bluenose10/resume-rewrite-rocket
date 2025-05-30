@@ -19,12 +19,12 @@ const A4_HEIGHT_PX = 1123;
 const PAGE_PADDING = 48;
 const HEADER_HEIGHT = 200;
 const SECTION_SPACING = 32;
-const USABLE_HEIGHT = A4_HEIGHT_PX - (PAGE_PADDING * 2);
+const SAFETY_MARGIN = 100; // Increased safety margin
+const USABLE_HEIGHT = A4_HEIGHT_PX - (PAGE_PADDING * 2) - SAFETY_MARGIN;
 
 export const calculateOptimalPageBreaks = (
   data: ResumeData,
-  visibleSections: string[],
-  measurements: Map<string, { height: number; canSplit: boolean }>
+  visibleSections: string[]
 ): PageLayout[] => {
   const pages: PageLayout[] = [];
   let currentPage: PageLayout = {
@@ -64,35 +64,60 @@ export const calculateOptimalPageBreaks = (
 };
 
 const getSectionHeight = (sectionId: string, data: ResumeData): number => {
-  const baseHeight = 80; // Title + spacing
+  const baseHeight = 100; // Increased base height for title + spacing
   
   switch (sectionId) {
     case 'personalStatement':
+      // Estimate based on text length
+      const statementLength = data.personalStatement?.length || 0;
+      return baseHeight + Math.max(120, Math.ceil(statementLength / 100) * 40);
     case 'summary':
-      return baseHeight + 100;
+      const summaryLength = data.summary?.length || 0;
+      return baseHeight + Math.max(120, Math.ceil(summaryLength / 100) * 40);
     case 'experience':
-      return baseHeight + (data.experience?.length || 0) * 160;
+      // More generous estimates for experience items
+      const expItems = data.experience?.length || 0;
+      const avgExpHeight = expItems > 0 ? 180 : 0; // Increased from 160
+      return baseHeight + (expItems * avgExpHeight);
     case 'projects':
-      return baseHeight + (data.projects?.length || 0) * 180;
+      const projItems = data.projects?.length || 0;
+      const avgProjHeight = projItems > 0 ? 200 : 0; // Increased from 180
+      return baseHeight + (projItems * avgProjHeight);
     case 'education':
-      return baseHeight + (data.education?.length || 0) * 120;
+      const eduItems = data.education?.length || 0;
+      const avgEduHeight = eduItems > 0 ? 140 : 0; // Increased from 120
+      return baseHeight + (eduItems * avgEduHeight);
     case 'skills':
-      return baseHeight + 100;
+      // Estimate based on number of skills
+      const skillsCount = data.skills?.length || 0;
+      return baseHeight + Math.max(100, Math.ceil(skillsCount / 10) * 60);
     case 'achievements':
-      return baseHeight + (data.achievements?.length || 0) * 60;
+      const achItems = data.achievements?.length || 0;
+      const avgAchHeight = achItems > 0 ? 80 : 0; // Increased from 60
+      return baseHeight + (achItems * avgAchHeight);
     case 'certifications':
-      return baseHeight + (data.certifications?.length || 0) * 80;
+      const certItems = data.certifications?.length || 0;
+      const avgCertHeight = certItems > 0 ? 100 : 0; // Increased from 80
+      return baseHeight + (certItems * avgCertHeight);
     case 'languages':
-      return baseHeight + 80;
+      const langItems = data.languages?.length || 0;
+      return baseHeight + Math.max(100, langItems * 40);
     case 'volunteerExperience':
-      return baseHeight + (data.volunteerExperience?.length || 0) * 140;
+      const volItems = data.volunteerExperience?.length || 0;
+      const avgVolHeight = volItems > 0 ? 160 : 0; // Increased from 140
+      return baseHeight + (volItems * avgVolHeight);
     case 'publications':
-      return baseHeight + (data.publications?.length || 0) * 100;
+      const pubItems = data.publications?.length || 0;
+      const avgPubHeight = pubItems > 0 ? 120 : 0; // Increased from 100
+      return baseHeight + (pubItems * avgPubHeight);
     case 'references':
-      return baseHeight + (data.references?.length || 0) * 160;
+      const refItems = data.references?.length || 0;
+      const avgRefHeight = refItems > 0 ? 180 : 0; // Increased from 160
+      return baseHeight + (refItems * avgRefHeight);
     case 'interests':
-      return baseHeight + 80;
+      const interestItems = data.interests?.length || 0;
+      return baseHeight + Math.max(100, Math.ceil(interestItems / 5) * 60);
     default:
-      return baseHeight;
+      return baseHeight + 60; // Default generous estimate
   }
 };
