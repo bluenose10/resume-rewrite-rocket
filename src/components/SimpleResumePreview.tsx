@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { ResumeData } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
 import PersonalInfoHeader from './PersonalInfoHeader';
@@ -57,32 +56,82 @@ const SimpleResumePreview: React.FC<SimpleResumePreviewProps> = ({ data }) => {
   const visibleSections = getVisibleSections();
 
   return (
-    <div className="space-y-4">
-      <Card className="shadow-lg border border-gray-200 bg-white">
-        <CardContent className="p-0">
-          <div 
-            className="bg-white text-gray-900 mx-auto relative resume-page"
-            style={{ 
-              width: '794px', 
-              maxWidth: '100%'
-            }}
-          >
-            <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-            
-            <div className="px-6 py-4 space-y-4">
-              {visibleSections.map((sectionId) => (
-                <div key={sectionId} className="resume-section">
+    <div className="resume-container">
+      <style jsx>{`
+        @media print {
+          .resume-container {
+            width: 794px !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+          
+          .resume-page {
+            width: 794px !important;
+            padding: 40px !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            page-break-inside: avoid;
+          }
+          
+          .resume-section {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          
+          .section-item {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          
+          .page-break-after {
+            page-break-after: always;
+          }
+          
+          .page-break-before {
+            page-break-before: always;
+          }
+        }
+      `}</style>
+      
+      <div className="space-y-8">
+        <div 
+          className="resume-page bg-white shadow-lg border border-gray-200 mx-auto relative"
+          style={{ 
+            width: '794px', 
+            maxWidth: '100%',
+            padding: '40px'
+          }}
+        >
+          <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
+          
+          <div className="space-y-6 mt-6">
+            {visibleSections.map((sectionId, index) => {
+              const needsPageBreak = index > 0 && (
+                sectionId === 'experience' || 
+                sectionId === 'education' || 
+                sectionId === 'projects'
+              );
+              
+              return (
+                <div 
+                  key={sectionId} 
+                  className={`resume-section ${needsPageBreak ? 'page-break-before' : ''}`}
+                >
                   <SectionRenderer 
                     sectionId={sectionId} 
                     data={data} 
                     theme={theme}
                   />
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
