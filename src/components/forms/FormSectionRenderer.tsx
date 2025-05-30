@@ -1,21 +1,21 @@
 
 import React from 'react';
 import { SectionConfig } from '@/types/resume';
-import PersonalStatementForm from './PersonalStatementForm';
 import ExperienceForm from './ExperienceForm';
 import EducationForm from './EducationForm';
 import ProjectsForm from './ProjectsForm';
-import SkillsForm from './SkillsForm';
 import AchievementsForm from './AchievementsForm';
 import CertificationsForm from './CertificationsForm';
 import LanguagesForm from './LanguagesForm';
 import VolunteerExperienceForm from './VolunteerExperienceForm';
 import PublicationsForm from './PublicationsForm';
 import ReferencesForm from './ReferencesForm';
+import PersonalStatementSection from './sections/PersonalStatementSection';
+import SummarySection from './sections/SummarySection';
+import SkillsSection from './sections/SkillsSection';
+import InterestsSection from './sections/InterestsSection';
 import { useResumeFormData } from '@/hooks/useResumeFormData';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { renderSection } from './utils/sectionVisibilityUtils';
 
 interface FormSectionRendererProps {
   sectionConfig: SectionConfig[];
@@ -26,67 +26,31 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
   sectionConfig,
   formData
 }) => {
-  const isSectionVisible = (sectionId: string) => {
-    const section = sectionConfig.find(s => s.id === sectionId);
-    console.log(`Section visibility check for ${sectionId}:`, section?.visible);
-    return section ? section.visible : true;
-  };
-
-  const renderSection = (sectionId: string, component: React.ReactNode) => {
-    const isVisible = isSectionVisible(sectionId);
-    console.log(`Rendering section ${sectionId}: ${isVisible ? 'visible' : 'hidden'}`);
-    return isVisible ? component : null;
-  };
-
   // Log the current section config for debugging
   console.log('FormSectionRenderer - Current sectionConfig:', sectionConfig);
 
   return (
     <>
       {/* Personal Statement */}
-      {renderSection('personalStatement', (
-        <Card key="personalStatement">
-          <CardHeader>
-            <CardTitle>Personal Statement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label htmlFor="personal-statement">Personal Statement</Label>
-              <Textarea
-                id="personal-statement"
-                value={formData.resumeData.personalStatement}
-                onChange={(e) => formData.updatePersonalStatement(e.target.value)}
-                placeholder="Write a compelling personal statement that highlights your passion and goals"
-                rows={4}
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {renderSection(sectionConfig, 'personalStatement', (
+        <PersonalStatementSection
+          key="personalStatement"
+          value={formData.resumeData.personalStatement}
+          onChange={formData.updatePersonalStatement}
+        />
       ))}
 
       {/* Summary */}
-      {renderSection('summary', (
-        <Card key="summary">
-          <CardHeader>
-            <CardTitle>Professional Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label htmlFor="summary">Professional Summary</Label>
-              <Textarea
-                id="summary"
-                value={formData.resumeData.summary}
-                onChange={(e) => formData.updateSummary(e.target.value)}
-                placeholder="Write a brief summary of your professional background, key skills, and achievements"
-                rows={4}
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {renderSection(sectionConfig, 'summary', (
+        <SummarySection
+          key="summary"
+          value={formData.resumeData.summary}
+          onChange={formData.updateSummary}
+        />
       ))}
 
       {/* Experience */}
-      {renderSection('experience', (
+      {renderSection(sectionConfig, 'experience', (
         <ExperienceForm
           key="experience"
           experience={formData.resumeData.experience}
@@ -97,7 +61,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Education */}
-      {renderSection('education', (
+      {renderSection(sectionConfig, 'education', (
         <EducationForm
           key="education"
           education={formData.resumeData.education}
@@ -108,7 +72,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Projects */}
-      {renderSection('projects', (
+      {renderSection(sectionConfig, 'projects', (
         <ProjectsForm
           key="projects"
           projects={formData.resumeData.projects}
@@ -119,30 +83,19 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Skills */}
-      {renderSection('skills', (
-        <Card key="skills">
-          <CardHeader>
-            <CardTitle>Technical Skills</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SkillsForm
-              skills={formData.resumeData.skills}
-              interests={[]}
-              newSkill={formData.newSkill}
-              newInterest=""
-              onNewSkillChange={formData.setNewSkill}
-              onNewInterestChange={() => {}}
-              onAddSkill={formData.addSkill}
-              onAddInterest={() => {}}
-              onRemoveSkill={formData.removeSkill}
-              onRemoveInterest={() => {}}
-            />
-          </CardContent>
-        </Card>
+      {renderSection(sectionConfig, 'skills', (
+        <SkillsSection
+          key="skills"
+          skills={formData.resumeData.skills}
+          newSkill={formData.newSkill}
+          onNewSkillChange={formData.setNewSkill}
+          onAddSkill={formData.addSkill}
+          onRemoveSkill={formData.removeSkill}
+        />
       ))}
 
       {/* Achievements */}
-      {renderSection('achievements', (
+      {renderSection(sectionConfig, 'achievements', (
         <AchievementsForm
           key="achievements"
           achievements={formData.resumeData.achievements}
@@ -153,7 +106,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Certifications */}
-      {renderSection('certifications', (
+      {renderSection(sectionConfig, 'certifications', (
         <CertificationsForm
           key="certifications"
           certifications={formData.resumeData.certifications}
@@ -164,7 +117,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Languages */}
-      {renderSection('languages', (
+      {renderSection(sectionConfig, 'languages', (
         <LanguagesForm
           key="languages"
           languages={formData.resumeData.languages}
@@ -175,7 +128,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Volunteer Experience */}
-      {renderSection('volunteerExperience', (
+      {renderSection(sectionConfig, 'volunteerExperience', (
         <VolunteerExperienceForm
           key="volunteerExperience"
           volunteerExperience={formData.resumeData.volunteerExperience}
@@ -186,7 +139,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Publications */}
-      {renderSection('publications', (
+      {renderSection(sectionConfig, 'publications', (
         <PublicationsForm
           key="publications"
           publications={formData.resumeData.publications}
@@ -197,7 +150,7 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* References */}
-      {renderSection('references', (
+      {renderSection(sectionConfig, 'references', (
         <ReferencesForm
           key="references"
           references={formData.resumeData.references}
@@ -208,26 +161,15 @@ const FormSectionRenderer: React.FC<FormSectionRendererProps> = ({
       ))}
 
       {/* Interests */}
-      {renderSection('interests', (
-        <Card key="interests">
-          <CardHeader>
-            <CardTitle>Interests & Hobbies</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SkillsForm
-              skills={[]}
-              interests={formData.resumeData.interests}
-              newSkill=""
-              newInterest={formData.newInterest}
-              onNewSkillChange={() => {}}
-              onNewInterestChange={formData.setNewInterest}
-              onAddSkill={() => {}}
-              onAddInterest={formData.addInterest}
-              onRemoveSkill={() => {}}
-              onRemoveInterest={formData.removeInterest}
-            />
-          </CardContent>
-        </Card>
+      {renderSection(sectionConfig, 'interests', (
+        <InterestsSection
+          key="interests"
+          interests={formData.resumeData.interests}
+          newInterest={formData.newInterest}
+          onNewInterestChange={formData.setNewInterest}
+          onAddInterest={formData.addInterest}
+          onRemoveInterest={formData.removeInterest}
+        />
       ))}
     </>
   );
