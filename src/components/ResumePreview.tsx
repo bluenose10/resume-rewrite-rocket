@@ -1,13 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { ResumeData } from '@/types/resume';
-import { DEFAULT_THEMES } from '@/constants/themes';
 import ExportOptionsModal from './ExportOptionsModal';
-import PersonalInfoHeader from './PersonalInfoHeader';
-import SectionRenderer from './SectionRenderer';
 import ResumeLengthIndicator from './ResumeLengthIndicator';
-import SmartPageBreakIndicator from './SmartPageBreakIndicator';
+import MultiPageResumePreview from './MultiPageResumePreview';
 import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,7 +13,6 @@ interface ResumePreviewProps {
 
 const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   const { toast } = useToast();
-  const theme = data.theme || DEFAULT_THEMES[0];
   const [isExporting, setIsExporting] = React.useState(false);
 
   const handleExport = async (options: ExportOptions) => {
@@ -42,52 +37,6 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
     }
   };
 
-  const isVisible = (sectionId: string) => {
-    const sectionConfig = data.sectionConfig?.find(s => s.id === sectionId);
-    return sectionConfig?.visible !== false;
-  };
-
-  const hasContent = (sectionId: string) => {
-    switch (sectionId) {
-      case 'personalStatement': return !!data.personalStatement;
-      case 'summary': return !!data.summary;
-      case 'experience': return data.experience?.length > 0;
-      case 'projects': return data.projects?.length > 0;
-      case 'education': return data.education?.length > 0;
-      case 'skills': return data.skills?.length > 0;
-      case 'achievements': return data.achievements?.length > 0;
-      case 'certifications': return data.certifications?.length > 0;
-      case 'languages': return data.languages?.length > 0;
-      case 'volunteerExperience': return data.volunteerExperience?.length > 0;
-      case 'publications': return data.publications?.length > 0;
-      case 'references': return data.references?.length > 0;
-      case 'interests': return data.interests?.length > 0;
-      default: return false;
-    }
-  };
-
-  const renderSection = (sectionId: string, index: number) => {
-    if (!isVisible(sectionId) || !hasContent(sectionId)) return null;
-    
-    return (
-      <div key={sectionId} className="resume-section">
-        <SectionRenderer sectionId={sectionId} data={data} theme={theme} />
-      </div>
-    );
-  };
-
-  const getSectionOrder = () => {
-    if (data.sectionOrder && data.sectionConfig) {
-      return data.sectionOrder;
-    }
-    // Default order if not specified
-    return [
-      'personalStatement', 'summary', 'experience', 'projects', 'education',
-      'skills', 'achievements', 'certifications', 'languages',
-      'volunteerExperience', 'publications', 'references', 'interests'
-    ];
-  };
-
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -98,19 +47,10 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
       {/* Resume Length Indicator */}
       <ResumeLengthIndicator data={data} />
 
-      <Card className="shadow-lg border border-gray-200 bg-white">
-        <CardContent className="p-0" id="resume-content">
-          <div className="max-w-4xl mx-auto bg-white text-gray-900">
-            <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-            <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-              {getSectionOrder().map((sectionId, index) => renderSection(sectionId, index))}
-            </div>
-            
-            {/* Smart page break indicator that calculates actual content height */}
-            <SmartPageBreakIndicator />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Multi-page resume preview */}
+      <div id="resume-content">
+        <MultiPageResumePreview data={data} />
+      </div>
     </div>
   );
 });

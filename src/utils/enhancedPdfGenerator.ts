@@ -1,4 +1,3 @@
-
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -36,13 +35,13 @@ const addPageBreakStyles = () => {
     .resume-section {
       page-break-inside: avoid;
       break-inside: avoid;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
     
     .resume-item {
       page-break-inside: avoid;
       break-inside: avoid;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     
     .page-break-before {
@@ -95,53 +94,16 @@ export const generateEnhancedPDF = async (
     // Add page break styles for better formatting
     const pageBreakStyle = addPageBreakStyles();
 
-    // Apply resume-specific classes for better page breaks
-    const sections = element.querySelectorAll('section, .space-y-3 > div, .space-y-2 > div');
-    sections.forEach(section => {
-      section.classList.add('resume-section');
-    });
-
-    // Optimize element for PDF generation with better spacing
-    const originalStyle = element.style.cssText;
-    element.style.width = '794px'; // A4 width in pixels at 96 DPI
-    element.style.maxWidth = '794px';
-    element.style.backgroundColor = '#ffffff';
-    element.style.lineHeight = '1.5';
-    element.style.padding = '20px';
-
-    // Generate high-quality canvas with better spacing
-    const canvas = await html2canvas(element, {
-      scale: qualitySettings.scale,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      width: 794,
-      height: element.scrollHeight,
-      scrollX: 0,
-      scrollY: 0,
-      removeContainer: false,
-      imageTimeout: 15000,
-      logging: false
-    });
-
-    // Restore original styles and remove page break styles
-    element.style.cssText = originalStyle;
-    sections.forEach(section => {
-      section.classList.remove('resume-section');
-    });
-    removePageBreakStyles(pageBreakStyle);
-
-    if (options.format === 'png' || options.format === 'jpeg') {
-      // Export as image
-      const link = document.createElement('a');
-      link.download = filename.replace('.pdf', `.${options.format}`);
-      link.href = canvas.toDataURL(`image/${options.format}`, qualitySettings.compression);
-      link.click();
-      return;
+    // Find all page cards in the multi-page preview
+    const pageCards = element.querySelectorAll('.space-y-8 > .shadow-lg');
+    
+    if (pageCards.length === 0) {
+      throw new Error('No pages found in resume preview');
     }
 
-    // Create PDF with smarter multi-page support
-    const imgData = canvas.toDataURL('image/png', qualitySettings.compression);
+    console.log(`Found ${pageCards.length} pages to export`);
+
+    // Create PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -149,65 +111,92 @@ export const generateEnhancedPDF = async (
       compress: true
     });
 
-    // Calculate dimensions with better spacing
-    const pdfWidth = paperSize.width - (margin * 2);
-    const pdfHeight = paperSize.height - (margin * 2);
-    
-    // Convert canvas pixels to mm (96 DPI standard)
-    const pixelsToMm = 0.264583;
-    const canvasWidthMm = canvas.width * pixelsToMm;
-    const canvasHeightMm = canvas.height * pixelsToMm;
-    
-    // Scale to fit page width
-    const scale = pdfWidth / canvasWidthMm;
-    const scaledWidth = pdfWidth;
-    const scaledHeight = canvasHeightMm * scale;
-    
-    // Calculate pages with better spacing - leave more room between pages
-    const usablePageHeight = pdfHeight - 10; // Add 10mm buffer for better spacing
-    const totalPages = Math.ceil(scaledHeight / usablePageHeight);
-    
-    console.log('Enhanced PDF Generation Info:', {
-      canvasSize: { width: canvas.width, height: canvas.height },
-      canvasMm: { width: canvasWidthMm, height: canvasHeightMm },
-      scaledMm: { width: scaledWidth, height: scaledHeight },
-      pageHeight: usablePageHeight,
-      totalPages: totalPages,
-      margins: margin
-    });
-    
-    // Add each page with better content distribution
-    for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+    // Process each page
+    for (let pageIndex = 0; pageIndex < pageCards.length; pageIndex++) {
+      const pageCard = pageCards[pageIndex] as HTMLElement;
+      
       if (pageIndex > 0) {
         pdf.addPage();
       }
+
+      // Get the actual content div inside the card
+      const pageContent = pageCard.querySelector('[style*="width: 794px"]') as HTMLElement;
+      if (!pageContent) {
+        console.warn(`Page ${pageIndex + 1} content not found, skipping`);
+        continue;
+      }
+
+      // Optimize page content for PDF generation
+      const originalStyle = pageContent.style.cssText;
+      pageContent.style.width = '794px';
+      pageContent.style.maxWidth = '794px';
+      pageContent.style.backgroundColor = '#ffffff';
+      pageContent.style.minHeight = '1123px';
+
+      // Generate canvas for this page
+      const canvas = await html2canvas(pageContent, {
+        scale: qualitySettings.scale,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: 1123,
+        scrollX: 0,
+        scrollY: 0,
+        removeContainer: false,
+        imageTimeout: 15000,
+        logging: false
+      });
+
+      // Restore original styles
+      pageContent.style.cssText = originalStyle;
+
+      // Add to PDF
+      const imgData = canvas.toDataURL('image/png', qualitySettings.compression);
       
-      // Calculate the Y offset for this page with better spacing
-      const yOffsetMm = pageIndex * usablePageHeight;
+      // Calculate dimensions to fit page with margins
+      const pdfWidth = paperSize.width - (margin * 2);
+      const pdfHeight = paperSize.height - (margin * 2);
       
-      // Add the image slice for this page
+      // Convert canvas to mm and scale to fit
+      const pixelsToMm = 0.264583;
+      const canvasWidthMm = canvas.width * pixelsToMm;
+      const canvasHeightMm = canvas.height * pixelsToMm;
+      
+      const scale = Math.min(pdfWidth / canvasWidthMm, pdfHeight / canvasHeightMm);
+      const scaledWidth = canvasWidthMm * scale;
+      const scaledHeight = canvasHeightMm * scale;
+      
+      // Center the content
+      const x = margin + (pdfWidth - scaledWidth) / 2;
+      const y = margin;
+
       pdf.addImage(
         imgData, 
         'PNG', 
-        margin,                    // x position
-        margin - yOffsetMm,        // y position (negative offset to show correct slice)
-        scaledWidth,               // width
-        scaledHeight,              // full height (clipped by page bounds)
-        undefined,                 // alias
-        'FAST'                     // compression
+        x,
+        y,
+        scaledWidth,
+        scaledHeight,
+        undefined,
+        'FAST'
       );
-      
-      // Add subtle page number for multi-page documents
-      if (totalPages > 1) {
-        pdf.setFontSize(8);
-        pdf.setTextColor(120, 120, 120);
-        pdf.text(
-          `${pageIndex + 1}`, 
-          paperSize.width - margin - 5, 
-          paperSize.height - 5, 
-          { align: 'right' }
-        );
-      }
+
+      console.log(`Added page ${pageIndex + 1} to PDF`);
+    }
+
+    // Remove page break styles
+    removePageBreakStyles(pageBreakStyle);
+
+    // Handle non-PDF formats
+    if (options.format === 'png' || options.format === 'jpeg') {
+      // For images, create a single canvas with all pages
+      const allPagesCanvas = await createAllPagesCanvas(pageCards, qualitySettings);
+      const link = document.createElement('a');
+      link.download = filename.replace('.pdf', `.${options.format}`);
+      link.href = allPagesCanvas.toDataURL(`image/${options.format}`, qualitySettings.compression);
+      link.click();
+      return;
     }
 
     // Add metadata
@@ -221,11 +210,42 @@ export const generateEnhancedPDF = async (
 
     pdf.save(filename);
     
-    console.log(`Successfully generated ${totalPages}-page PDF with enhanced formatting: ${filename}`);
+    console.log(`Successfully generated ${pageCards.length}-page PDF: ${filename}`);
   } catch (error) {
     console.error('Enhanced PDF generation error:', error);
     throw new Error('Failed to generate professional PDF. Please try again.');
   }
+};
+
+const createAllPagesCanvas = async (pageCards: NodeListOf<Element>, qualitySettings: any) => {
+  const totalHeight = pageCards.length * 1123;
+  const canvas = document.createElement('canvas');
+  canvas.width = 794 * qualitySettings.scale;
+  canvas.height = totalHeight * qualitySettings.scale;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas context not available');
+  
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  for (let i = 0; i < pageCards.length; i++) {
+    const pageContent = pageCards[i].querySelector('[style*="width: 794px"]') as HTMLElement;
+    if (pageContent) {
+      const pageCanvas = await html2canvas(pageContent, {
+        scale: qualitySettings.scale,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: 1123
+      });
+      
+      ctx.drawImage(pageCanvas, 0, i * 1123 * qualitySettings.scale);
+    }
+  }
+  
+  return canvas;
 };
 
 export const optimizeResumeForPrint = (elementId: string) => {
