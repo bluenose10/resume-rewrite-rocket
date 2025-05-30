@@ -1,3 +1,4 @@
+
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -53,14 +54,14 @@ export const generateEnhancedPDF = async (
     element.style.maxWidth = '794px';
     element.style.backgroundColor = '#ffffff';
 
-    // Generate high-quality canvas
+    // Generate high-quality canvas with the FULL height of content
     const canvas = await html2canvas(element, {
       scale: qualitySettings.scale,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
       width: 794,
-      height: element.scrollHeight,
+      height: element.scrollHeight, // This captures ALL content height
       scrollX: 0,
       scrollY: 0,
       removeContainer: false,
@@ -80,7 +81,7 @@ export const generateEnhancedPDF = async (
       return;
     }
 
-    // Generate PDF with multi-page support
+    // Create PDF with proper multi-page support
     const imgData = canvas.toDataURL('image/png', qualitySettings.compression);
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -89,34 +90,51 @@ export const generateEnhancedPDF = async (
       compress: true
     });
 
+    // Calculate dimensions
     const pdfWidth = paperSize.width - (margin * 2);
     const pdfHeight = paperSize.height - (margin * 2);
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
     
-    // Calculate how many pages we need
-    const pageHeightInPixels = (pdfHeight / (imgWidth * 0.264583)) * imgHeight;
-    const totalPages = Math.ceil(imgHeight / pageHeightInPixels);
+    // Convert canvas pixels to mm (96 DPI standard)
+    const pixelsToMm = 0.264583;
+    const canvasWidthMm = canvas.width * pixelsToMm;
+    const canvasHeightMm = canvas.height * pixelsToMm;
     
-    // Add each page
+    // Scale to fit page width
+    const scale = pdfWidth / canvasWidthMm;
+    const scaledWidth = pdfWidth;
+    const scaledHeight = canvasHeightMm * scale;
+    
+    // Calculate how many pages we need based on actual scaled content height
+    const usablePageHeight = pdfHeight;
+    const totalPages = Math.ceil(scaledHeight / usablePageHeight);
+    
+    console.log('PDF Generation Info:', {
+      canvasSize: { width: canvas.width, height: canvas.height },
+      canvasMm: { width: canvasWidthMm, height: canvasHeightMm },
+      scaledMm: { width: scaledWidth, height: scaledHeight },
+      pageHeight: usablePageHeight,
+      totalPages: totalPages
+    });
+    
+    // Add each page with proper content slicing
     for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
       if (pageIndex > 0) {
         pdf.addPage();
       }
       
-      const yOffset = -(pageIndex * pageHeightInPixels);
-      const scaledWidth = pdfWidth;
-      const scaledHeight = (imgHeight * 0.264583) * (pdfWidth / (imgWidth * 0.264583));
+      // Calculate the Y offset for this page
+      const yOffsetMm = pageIndex * usablePageHeight;
       
+      // Add the image slice for this page
       pdf.addImage(
         imgData, 
         'PNG', 
-        margin, 
-        margin + yOffset * 0.264583, 
-        scaledWidth, 
-        scaledHeight, 
-        undefined, 
-        'FAST'
+        margin,                    // x position
+        margin - yOffsetMm,        // y position (negative offset to show correct slice)
+        scaledWidth,               // width
+        scaledHeight,              // full height (clipped by page bounds)
+        undefined,                 // alias
+        'FAST'                     // compression
       );
       
       // Add page number for multi-page documents
@@ -126,17 +144,11 @@ export const generateEnhancedPDF = async (
         pdf.text(
           `Page ${pageIndex + 1} of ${totalPages}`, 
           paperSize.width / 2, 
-          paperSize.height - 5, 
+          paperSize.height - 3, 
           { align: 'center' }
         );
       }
     }
-    
-    // Add watermark for professional touch
-    pdf.setPage(1);
-    pdf.setFontSize(8);
-    pdf.setTextColor(200, 200, 200);
-    pdf.text('Generated with AI Resume Builder', margin, paperSize.height - 5);
 
     // Add metadata
     pdf.setProperties({
@@ -148,6 +160,8 @@ export const generateEnhancedPDF = async (
     });
 
     pdf.save(filename);
+    
+    console.log(`Successfully generated ${totalPages}-page PDF: ${filename}`);
   } catch (error) {
     console.error('Enhanced PDF generation error:', error);
     throw new Error('Failed to generate professional PDF. Please try again.');
