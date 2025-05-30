@@ -7,10 +7,7 @@ import { DEFAULT_THEMES } from '@/constants/themes';
 import { 
   PAGE_HEIGHT, 
   PAGE_MARGIN, 
-  CONTENT_HEIGHT, 
-  measureElement, 
-  canSectionSplit,
-  splitLongSection 
+  CONTENT_HEIGHT 
 } from '@/utils/pageBreakUtils';
 
 interface MeasuredMultiPagePreviewProps {
@@ -30,50 +27,62 @@ const MeasuredMultiPagePreview: React.FC<MeasuredMultiPagePreviewProps> = ({ dat
     const createMeasuredPages = async () => {
       console.log('Starting measured page creation...');
       
-      // First, render all content in a hidden measuring container
       const measuringContainer = measuringRef.current!;
+      
+      // Clear and setup measuring container
       measuringContainer.innerHTML = '';
       measuringContainer.style.position = 'absolute';
       measuringContainer.style.left = '-9999px';
-      measuringContainer.style.width = `${794}px`; // A4 width
+      measuringContainer.style.width = `794px`; // A4 width
       measuringContainer.style.visibility = 'hidden';
+      measuringContainer.style.display = 'block';
 
-      // Create header
-      const headerContainer = document.createElement('div');
-      headerContainer.className = 'header-container';
-      measuringContainer.appendChild(headerContainer);
+      // Create a temporary React root for measuring
+      const { createRoot } = await import('react-dom/client');
+      const root = createRoot(measuringContainer);
 
-      // Create section containers
-      const sectionContainers: { id: string; element: HTMLElement }[] = [];
-      
-      visibleSections.forEach((sectionConfig) => {
-        if (hasSectionContent(sectionConfig.id, data)) {
-          const sectionContainer = document.createElement('div');
-          sectionContainer.className = `section-container section-${sectionConfig.id}`;
-          sectionContainer.setAttribute('data-section-id', sectionConfig.id);
-          measuringContainer.appendChild(sectionContainer);
-          sectionContainers.push({ id: sectionConfig.id, element: sectionContainer });
-        }
-      });
+      // Render all content for measurement
+      const MeasuringContent = () => (
+        <div className="space-y-6" style={{ padding: `${PAGE_MARGIN}px` }}>
+          <div ref={(el) => el && el.setAttribute('data-section', 'header')}>
+            <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
+          </div>
+          {visibleSections.map((sectionConfig) => {
+            if (hasSectionContent(sectionConfig.id, data)) {
+              return (
+                <div key={sectionConfig.id} ref={(el) => el && el.setAttribute('data-section', sectionConfig.id)}>
+                  <SectionRenderer sectionId={sectionConfig.id} data={data} theme={theme} />
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
+      );
 
-      // Force a render cycle to get measurements
-      await new Promise(resolve => setTimeout(resolve, 100));
+      root.render(<MeasuringContent />);
 
-      // Measure header
-      const headerHeight = measureElement(headerContainer);
+      // Wait for rendering to complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Measure the rendered content
+      const headerElement = measuringContainer.querySelector('[data-section="header"]') as HTMLElement;
+      const sectionElements = Array.from(measuringContainer.querySelectorAll('[data-section]')).filter(
+        el => el.getAttribute('data-section') !== 'header'
+      ) as HTMLElement[];
+
+      const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : 0;
       console.log(`Header height: ${headerHeight}px`);
 
-      // Measure sections
-      const measuredSections = sectionContainers.map(({ id, element }) => ({
-        id,
-        element,
-        height: measureElement(element),
-        canSplit: canSectionSplit(id)
+      const sectionMeasurements = sectionElements.map(el => ({
+        id: el.getAttribute('data-section')!,
+        element: el,
+        height: el.getBoundingClientRect().height
       }));
 
-      console.log('Measured sections:', measuredSections.map(s => ({ id: s.id, height: s.height })));
+      console.log('Section measurements:', sectionMeasurements.map(s => ({ id: s.id, height: s.height })));
 
-      // Now create pages based on measurements
+      // Create pages based on measurements
       const newPages: React.ReactNode[] = [];
       let currentPageContent: React.ReactNode[] = [];
       let currentPageHeight = 0;
@@ -85,79 +94,53 @@ const MeasuredMultiPagePreview: React.FC<MeasuredMultiPagePreviewProps> = ({ dat
       );
       currentPageHeight += headerHeight;
 
-      // Process each measured section
-      for (const section of measuredSections) {
-        console.log(`Processing section ${section.id} (${section.height}px)`);
+      // Process each section
+      for (const measurement of sectionMeasurements) {
+        console.log(`Processing section ${measurement.id} (${measurement.height}px)`);
 
         // Check if section fits on current page
-        if (currentPageHeight + section.height > CONTENT_HEIGHT && currentPageContent.length > 1) {
+        if (currentPageHeight + measurement.height > CONTENT_HEIGHT && currentPageContent.length > 1) {
           // Create current page and start new one
           console.log(`Creating page ${pageNumber + 1} with ${currentPageContent.length} items`);
-          newPages.push(createPage(currentPageContent, pageNumber));
+          newPages.push(createPage(currentPageContent, pageNumber, theme));
           pageNumber++;
           currentPageContent = [];
           currentPageHeight = 0;
         }
 
-        // If section is too tall for a page and can be split
-        if (section.height > CONTENT_HEIGHT && section.canSplit) {
-          const availableHeight = CONTENT_HEIGHT - currentPageHeight;
-          const splitResult = splitLongSection(section.element, section.id, availableHeight);
-          
-          if (splitResult) {
-            // Add first part to current page
-            currentPageContent.push(
-              <div key={`${section.id}-part1`} dangerouslySetInnerHTML={{ __html: splitResult.firstPart.innerHTML }} />
-            );
-            
-            // Create page and start new one with remaining content
-            newPages.push(createPage(currentPageContent, pageNumber));
-            pageNumber++;
-            currentPageContent = [
-              <div key={`${section.id}-part2`} dangerouslySetInnerHTML={{ __html: splitResult.remainingPart.innerHTML }} />
-            ];
-            currentPageHeight = measureElement(splitResult.remainingPart);
-          } else {
-            // Can't split, add whole section
-            currentPageContent.push(
-              <SectionRenderer key={section.id} sectionId={section.id} data={data} theme={theme} />
-            );
-            currentPageHeight += section.height;
-          }
-        } else {
-          // Add section to current page
-          currentPageContent.push(
-            <SectionRenderer key={section.id} sectionId={section.id} data={data} theme={theme} />
-          );
-          currentPageHeight += section.height;
-        }
+        // Add section to current page
+        currentPageContent.push(
+          <SectionRenderer key={measurement.id} sectionId={measurement.id} data={data} theme={theme} />
+        );
+        currentPageHeight += measurement.height;
       }
 
       // Add the last page if it has content
       if (currentPageContent.length > 0) {
         console.log(`Creating final page ${pageNumber + 1} with ${currentPageContent.length} items`);
-        newPages.push(createPage(currentPageContent, pageNumber));
+        newPages.push(createPage(currentPageContent, pageNumber, theme));
       }
 
       // Ensure at least one page exists
       if (newPages.length === 0) {
-        newPages.push(createEmptyPage());
+        newPages.push(createEmptyPage(theme));
       }
 
       console.log(`Created ${newPages.length} total pages`);
       setPages(newPages);
 
-      // Clean up measuring container
+      // Clean up
+      root.unmount();
       measuringContainer.style.position = '';
       measuringContainer.style.left = '';
       measuringContainer.style.visibility = '';
-      measuringContainer.innerHTML = '';
+      measuringContainer.style.display = '';
     };
 
     createMeasuredPages();
   }, [data, visibleSections, theme]);
 
-  const createPage = (content: React.ReactNode[], pageIndex: number) => (
+  const createPage = (content: React.ReactNode[], pageIndex: number, theme: ColorTheme) => (
     <div
       key={pageIndex}
       className="resume-page relative bg-white shadow-lg border border-gray-200 mx-auto"
@@ -182,7 +165,7 @@ const MeasuredMultiPagePreview: React.FC<MeasuredMultiPagePreviewProps> = ({ dat
     </div>
   );
 
-  const createEmptyPage = () => (
+  const createEmptyPage = (theme: ColorTheme) => (
     <div
       key="empty"
       className="resume-page bg-white shadow-lg border border-gray-200 mx-auto flex items-center justify-center text-gray-500"
