@@ -49,6 +49,36 @@ const ResumeHelpModal: React.FC<ResumeHelpModalProps> = ({ children }) => {
 
             <Separator />
 
+            {/* Resume Length Guidelines */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                📏 Resume Length Guidelines
+              </h3>
+              
+              <div className="space-y-3">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="font-semibold text-green-800">🎯 1 Page (Recommended for most people)</p>
+                  <ul className="text-green-700 mt-2 space-y-1 text-sm">
+                    <li>• Entry-level to mid-level professionals (0-10 years)</li>
+                    <li>• Career changers or new graduates</li>
+                    <li>• Most industry positions</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="font-semibold text-blue-800">📄 2 Pages (When appropriate)</p>
+                  <ul className="text-blue-700 mt-2 space-y-1 text-sm">
+                    <li>• Senior professionals (10+ years experience)</li>
+                    <li>• Academic or research positions</li>
+                    <li>• Extensive technical certifications</li>
+                    <li>• Multiple relevant publications</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
             {/* Resume Guidelines */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold flex items-center gap-2">
@@ -59,7 +89,7 @@ const ResumeHelpModal: React.FC<ResumeHelpModalProps> = ({ children }) => {
               <ul className="space-y-3 list-none">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>
-                  <span><strong>Limit it to 1 PAGE.</strong> No exceptions.</span>
+                  <span><strong>Prioritize relevance over length.</strong> Quality content matters more than fitting everything on one page.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">•</span>

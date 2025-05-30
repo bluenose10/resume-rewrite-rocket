@@ -6,6 +6,7 @@ import { DEFAULT_THEMES } from '@/constants/themes';
 import ExportOptionsModal from './ExportOptionsModal';
 import PersonalInfoHeader from './PersonalInfoHeader';
 import SectionRenderer from './SectionRenderer';
+import ResumeLengthIndicator from './ResumeLengthIndicator';
 import { generateEnhancedPDF, ExportOptions } from '@/utils/enhancedPdfGenerator';
 import { useToast } from '@/hooks/use-toast';
 
@@ -87,6 +88,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Resume Preview</h2>
         <ExportOptionsModal onExport={handleExport} isExporting={isExporting} />
       </div>
+
+      {/* Resume Length Indicator */}
+      <ResumeLengthIndicator data={data} />
 
       <Card className="shadow-lg border border-gray-200 bg-white">
         <CardContent className="p-0" id="resume-content">
