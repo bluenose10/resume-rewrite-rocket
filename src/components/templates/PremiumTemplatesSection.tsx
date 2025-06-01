@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, Star, Crown } from 'lucide-react';
+import { Download, Star, Crown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,8 +22,8 @@ const PREMIUM_TEMPLATES: Template[] = [
     id: 'Executive-Professional',
     name: 'Executive-Professional',
     displayName: 'Executive Professional',
-    description: 'Sophisticated design for senior-level positions and C-suite executives',
-    features: ['Executive Layout', 'Achievement Focus', 'Leadership Emphasis', 'Premium Typography'],
+    description: 'Sophisticated design for senior-level positions',
+    features: ['Executive Layout', 'Achievement Focus', 'Leadership Style'],
     previewImage: '/lovable-uploads/Executive-Professional.png',
     category: 'executive'
   },
@@ -31,8 +31,8 @@ const PREMIUM_TEMPLATES: Template[] = [
     id: 'Modern-Creative',
     name: 'Modern-Creative',
     displayName: 'Modern Creative',
-    description: 'Eye-catching design for creative professionals and designers',
-    features: ['Visual Appeal', 'Portfolio Ready', 'Brand Focused', 'Creative Elements'],
+    description: 'Eye-catching design for creative professionals',
+    features: ['Visual Appeal', 'Portfolio Ready', 'Creative Elements'],
     previewImage: '/lovable-uploads/Modern-Creative.png',
     category: 'creative'
   },
@@ -40,8 +40,8 @@ const PREMIUM_TEMPLATES: Template[] = [
     id: 'Tech-Minimalist',
     name: 'Tech-Minimalist',
     displayName: 'Tech Minimalist',
-    description: 'Clean, code-inspired design perfect for software engineers',
-    features: ['Clean Design', 'Skills Highlighted', 'Project Focused', 'ATS Optimized'],
+    description: 'Clean design perfect for software engineers',
+    features: ['Clean Design', 'Skills Focused', 'ATS Optimized'],
     previewImage: '/lovable-uploads/Tech-Minimalist.png',
     category: 'technical'
   },
@@ -49,8 +49,8 @@ const PREMIUM_TEMPLATES: Template[] = [
     id: 'Academic-Research',
     name: 'Academic-Research',
     displayName: 'Academic Research',
-    description: 'Detailed format for academic and research positions',
-    features: ['Publication Ready', 'Research Focused', 'Detailed Format', 'Academic Standards'],
+    description: 'Detailed format for academic positions',
+    features: ['Publication Ready', 'Research Focused', 'Academic Standards'],
     previewImage: '/lovable-uploads/Academic-Research.png',
     category: 'academic'
   },
@@ -58,8 +58,8 @@ const PREMIUM_TEMPLATES: Template[] = [
     id: 'Modern-Professional',
     name: 'Modern-Professional',
     displayName: 'Modern Professional',
-    description: 'Contemporary design that works across all industries',
-    features: ['Versatile Design', 'Modern Layout', 'Professional Appeal', 'Industry Agnostic'],
+    description: 'Contemporary design for all industries',
+    features: ['Versatile Design', 'Modern Layout', 'Professional Appeal'],
     previewImage: '/lovable-uploads/Modern-Professional.png',
     category: 'modern'
   }
@@ -67,11 +67,11 @@ const PREMIUM_TEMPLATES: Template[] = [
 
 const getCategoryColor = (category: Template['category']) => {
   const colors = {
-    executive: 'bg-purple-100 text-purple-800',
-    creative: 'bg-pink-100 text-pink-800',
-    technical: 'bg-green-100 text-green-800',
-    academic: 'bg-blue-100 text-blue-800',
-    modern: 'bg-orange-100 text-orange-800'
+    executive: 'bg-brand-cyan/20 text-brand-cyan border-brand-cyan/30',
+    creative: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+    technical: 'bg-green-500/20 text-green-300 border-green-500/30',
+    academic: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    modern: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
   };
   return colors[category];
 };
@@ -84,8 +84,6 @@ const PremiumTemplatesSection: React.FC = () => {
     setPurchasingTemplate(template.id);
     
     try {
-      // For demo purposes, we'll use a placeholder email
-      // In a real app, this would come from authenticated user
       const userEmail = 'demo@example.com';
       
       const { data, error } = await supabase.functions.invoke('create-template-checkout', {
@@ -99,7 +97,6 @@ const PremiumTemplatesSection: React.FC = () => {
         throw error;
       }
 
-      // Open Stripe checkout in a new tab
       if (data?.url) {
         window.open(data.url, '_blank');
       }
@@ -117,79 +114,90 @@ const PremiumTemplatesSection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-blue-50">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 hero-gradient relative overflow-hidden">
+      {/* Background decorations matching the app theme */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-brand-cyan/20 rounded-full opacity-30 floating-particle"></div>
+        <div className="absolute top-20 -left-20 w-32 h-32 bg-brand-medium-blue/30 rounded-full opacity-40 floating-particle"></div>
+        <div className="absolute bottom-20 right-20 w-24 h-24 bg-brand-cyan/25 rounded-full opacity-35 floating-particle"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Crown className="h-8 w-8 text-purple-600" />
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Crown className="h-8 w-8 text-brand-cyan" />
+            <h2 className="text-responsive-2xl font-bold text-white">
               Premium Word Templates
             </h2>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
             Professional Microsoft Word resume templates designed by experts. 
-            Download instantly and customize in Word - perfect for any industry.
+            Download instantly and customize in Word.
           </p>
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <Star className="h-5 w-5 text-yellow-500 fill-current" />
-            <span className="text-sm font-medium text-gray-600">
+          <div className="flex items-center justify-center gap-2">
+            <Star className="h-5 w-5 text-brand-cyan" />
+            <span className="text-sm font-medium text-gray-400">
               Used by 10,000+ professionals worldwide
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {PREMIUM_TEMPLATES.map((template) => (
-            <Card key={template.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-200 bg-white">
+            <Card key={template.id} className="group bg-white/15 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300 hover:glow-cyan">
               <CardHeader className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <img
                     src={template.previewImage}
-                    alt={`${template.displayName} Resume Template Preview`}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    alt={`${template.displayName} Resume Template`}
+                    className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder.svg';
+                    }}
                   />
                   <Badge 
-                    className={`absolute top-3 right-3 ${getCategoryColor(template.category)}`}
+                    className={`absolute top-3 right-3 ${getCategoryColor(template.category)} border`}
                   >
                     {template.category}
                   </Badge>
                 </div>
               </CardHeader>
               
-              <CardContent className="p-6">
-                <CardTitle className="text-xl font-bold mb-2 group-hover:text-purple-600 transition-colors">
+              <CardContent className="p-5">
+                <CardTitle className="text-lg font-bold mb-2 text-white group-hover:text-brand-cyan transition-colors">
                   {template.displayName}
                 </CardTitle>
                 
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                <p className="text-gray-300 mb-4 text-sm">
                   {template.description}
                 </p>
 
-                <div className="space-y-3 mb-6">
-                  <h4 className="font-semibold text-sm text-gray-900">Key Features:</h4>
+                <div className="space-y-3 mb-5">
                   <div className="flex flex-wrap gap-1">
                     {template.features.map((feature, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
+                      <div key={index} className="flex items-center gap-1 text-xs text-gray-400">
+                        <Check className="h-3 w-3 text-brand-cyan" />
                         {feature}
-                      </Badge>
+                      </div>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-purple-600">$2</span>
-                    <span className="text-sm text-gray-500">One-time purchase</span>
+                    <span className="text-2xl font-bold text-brand-cyan">$2</span>
+                    <span className="text-xs text-gray-400">One-time purchase</span>
                   </div>
                   
                   <Button
                     onClick={() => handlePurchaseTemplate(template)}
                     disabled={purchasingTemplate === template.id}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3"
+                    className="w-full bg-brand-cyan hover:bg-brand-cyan/90 text-black font-semibold py-2.5 glow-cyan"
                   >
                     {purchasingTemplate === template.id ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                         Processing...
                       </div>
                     ) : (
@@ -200,8 +208,8 @@ const PremiumTemplatesSection: React.FC = () => {
                     )}
                   </Button>
                   
-                  <p className="text-xs text-gray-500 text-center">
-                    Instant download • 3 downloads included • Microsoft Word format
+                  <p className="text-xs text-gray-400 text-center">
+                    Instant download • 3 downloads • Word format
                   </p>
                 </div>
               </CardContent>
@@ -209,16 +217,35 @@ const PremiumTemplatesSection: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <div className="bg-white rounded-lg p-6 shadow-lg max-w-2xl mx-auto">
-            <h3 className="text-lg font-semibold mb-3">Why Choose Our Premium Templates?</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
-              <div>✓ Professional Microsoft Word format</div>
-              <div>✓ Instant download after purchase</div>
-              <div>✓ ATS-optimized for job applications</div>
-              <div>✓ Easy to customize and edit</div>
-              <div>✓ Industry-specific designs</div>
-              <div>✓ 3 downloads per purchase</div>
+        {/* Benefits section */}
+        <div className="text-center">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-4xl mx-auto border border-white/20">
+            <h3 className="text-lg font-semibold mb-4 text-white">Why Choose Our Premium Templates?</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-300">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-brand-cyan" />
+                Microsoft Word format
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-brand-cyan" />
+                Instant download
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-brand-cyan" />
+                ATS-optimized
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-brand-cyan" />
+                Easy to customize
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-brand-cyan" />
+                Industry-specific
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-brand-cyan" />
+                3 downloads included
+              </div>
             </div>
           </div>
         </div>
