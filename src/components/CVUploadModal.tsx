@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -76,27 +77,51 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       return;
     }
 
+    // Check if user is authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload your CV",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsUploading(true);
     try {
-      // Upload file to Supabase storage
+      console.log('Starting CV upload for user:', user.id);
+      
+      // Upload file to Supabase storage with user ID in path
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+      
+      console.log('Uploading file to path:', filePath);
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('uploaded-cvs')
-        .upload(fileName, file);
+        .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('File uploaded successfully:', uploadData);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('uploaded-cvs')
-        .getPublicUrl(fileName);
+        .getPublicUrl(filePath);
 
-      // Store CV metadata
+      console.log('Public URL generated:', publicUrl);
+
+      // Store CV metadata with user ID
       const { data: cvData, error: insertError } = await supabase
         .from('uploaded_cvs')
         .insert({
+          user_id: user.id,
           original_filename: file.name,
           file_type: file.type,
           file_url: publicUrl,
@@ -105,10 +130,16 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
         .select()
         .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Database insert error:', insertError);
+        throw insertError;
+      }
+
+      console.log('CV metadata saved:', cvData);
 
       // Call extraction function
-      const { error: extractionError } = await supabase.functions.invoke('extract-cv-content', {
+      console.log('Calling extract-cv-content function...');
+      const { data: extractionData, error: extractionError } = await supabase.functions.invoke('extract-cv-content', {
         body: { 
           cvId: cvData.id,
           fileUrl: publicUrl,
@@ -118,14 +149,20 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       });
 
       if (extractionError) {
-        console.warn('CV extraction failed:', extractionError);
+        console.error('CV extraction failed:', extractionError);
         // Don't throw error here as CV was uploaded successfully
+        toast({
+          title: "CV uploaded with warning",
+          description: "CV uploaded but content extraction had issues. You can still redesign it.",
+          variant: "default"
+        });
+      } else {
+        console.log('CV extraction result:', extractionData);
+        toast({
+          title: "CV uploaded successfully",
+          description: "Your CV has been processed. Now you can redesign it with premium templates!"
+        });
       }
-
-      toast({
-        title: "CV uploaded successfully",
-        description: "Your CV has been processed. Now you can redesign it with premium templates!"
-      });
 
       // Show redesign step
       setUploadedCvId(cvData.id);
@@ -140,7 +177,7 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: "Failed to upload CV. Please try again.",
+        description: `Failed to upload CV: ${error.message}`,
         variant: "destructive"
       });
     } finally {
