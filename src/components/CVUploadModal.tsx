@@ -6,6 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, FileText, Loader2, Palette } from 'lucide-react';
 import CVRedesignModal from './CVRedesignModal';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface CVUploadModalProps {
   onUploadSuccess?: (uploadedCvId: string) => void;
@@ -20,6 +22,8 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
   const [uploadedCvId, setUploadedCvId] = useState<string | null>(null);
   const [showRedesignStep, setShowRedesignStep] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -68,21 +72,20 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
   };
 
   const handleUpload = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload your CV",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+
     if (!file) {
       toast({
         title: "No file selected",
         description: "Please select a CV file to upload",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to upload your CV",
         variant: "destructive"
       });
       return;
@@ -204,11 +207,22 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
     setShowRedesignStep(false);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!user && open) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload your CV",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+    setIsOpen(open);
+    if (!open) resetModal();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      setIsOpen(open);
-      if (!open) resetModal();
-    }}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
