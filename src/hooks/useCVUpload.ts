@@ -13,6 +13,32 @@ interface UploadedCV {
   processing_error: string | null;
 }
 
+// Type guard to validate ResumeData structure
+const isValidResumeData = (data: any): data is ResumeData => {
+  return (
+    data &&
+    typeof data === 'object' &&
+    data.personalInfo &&
+    typeof data.personalInfo === 'object' &&
+    Array.isArray(data.experience) &&
+    Array.isArray(data.education) &&
+    Array.isArray(data.skills)
+  );
+};
+
+// Safe conversion from Json to ResumeData
+const safeConvertToResumeData = (data: any): ResumeData | null => {
+  if (!data) return null;
+  
+  if (isValidResumeData(data)) {
+    return data as ResumeData;
+  }
+  
+  // If data structure doesn't match, return null
+  console.warn('Invalid ResumeData structure received:', data);
+  return null;
+};
+
 export const useCVUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -60,7 +86,7 @@ export const useCVUpload = () => {
         file_url: data.file_url,
         file_type: data.file_type,
         processing_status: data.processing_status as 'pending' | 'processing' | 'completed' | 'failed',
-        extracted_content: data.extracted_content as ResumeData | null,
+        extracted_content: safeConvertToResumeData(data.extracted_content),
         processing_error: data.processing_error
       };
     } catch (error) {
@@ -113,7 +139,11 @@ export const useCVUpload = () => {
         }
 
         if (updatedCV.processing_status === 'completed') {
-          return updatedCV.extracted_content as ResumeData;
+          const extractedData = safeConvertToResumeData(updatedCV.extracted_content);
+          if (!extractedData) {
+            throw new Error('Failed to parse extracted CV data');
+          }
+          return extractedData;
         }
 
         if (updatedCV.processing_status === 'failed') {
