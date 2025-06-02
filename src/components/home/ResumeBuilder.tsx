@@ -4,18 +4,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import CVUploadRedesign from '@/components/cv/CVUploadRedesign';
-import { useResumeFormData } from '@/hooks/useResumeFormData';
 import { ResumeData } from '@/types/resume';
 
 const ResumeBuilder: React.FC = () => {
   const [activeTab, setActiveTab] = useState('create');
-  const { resumeData, updateResumeData } = useResumeFormData();
+  const [resumeData, setResumeData] = useState<ResumeData>({
+    personalInfo: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      location: '',
+      linkedin: '',
+      github: '',
+      website: ''
+    },
+    personalStatement: '',
+    summary: '',
+    experience: [],
+    education: [],
+    projects: [],
+    skills: [],
+    achievements: [],
+    certifications: [],
+    languages: [],
+    volunteerExperience: [],
+    references: [],
+    publications: [],
+    interests: []
+  });
+  const [isOptimizing, setIsOptimizing] = useState(false);
 
   const handleResumeDataExtracted = (extractedData: ResumeData) => {
     // Update the resume data with extracted content
-    updateResumeData(extractedData);
+    setResumeData(extractedData);
     // Switch to the edit tab so user can review and modify
     setActiveTab('create');
+  };
+
+  const handleDataChange = (data: ResumeData) => {
+    setResumeData(data);
+  };
+
+  const handleOptimize = async () => {
+    setIsOptimizing(true);
+    // TODO: Implement AI optimization logic
+    setTimeout(() => setIsOptimizing(false), 2000);
   };
 
   return (
@@ -37,7 +71,12 @@ const ResumeBuilder: React.FC = () => {
         
         <TabsContent value="create" className="mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <ResumeForm />
+            <ResumeForm 
+              initialData={resumeData}
+              onDataChange={handleDataChange}
+              onOptimize={handleOptimize}
+              isOptimizing={isOptimizing}
+            />
             <ResumePreview data={resumeData} />
           </div>
         </TabsContent>

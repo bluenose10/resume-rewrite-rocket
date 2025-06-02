@@ -54,7 +54,15 @@ export const useCVUpload = () => {
         throw error;
       }
 
-      return data as UploadedCV;
+      return {
+        id: data.id,
+        original_filename: data.original_filename,
+        file_url: data.file_url,
+        file_type: data.file_type,
+        processing_status: data.processing_status as 'pending' | 'processing' | 'completed' | 'failed',
+        extracted_content: data.extracted_content as ResumeData | null,
+        processing_error: data.processing_error
+      };
     } catch (error) {
       console.error('Error uploading CV:', error);
       throw error;
