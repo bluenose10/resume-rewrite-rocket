@@ -32,23 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const initializeAuth = async () => {
       try {
-        // First get the initial session
-        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        console.log('Initializing auth...');
         
-        if (error) {
-          console.error('Error getting initial session:', error);
-        }
-
-        if (mounted) {
-          setSession(initialSession);
-          setUser(initialSession?.user ?? null);
-          setLoading(false);
-        }
-
-        // Then set up the auth state listener
+        // Set up the auth state listener first
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
-            console.log('Auth state change:', event);
+            console.log('Auth state change:', event, session?.user?.email);
             
             if (mounted) {
               setSession(session);
@@ -57,6 +46,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
         );
+
+        // Then get the initial session
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting initial session:', error);
+        } else {
+          console.log('Initial session:', initialSession?.user?.email || 'No session');
+        }
+
+        if (mounted) {
+          setSession(initialSession);
+          setUser(initialSession?.user ?? null);
+          setLoading(false);
+        }
 
         return () => {
           subscription.unsubscribe();

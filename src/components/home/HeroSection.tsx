@@ -15,7 +15,20 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes }) => {
-  const { user } = useAuth();
+  // Safely get auth context with error handling
+  let user = null;
+  let authLoading = true;
+  
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+    authLoading = authContext.loading;
+  } catch (error) {
+    console.log('Auth context not ready yet:', error);
+    // Context not ready yet, use default values
+    user = null;
+    authLoading = true;
+  }
 
   const handleCVUploadSuccess = (uploadedCvId: string) => {
     console.log('CV uploaded with ID:', uploadedCvId);
@@ -78,7 +91,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
             
-            {user && (
+            {user && !authLoading && (
               <CVUploadModal onUploadSuccess={handleCVUploadSuccess}>
                 <Button 
                   variant="outline" 
