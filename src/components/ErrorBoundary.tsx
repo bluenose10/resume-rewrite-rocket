@@ -28,14 +28,20 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     // If it's an auth-related error, try to clear auth state
-    if (error.message?.includes('subscription') || error.message?.includes('auth')) {
+    if (error.message?.includes('useAuth must be used within an AuthProvider') || 
+        error.message?.includes('subscription') || 
+        error.message?.includes('auth')) {
       console.log('Clearing auth state due to error');
-      localStorage.removeItem('supabase.auth.token');
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
+      try {
+        localStorage.removeItem('supabase.auth.token');
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+            localStorage.removeItem(key);
+          }
+        });
+      } catch (storageError) {
+        console.error('Error clearing storage:', storageError);
+      }
     }
   }
 
@@ -49,18 +55,25 @@ class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      const isAuthError = this.state.error?.message?.includes('useAuth must be used within an AuthProvider') ||
+                         this.state.error?.message?.includes('subscription') ||
+                         this.state.error?.message?.includes('auth');
+
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
           <Card className="max-w-lg mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-red-600">
                 <AlertTriangle className="h-5 w-5" />
-                Something went wrong
+                {isAuthError ? 'Authentication Error' : 'Something went wrong'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-600">
-                We encountered an unexpected error. This has been logged and we're working to fix it.
+                {isAuthError 
+                  ? 'There was an issue with authentication. Please refresh the page to continue.'
+                  : 'We encountered an unexpected error. This has been logged and we\'re working to fix it.'
+                }
               </p>
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <details className="bg-gray-50 p-3 rounded text-sm">
