@@ -7,7 +7,6 @@ import { ArrowRight, Star, Users, FileText, Sparkles, Upload } from 'lucide-reac
 import AnimatedCounter from '@/components/AnimatedCounter';
 import CVUploadModal from '@/components/CVUploadModal';
 import UserMenu from '@/components/UserMenu';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface HeroSectionProps {
   onStartBuilding: () => void;
@@ -20,6 +19,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
   let authLoading = true;
   
   try {
+    const { useAuth } = require('@/contexts/AuthContext');
     const authContext = useAuth();
     user = authContext.user;
     authLoading = authContext.loading;

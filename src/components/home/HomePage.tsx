@@ -12,7 +12,15 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
-  const { stats } = useResumeStats();
+  // Use stats hook with error handling
+  let stats = { totalResumes: 0 };
+  try {
+    const { stats: resumeStats } = useResumeStats();
+    stats = resumeStats;
+  } catch (error) {
+    console.log('Stats loading deferred:', error);
+    // Use default stats if hook fails
+  }
 
   return (
     <div className="min-h-screen hero-gradient relative overflow-hidden">

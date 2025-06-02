@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ResumeStats {
   totalResumes: number;
@@ -15,6 +16,16 @@ export const useResumeStats = () => {
     lastUpdated: new Date().toISOString()
   });
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get auth context safely
+  let authReady = false;
+  try {
+    const { loading: authLoading } = useAuth();
+    authReady = !authLoading;
+  } catch (error) {
+    // Auth context not ready yet
+    authReady = false;
+  }
 
   const fetchStats = async () => {
     try {
@@ -59,9 +70,15 @@ export const useResumeStats = () => {
   };
 
   useEffect(() => {
+    // Only initialize stats fetching when auth is ready
+    if (!authReady) {
+      setIsLoading(false);
+      return;
+    }
+
     fetchStats();
 
-    // Set up realtime subscription for stats updates
+    // Set up realtime subscription for stats updates only if auth is ready
     const channel = supabase
       .channel('resume-stats-changes')
       .on(
@@ -80,7 +97,7 @@ export const useResumeStats = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [authReady]);
 
   return {
     stats,

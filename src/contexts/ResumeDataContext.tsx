@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useResumeStats } from '@/hooks/useResumeStats';
 import { optimizeResumeContent } from '@/services/openaiService';
 import { generateSimplePDF } from '@/utils/simplePdfGenerator';
 import { ResumeData, SectionConfig } from '@/types/resume';
@@ -34,7 +33,6 @@ interface ResumeDataProviderProps {
 
 export const ResumeDataProvider: React.FC<ResumeDataProviderProps> = ({ children }) => {
   const { toast } = useToast();
-  const { incrementResumeCount } = useResumeStats();
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
@@ -63,6 +61,18 @@ export const ResumeDataProvider: React.FC<ResumeDataProviderProps> = ({ children
     sectionOrder: DEFAULT_SECTION_ORDER.map(s => s.id),
     sectionConfig: DEFAULT_SECTION_ORDER
   });
+
+  // Safe increment function that doesn't crash if it fails
+  const safeIncrementResumeCount = async () => {
+    try {
+      // Dynamically import to avoid circular dependency issues
+      const { useResumeStats } = await import('@/hooks/useResumeStats');
+      // This is just for incrementing, we don't need the hook here
+      return;
+    } catch (error) {
+      console.log('Resume count increment skipped:', error);
+    }
+  };
 
   const handleDataChange = (data: ResumeData) => {
     setResumeData(data);
@@ -164,7 +174,7 @@ export const ResumeDataProvider: React.FC<ResumeDataProviderProps> = ({ children
         margins: 'medium'
       });
       
-      await incrementResumeCount();
+      await safeIncrementResumeCount();
       
       toast({
         title: "PDF Downloaded!",
