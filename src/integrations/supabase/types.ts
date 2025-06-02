@@ -9,405 +9,35 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      cv_redesign_sessions: {
+      images: {
         Row: {
-          created_at: string
-          feedback_comments: string | null
-          feedback_rating: number | null
-          id: string
-          redesigned_data: Json | null
-          selected_template_id: string | null
-          updated_at: string
-          uploaded_cv_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          feedback_comments?: string | null
-          feedback_rating?: number | null
-          id?: string
-          redesigned_data?: Json | null
-          selected_template_id?: string | null
-          updated_at?: string
-          uploaded_cv_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          feedback_comments?: string | null
-          feedback_rating?: number | null
-          id?: string
-          redesigned_data?: Json | null
-          selected_template_id?: string | null
-          updated_at?: string
-          uploaded_cv_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cv_redesign_sessions_selected_template_id_fkey"
-            columns: ["selected_template_id"]
-            isOneToOne: false
-            referencedRelation: "premium_templates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cv_redesign_sessions_uploaded_cv_id_fkey"
-            columns: ["uploaded_cv_id"]
-            isOneToOne: false
-            referencedRelation: "uploaded_cvs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      design_patterns: {
-        Row: {
-          confidence_score: number | null
-          created_at: string
-          id: string
-          pattern_data: Json
-          pattern_type: string
-          template_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          confidence_score?: number | null
-          created_at?: string
-          id?: string
-          pattern_data: Json
-          pattern_type: string
-          template_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          confidence_score?: number | null
-          created_at?: string
-          id?: string
-          pattern_data?: Json
-          pattern_type?: string
-          template_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "design_patterns_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "premium_templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      horse_identifications: {
-        Row: {
-          additional_data: Json | null
           breed: string | null
           confidence: number | null
-          created_at: string
+          created_at: string | null
           description: string | null
           id: string
           image_url: string
-          updated_at: string
+          thumbnail_url: string | null
           user_id: string
         }
         Insert: {
-          additional_data?: Json | null
           breed?: string | null
           confidence?: number | null
-          created_at?: string
+          created_at?: string | null
           description?: string | null
           id?: string
           image_url: string
-          updated_at?: string
+          thumbnail_url?: string | null
           user_id: string
         }
         Update: {
-          additional_data?: Json | null
           breed?: string | null
           confidence?: number | null
-          created_at?: string
+          created_at?: string | null
           description?: string | null
           id?: string
           image_url?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      premium_templates: {
-        Row: {
-          category: string | null
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string
-          industry: string | null
-          is_active: boolean
-          name: string
-          updated_at: string
-          upload_date: string
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url: string
-          industry?: string | null
-          is_active?: boolean
-          name: string
-          updated_at?: string
-          upload_date?: string
-        }
-        Update: {
-          category?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          image_url?: string
-          industry?: string | null
-          is_active?: boolean
-          name?: string
-          updated_at?: string
-          upload_date?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          id: string
-          updated_at: string
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          id: string
-          updated_at?: string
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          id?: string
-          updated_at?: string
-          username?: string | null
-        }
-        Relationships: []
-      }
-      resume_stats: {
-        Row: {
-          created_at: string
-          daily_count: number
-          id: string
-          last_reset_date: string
-          total_resumes_created: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          daily_count?: number
-          id?: string
-          last_reset_date?: string
-          total_resumes_created?: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          daily_count?: number
-          id?: string
-          last_reset_date?: string
-          total_resumes_created?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      subscriptions: {
-        Row: {
-          created_at: string
-          expires_at: string | null
-          id: string
-          stripe_customer_id: string | null
-          subscription_status: Database["public"]["Enums"]["subscription_status"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          stripe_customer_id?: string | null
-          subscription_status?: Database["public"]["Enums"]["subscription_status"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          expires_at?: string | null
-          id?: string
-          stripe_customer_id?: string | null
-          subscription_status?: Database["public"]["Enums"]["subscription_status"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      template_purchases: {
-        Row: {
-          amount: number
-          created_at: string
-          currency: string | null
-          download_count: number | null
-          id: string
-          max_downloads: number | null
-          status: string | null
-          stripe_session_id: string
-          template_name: string
-          updated_at: string
-          user_email: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          currency?: string | null
-          download_count?: number | null
-          id?: string
-          max_downloads?: number | null
-          status?: string | null
-          stripe_session_id: string
-          template_name: string
-          updated_at?: string
-          user_email: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          currency?: string | null
-          download_count?: number | null
-          id?: string
-          max_downloads?: number | null
-          status?: string | null
-          stripe_session_id?: string
-          template_name?: string
-          updated_at?: string
-          user_email?: string
-        }
-        Relationships: []
-      }
-      template_training_data: {
-        Row: {
-          ai_response: Json
-          created_at: string
-          feedback_score: number | null
-          human_feedback: string | null
-          id: string
-          template_id: string | null
-          training_prompt: string
-        }
-        Insert: {
-          ai_response: Json
-          created_at?: string
-          feedback_score?: number | null
-          human_feedback?: string | null
-          id?: string
-          template_id?: string | null
-          training_prompt: string
-        }
-        Update: {
-          ai_response?: Json
-          created_at?: string
-          feedback_score?: number | null
-          human_feedback?: string | null
-          id?: string
-          template_id?: string | null
-          training_prompt?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "template_training_data_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "premium_templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      uploaded_cvs: {
-        Row: {
-          created_at: string
-          extracted_content: Json | null
-          file_type: string
-          file_url: string
-          id: string
-          original_filename: string
-          processing_error: string | null
-          processing_status: string
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          extracted_content?: Json | null
-          file_type: string
-          file_url: string
-          id?: string
-          original_filename: string
-          processing_error?: string | null
-          processing_status?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          extracted_content?: Json | null
-          file_type?: string
-          file_url?: string
-          id?: string
-          original_filename?: string
-          processing_error?: string | null
-          processing_status?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_analysis_count: {
-        Row: {
-          created_at: string | null
-          total_analyses: number | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          total_analyses?: number | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          total_analyses?: number | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string | null
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          thumbnail_url?: string | null
           user_id?: string
         }
         Relationships: []
@@ -417,32 +47,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      delete_user_account: {
-        Args: { target_user_id: string }
-        Returns: undefined
-      }
-      get_resume_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          total_resumes: number
-          daily_count: number
-          last_updated: string
-        }[]
-      }
-      has_role: {
-        Args: { user_id: string; role: Database["public"]["Enums"]["app_role"] }
-        Returns: boolean
-      }
-      increment_resume_count: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          new_total: number
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "user"
-      subscription_status: "free" | "premium"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -557,9 +165,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "user"],
-      subscription_status: ["free", "premium"],
-    },
+    Enums: {},
   },
 } as const
