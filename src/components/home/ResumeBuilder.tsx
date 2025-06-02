@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Eye, Edit3 } from 'lucide-react';
+import { Menu, Eye, Edit3, Upload } from 'lucide-react';
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import SectionLayoutManager from '@/components/SectionLayoutManager';
 import ResumeHelpModal from '@/components/help/ResumeHelpModal';
+import CVUploadModal from '@/components/CVUploadModal';
 import { ResumeData, SectionConfig } from '@/types/resume';
 
 interface ResumeBuilderProps {
@@ -34,6 +35,12 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
   const [activeTab, setActiveTab] = useState('content');
   const [showPreview, setShowPreview] = useState(false);
 
+  const handleCVUploadSuccess = (uploadedCvId: string) => {
+    // TODO: Implement CV redesign functionality
+    console.log('CV uploaded with ID:', uploadedCvId);
+    // This will be connected to the redesign engine in the next phase
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-4 sm:py-8">
@@ -48,8 +55,15 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
               ← Back to Home
             </Button>
             
-            {/* Help buttons */}
+            {/* Help buttons and CV Upload */}
             <div className="flex items-center gap-2">
+              <CVUploadModal onUploadSuccess={handleCVUploadSuccess}>
+                <Button variant="outline" size="sm" className="hidden sm:flex">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Existing CV
+                </Button>
+              </CVUploadModal>
+              
               <div className="hidden sm:flex items-center gap-2">
                 <ResumeHelpModal />
               </div>
@@ -73,8 +87,14 @@ const ResumeBuilder: React.FC<ResumeBuilderProps> = ({
             </div>
           </div>
           
-          {/* Mobile help buttons */}
+          {/* Mobile help buttons and CV Upload */}
           <div className="sm:hidden flex items-center gap-2 mt-3">
+            <CVUploadModal onUploadSuccess={handleCVUploadSuccess}>
+              <Button variant="outline" size="sm">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload CV
+              </Button>
+            </CVUploadModal>
             <ResumeHelpModal />
           </div>
         </div>
