@@ -26,6 +26,17 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
+    // If it's an auth-related error, try to clear auth state
+    if (error.message?.includes('subscription') || error.message?.includes('auth')) {
+      console.log('Clearing auth state due to error');
+      localStorage.removeItem('supabase.auth.token');
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+    }
   }
 
   handleRetry = () => {
@@ -39,39 +50,41 @@ class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <Card className="max-w-lg mx-auto mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
-              Something went wrong
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-gray-600">
-              We encountered an unexpected error. This has been logged and we're working to fix it.
-            </p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="bg-gray-50 p-3 rounded text-sm">
-                <summary className="cursor-pointer font-medium">Error Details</summary>
-                <pre className="mt-2 whitespace-pre-wrap text-red-600">
-                  {this.state.error.message}
-                </pre>
-              </details>
-            )}
-            <div className="flex gap-2">
-              <Button onClick={this.handleRetry} className="flex items-center gap-2">
-                <RefreshCw className="h-4 w-4" />
-                Try Again
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => window.location.reload()}
-              >
-                Refresh Page
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card className="max-w-lg mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                Something went wrong
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-gray-600">
+                We encountered an unexpected error. This has been logged and we're working to fix it.
+              </p>
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <details className="bg-gray-50 p-3 rounded text-sm">
+                  <summary className="cursor-pointer font-medium">Error Details</summary>
+                  <pre className="mt-2 whitespace-pre-wrap text-red-600">
+                    {this.state.error.message}
+                  </pre>
+                </details>
+              )}
+              <div className="flex gap-2">
+                <Button onClick={this.handleRetry} className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Try Again
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.location.reload()}
+                >
+                  Refresh Page
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       );
     }
 
