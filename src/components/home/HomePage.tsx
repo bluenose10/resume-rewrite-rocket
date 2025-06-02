@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FileText } from 'lucide-react';
 import MainNavigation from '@/components/navigation/MainNavigation';
@@ -6,12 +7,15 @@ import FeaturesSection from './FeaturesSection';
 import HowItWorksSection from './HowItWorksSection';
 import TestimonialsSection from './TestimonialsSection';
 import CTASection from './CTASection';
+import { useResumeStats } from '@/hooks/useResumeStats';
 
 interface HomePageProps {
   onStartBuilding: () => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
+  const { stats } = useResumeStats();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Navigation Header */}
@@ -27,9 +31,9 @@ const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
 
       {/* Main Content */}
       <main>
-        <HeroSection onStartBuilding={onStartBuilding} />
+        <HeroSection onStartBuilding={onStartBuilding} totalResumes={stats.totalResumes} />
         <FeaturesSection />
-        <HowItWorksSection />
+        <HowItWorksSection onStartBuilding={onStartBuilding} />
         <TestimonialsSection />
         <CTASection onStartBuilding={onStartBuilding} />
       </main>
