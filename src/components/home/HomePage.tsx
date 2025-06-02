@@ -6,7 +6,6 @@ import FeaturesSection from './FeaturesSection';
 import HowItWorksSection from './HowItWorksSection';
 import TestimonialsSection from './TestimonialsSection';
 import CTASection from './CTASection';
-import PremiumTemplatesSection from '../templates/PremiumTemplatesSection';
 
 interface HomePageProps {
   onStartBuilding: () => void;
@@ -34,7 +33,6 @@ const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
           totalResumes={stats.totalResumes}
         />
         <FeaturesSection />
-        <PremiumTemplatesSection />
         <HowItWorksSection onStartBuilding={onStartBuilding} />
         <TestimonialsSection />
         <CTASection onStartBuilding={onStartBuilding} />
