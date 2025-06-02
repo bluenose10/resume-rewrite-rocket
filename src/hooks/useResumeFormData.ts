@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ResumeData, ColorTheme } from '@/types/resume';
 import { DEFAULT_THEMES } from '@/constants/themes';
@@ -15,12 +16,10 @@ import { useReferences } from './useReferences';
 
 interface UseResumeFormDataProps {
   initialData?: ResumeData;
-  onDataChange?: (data: ResumeData) => void;
+  onDataChange: (data: ResumeData) => void;
 }
 
-export const useResumeFormData = (props?: UseResumeFormDataProps) => {
-  const { initialData, onDataChange } = props || {};
-  
+export const useResumeFormData = ({ initialData, onDataChange }: UseResumeFormDataProps) => {
   const getInitialResumeData = (): ResumeData => {
     return initialData || {
       personalInfo: {
@@ -72,16 +71,7 @@ export const useResumeFormData = (props?: UseResumeFormDataProps) => {
   const updateData = (updates: Partial<ResumeData>) => {
     const updated = { ...resumeData, ...updates };
     setResumeData(updated);
-    if (onDataChange) {
-      onDataChange(updated);
-    }
-  };
-
-  const updateResumeData = (newData: ResumeData) => {
-    setResumeData(newData);
-    if (onDataChange) {
-      onDataChange(newData);
-    }
+    onDataChange(updated);
   };
 
   // Personal Info hook
@@ -166,7 +156,6 @@ export const useResumeFormData = (props?: UseResumeFormDataProps) => {
 
   return {
     resumeData,
-    updateResumeData,
     newSkill: skillsAndInterestsHook.newSkill,
     newInterest: skillsAndInterestsHook.newInterest,
     setNewSkill: skillsAndInterestsHook.setNewSkill,
