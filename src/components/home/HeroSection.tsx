@@ -60,7 +60,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-white/80 text-sm sm:text-base">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 sm:w-5 sm:h-5 text-brand-cyan" />
-              <span><AnimatedCounter value={totalResumes} />+ Resumes Created</span>
+              <span><AnimatedCounter targetValue={totalResumes} />+ Resumes Created</span>
             </div>
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 sm:w-5 sm:h-5 text-brand-cyan" />
