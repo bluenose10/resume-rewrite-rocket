@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Star, Users, FileText, Sparkles, Upload } from 'lucide-react';
-import { AnimatedCounter } from '@/components/AnimatedCounter';
+import AnimatedCounter from '@/components/AnimatedCounter';
 import CVUploadModal from '@/components/CVUploadModal';
 import UserMenu from '@/components/UserMenu';
 import { useAuth } from '@/contexts/AuthContext';
