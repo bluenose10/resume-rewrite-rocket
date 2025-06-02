@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import AnimatedCounter from '@/components/AnimatedCounter';
@@ -48,7 +49,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
             <div className="text-2xl sm:text-3xl font-bold text-brand-cyan mb-2 text-glow">
               <AnimatedCounter targetValue={totalResumes} />+
             </div>
-            <div className="text-sm sm:text-base text-white/70">Resumes Created</div>
+            <div className="text-sm sm:text-base text-white/70">Resumes Downloaded</div>
           </div>
           <div className="text-center">
             <div className="text-2xl sm:text-3xl font-bold text-brand-cyan mb-2 text-glow">98%</div>

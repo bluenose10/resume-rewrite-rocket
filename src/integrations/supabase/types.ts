@@ -126,6 +126,48 @@ export type Database = {
         }
         Relationships: []
       }
+      template_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          download_count: number | null
+          id: string
+          max_downloads: number | null
+          status: string | null
+          stripe_session_id: string
+          template_name: string
+          updated_at: string
+          user_email: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          download_count?: number | null
+          id?: string
+          max_downloads?: number | null
+          status?: string | null
+          stripe_session_id: string
+          template_name: string
+          updated_at?: string
+          user_email: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          download_count?: number | null
+          id?: string
+          max_downloads?: number | null
+          status?: string | null
+          stripe_session_id?: string
+          template_name?: string
+          updated_at?: string
+          user_email?: string
+        }
+        Relationships: []
+      }
       user_analysis_count: {
         Row: {
           created_at: string | null

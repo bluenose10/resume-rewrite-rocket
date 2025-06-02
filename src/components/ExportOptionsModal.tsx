@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,9 +7,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Image, Printer } from 'lucide-react';
 import { ExportOptions } from '@/types/export';
+import { useResumeStats } from '@/hooks/useResumeStats';
+import { toast } from 'sonner';
 
 interface ExportOptionsModalProps {
-  onExport: (options: ExportOptions) => void;
+  onExport: (options: ExportOptions) => Promise<void>;
   isExporting: boolean;
 }
 
@@ -20,10 +23,27 @@ const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ onExport, isExp
     margins: 'medium'
   });
   const [isOpen, setIsOpen] = useState(false);
+  const { incrementResumeCount } = useResumeStats();
 
-  const handleExport = () => {
-    onExport(options);
-    setIsOpen(false);
+  const handleExport = async () => {
+    try {
+      await onExport(options);
+      
+      // Increment resume count after successful export
+      try {
+        await incrementResumeCount();
+        console.log('Resume count incremented successfully');
+      } catch (countError) {
+        console.error('Failed to increment resume count:', countError);
+        // Don't show error to user as export was successful
+      }
+      
+      setIsOpen(false);
+      toast.success('Resume exported successfully!');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export resume. Please try again.');
+    }
   };
 
   const handlePrint = () => {

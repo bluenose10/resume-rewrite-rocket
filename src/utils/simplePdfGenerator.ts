@@ -24,7 +24,7 @@ export const generateSimplePDF = async (
       throw new Error('No resume page found');
     }
 
-    console.log('Processing resume for PDF export');
+    console.log('Processing resume for export');
 
     // Paper dimensions in mm
     const paperSizes = {
@@ -121,8 +121,10 @@ export const generateSimplePDF = async (
       console.log('Saving PDF');
       pdf.save(fileName);
     }
+    
+    console.log('Export completed successfully');
   } catch (error) {
-    console.error('PDF generation error:', error);
-    throw new Error('Failed to generate PDF');
+    console.error('Export generation error:', error);
+    throw new Error('Failed to generate export');
   }
 };
