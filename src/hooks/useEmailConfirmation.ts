@@ -2,12 +2,11 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export const useEmailConfirmation = () => {
-  const sendConfirmationEmail = async (email: string, fullName?: string, retryCount = 0): Promise<{success: boolean, error?: string, data?: any}> => {
+  const sendConfirmationEmail = async (email: string, fullName?: string): Promise<{success: boolean, error?: string, data?: any}> => {
     try {
       console.log('=== SENDING CONFIRMATION EMAIL ===');
       console.log('Email:', email);
       console.log('Full name:', fullName);
-      console.log('Retry attempt:', retryCount);
       
       // Call our edge function to send the confirmation email
       console.log('Calling supabase.functions.invoke...');
@@ -25,14 +24,6 @@ export const useEmailConfirmation = () => {
 
       if (error) {
         console.error('Error calling send-email function:', error);
-        
-        // If it's a network error and we haven't retried too many times, try again
-        if (retryCount < 2 && (error.message?.includes('network') || error.message?.includes('fetch') || error.message?.includes('Failed to fetch'))) {
-          console.log('Network error detected, retrying...');
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Wait 1s, 2s, 3s
-          return sendConfirmationEmail(email, fullName, retryCount + 1);
-        }
-        
         return { success: false, error: error.message };
       }
 
@@ -46,14 +37,6 @@ export const useEmailConfirmation = () => {
       }
     } catch (error) {
       console.error('Failed to send confirmation email:', error);
-      
-      // If it's a network error and we haven't retried too many times, try again
-      if (retryCount < 2 && error instanceof Error && (error.message?.includes('network') || error.message?.includes('fetch') || error.message?.includes('Failed to fetch'))) {
-        console.log('Network error detected, retrying...');
-        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-        return sendConfirmationEmail(email, fullName, retryCount + 1);
-      }
-      
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   };
