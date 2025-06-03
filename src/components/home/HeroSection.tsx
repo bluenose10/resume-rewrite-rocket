@@ -1,10 +1,10 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Star, Users, FileText, Sparkles, Upload } from 'lucide-react';
+import { ArrowRight, Star, Users, FileText, Sparkles } from 'lucide-react';
 import AnimatedCounter from '@/components/AnimatedCounter';
-import CVUploadModal from '@/components/CVUploadModal';
 import UserMenu from '@/components/UserMenu';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -15,10 +15,6 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes }) => {
   const { user, loading } = useAuth();
-
-  const handleCVUploadSuccess = (uploadedCvId: string) => {
-    console.log('CV uploaded with ID:', uploadedCvId);
-  };
 
   return (
     <section className="relative min-h-screen flex flex-col">
@@ -88,18 +84,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
                 </>
               )}
             </Button>
-            
-            {user && !loading && (
-              <CVUploadModal onUploadSuccess={handleCVUploadSuccess}>
-                <Button 
-                  variant="outline" 
-                  className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg backdrop-blur-sm transition-all duration-300"
-                >
-                  <Upload className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Upload Existing CV
-                </Button>
-              </CVUploadModal>
-            )}
           </div>
 
           {/* Feature Cards */}
