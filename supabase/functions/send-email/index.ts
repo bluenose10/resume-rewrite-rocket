@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { renderAsync } from "npm:@react-email/components@0.0.22";
@@ -137,10 +136,8 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
     );
     console.log("Email template rendered successfully");
 
-    // Determine the sender email based on domain verification
-    // For testing with unverified domains, use the default Resend sender
-    // For production, you should replace this with your verified domain
-    const senderEmail = "onboarding@resend.dev";
+    // Use your verified email address as the sender
+    const senderEmail = "markmoran.moran2@googlemail.com";
     
     console.log("Sending email with sender:", senderEmail);
 
