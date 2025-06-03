@@ -19,7 +19,7 @@ interface EmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  console.log("=== Email Function Called (v2.0) ===");
+  console.log("=== Email Function Called (v3.0) ===");
   console.log("Method:", req.method);
   console.log("URL:", req.url);
   
@@ -33,57 +33,21 @@ const handler = async (req: Request): Promise<Response> => {
     const requestBody = await req.json();
     console.log("Request body received:", JSON.stringify(requestBody, null, 2));
     
-    // Enhanced environment variable debugging
-    console.log("=== COMPREHENSIVE ENV DEBUG ===");
-    const allEnvVars = Deno.env.toObject();
-    console.log("Total environment variables count:", Object.keys(allEnvVars).length);
-    
-    // Log all environment variable names (not values for security)
-    console.log("All environment variable names:", Object.keys(allEnvVars).sort());
-    
-    // Check for Resend-related variables specifically
-    const resendVars = Object.keys(allEnvVars).filter(key => 
-      key.toLowerCase().includes('resend') || key.toLowerCase().includes('api')
-    );
-    console.log("Resend/API related variable names:", resendVars);
-    
-    // Try multiple ways to get the API key with detailed logging
-    console.log("Checking RESEND_API_KEY specifically...");
-    const apiKey1 = Deno.env.get("RESEND_API_KEY");
-    console.log("Deno.env.get('RESEND_API_KEY') result:", apiKey1 ? `[SET - length: ${apiKey1.length}]` : '[NOT SET]');
-    
-    const apiKey2 = Deno.env.get("resend_api_key");
-    console.log("Deno.env.get('resend_api_key') result:", apiKey2 ? `[SET - length: ${apiKey2.length}]` : '[NOT SET]');
-    
-    const apiKey3 = allEnvVars["RESEND_API_KEY"];
-    console.log("allEnvVars['RESEND_API_KEY'] result:", apiKey3 ? `[SET - length: ${apiKey3.length}]` : '[NOT SET]');
-    
-    // Use the first available API key
-    const apiKey = apiKey1 || apiKey2 || apiKey3;
-    
-    console.log("Final API key status:", {
+    // Get API key
+    const apiKey = Deno.env.get("RESEND_API_KEY");
+    console.log("API key status:", {
       present: !!apiKey,
       length: apiKey ? apiKey.length : 0,
-      startsWithRe: apiKey ? apiKey.startsWith('re_') : false,
-      firstChars: apiKey ? apiKey.substring(0, 5) + '...' : 'N/A'
+      startsWithRe: apiKey ? apiKey.startsWith('re_') : false
     });
     
     if (!apiKey) {
-      console.error("=== CRITICAL: RESEND_API_KEY MISSING ===");
-      console.error("Environment variables available:", Object.keys(allEnvVars).length);
-      console.error("Resend-related variables found:", resendVars);
-      
+      console.error("RESEND_API_KEY is missing");
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: "Email service not configured. RESEND_API_KEY is missing from environment.",
-          code: "MISSING_API_KEY",
-          debug: {
-            totalEnvVars: Object.keys(allEnvVars).length,
-            resendRelatedVars: resendVars,
-            checkedVariables: ["RESEND_API_KEY", "resend_api_key"],
-            functionVersion: "2.0"
-          }
+          error: "Email service not configured. RESEND_API_KEY is missing.",
+          code: "MISSING_API_KEY"
         }),
         {
           status: 500,
@@ -92,20 +56,14 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Handle test requests with enhanced debugging
+    // Handle test requests
     if (requestBody.type === 'test') {
-      console.log("Processing test request with API key present");
+      console.log("Processing test request");
       return new Response(JSON.stringify({
         success: true,
         message: "Function is working correctly with API key",
         timestamp: new Date().toISOString(),
-        debug: {
-          apiKeyConfigured: true,
-          apiKeyLength: apiKey.length,
-          apiKeyValid: apiKey.startsWith('re_'),
-          environment: "edge-function",
-          functionVersion: "2.0"
-        }
+        functionVersion: "3.0"
       }), {
         status: 200,
         headers: {
@@ -142,15 +100,13 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("=== ERROR in send-email function ===");
     console.error("Error message:", error.message);
     console.error("Error stack:", error.stack);
-    console.error("Full error object:", error);
     
     return new Response(
       JSON.stringify({ 
         success: false,
         error: error.message || "Unknown error occurred",
         code: "FUNCTION_ERROR",
-        stack: error.stack,
-        functionVersion: "2.0"
+        functionVersion: "3.0"
       }),
       {
         status: 500,
@@ -181,10 +137,17 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
     );
     console.log("Email template rendered successfully");
 
+    // Determine the sender email based on domain verification
+    // For testing with unverified domains, use the default Resend sender
+    // For production, you should replace this with your verified domain
+    const senderEmail = "onboarding@resend.dev";
+    
+    console.log("Sending email with sender:", senderEmail);
+
     // Send confirmation email
     console.log("Calling Resend API...");
     const emailResponse = await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: senderEmail,
       to: [payload.email!],
       subject: "Welcome to ResumeAI - Confirm your account",
       html: emailHtml,
@@ -195,11 +158,30 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
 
     if (emailResponse.error) {
       console.error("Resend API returned an error:", emailResponse.error);
+      
+      // Handle specific domain verification errors
+      if (emailResponse.error.message?.includes("verify a domain")) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: "Email domain not verified. Please verify your domain in Resend dashboard or use your registered email address.",
+            code: "DOMAIN_NOT_VERIFIED",
+            details: emailResponse.error.message,
+            suggestion: "Visit https://resend.com/domains to verify your domain"
+          }),
+          {
+            status: 403,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ 
           success: false,
           error: emailResponse.error.message || "Email sending failed",
-          code: "RESEND_ERROR"
+          code: "RESEND_ERROR",
+          details: emailResponse.error
         }),
         {
           status: 500,
@@ -226,7 +208,6 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
     console.error("=== CONFIRMATION EMAIL ERROR ===");
     console.error("Error message:", error.message);
     console.error("Error stack:", error.stack);
-    console.error("Full error object:", error);
     
     return new Response(
       JSON.stringify({ 
