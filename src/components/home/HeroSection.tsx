@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { ArrowRight, Star, Users, FileText, Sparkles, Upload } from 'lucide-reac
 import AnimatedCounter from '@/components/AnimatedCounter';
 import CVUploadModal from '@/components/CVUploadModal';
 import UserMenu from '@/components/UserMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeroSectionProps {
   onStartBuilding: () => void;
@@ -14,21 +16,20 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes }) => {
-  // Safely get auth context with error handling
-  let user = null;
-  let authLoading = true;
-  
-  try {
-    const { useAuth } = require('@/contexts/AuthContext');
-    const authContext = useAuth();
-    user = authContext.user;
-    authLoading = authContext.loading;
-  } catch (error) {
-    console.log('Auth context not ready yet:', error);
-    // Context not ready yet, use default values
-    user = null;
-    authLoading = true;
-  }
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleStartBuilding = () => {
+    if (loading) {
+      return; // Don't do anything while loading
+    }
+    
+    if (user) {
+      onStartBuilding();
+    } else {
+      navigate('/auth');
+    }
+  };
 
   const handleCVUploadSuccess = (uploadedCvId: string) => {
     console.log('CV uploaded with ID:', uploadedCvId);
@@ -84,14 +85,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4 px-2">
             <Button 
-              onClick={onStartBuilding}
+              onClick={handleStartBuilding}
+              disabled={loading}
               className="w-full sm:w-auto bg-brand-cyan hover:bg-brand-cyan/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg glow-cyan transition-all duration-300 hover:scale-105"
             >
-              Start Building Free
-              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+              {loading ? (
+                <>Loading...</>
+              ) : user ? (
+                <>
+                  Start Building
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                </>
+              ) : (
+                <>
+                  Start Building Free
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                </>
+              )}
             </Button>
             
-            {user && !authLoading && (
+            {user && !loading && (
               <CVUploadModal onUploadSuccess={handleCVUploadSuccess}>
                 <Button 
                   variant="outline" 
