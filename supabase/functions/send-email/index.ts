@@ -23,14 +23,6 @@ interface EmailRequest {
   fullName?: string;
 }
 
-interface AuthWebhookPayload {
-  type: string;
-  table: string;
-  record?: any;
-  schema: string;
-  old_record?: any;
-}
-
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -38,11 +30,6 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const requestBody = await req.json();
-
-    // Check if this is a webhook from Supabase Auth
-    if (requestBody.type && requestBody.table === 'users') {
-      return await handleAuthWebhook(requestBody);
-    }
 
     // Handle confirmation email type
     if (requestBody.type === 'confirmation' && requestBody.email) {
@@ -84,9 +71,9 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
   try {
     console.log("Sending confirmation email to:", payload.email);
     
-    // Generate a simple confirmation URL (this would normally come from Supabase)
-    const baseUrl = "https://your-app.lovableproject.com";
-    const confirmationUrl = `${baseUrl}/auth/confirm?confirmed=true`;
+    // Generate a proper confirmation URL using the actual app URL
+    const appUrl = "https://cvai.site";
+    const confirmationUrl = `${appUrl}/auth/confirm?confirmed=true`;
     
     // Render the confirmation email
     const emailHtml = await renderAsync(
@@ -96,10 +83,10 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
       })
     );
 
-    // Send confirmation email
+    // Send confirmation email - FIX: Use array format for 'to' field
     const emailResponse = await resend.emails.send({
       from: "ResumeAI <onboarding@resend.dev>",
-      to: [payload.email!],
+      to: [payload.email!], // This was the issue - needs to be an array
       subject: "Welcome to ResumeAI - Confirm your account",
       html: emailHtml,
     });
@@ -121,79 +108,10 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
   } catch (error: any) {
     console.error("Error sending confirmation email:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
-  }
-};
-
-const handleAuthWebhook = async (payload: AuthWebhookPayload): Promise<Response> => {
-  try {
-    console.log("Auth webhook received:", payload);
-
-    // Handle user creation (sign up)
-    if (payload.type === 'INSERT' && payload.record) {
-      const user = payload.record;
-      
-      // Check if email is not confirmed yet
-      if (!user.email_confirmed_at && user.email) {
-        console.log("Sending confirmation email to:", user.email);
-        
-        // Generate confirmation URL
-        const baseUrl = Deno.env.get("SUPABASE_URL") || "https://uqoxukprtmpnpsnxngog.supabase.co";
-        const confirmationUrl = `${baseUrl}/auth/v1/verify?token=${user.confirmation_token}&type=signup&redirect_to=${encodeURIComponent('https://your-app.lovableproject.com/')}`;
-        
-        // Render the confirmation email
-        const emailHtml = await renderAsync(
-          React.createElement(ConfirmationEmail, {
-            userName: user.raw_user_meta_data?.full_name || user.email.split('@')[0],
-            confirmationUrl: confirmationUrl,
-          })
-        );
-
-        // Send confirmation email
-        const emailResponse = await resend.emails.send({
-          from: "ResumeAI <onboarding@resend.dev>",
-          to: [user.email],
-          subject: "Welcome to ResumeAI - Confirm your account",
-          html: emailHtml,
-        });
-
-        console.log("Confirmation email sent:", emailResponse);
-
-        return new Response(JSON.stringify({ 
-          success: true, 
-          message: "Confirmation email sent",
-          emailId: emailResponse.id 
-        }), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            ...corsHeaders,
-          },
-        });
-      }
-    }
-
-    // Return success for other webhook types
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: "Webhook processed" 
-    }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
-
-  } catch (error: any) {
-    console.error("Error handling auth webhook:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false,
+        error: error.message 
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

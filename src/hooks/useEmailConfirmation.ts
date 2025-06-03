@@ -16,15 +16,21 @@ export const useEmailConfirmation = () => {
       });
 
       if (error) {
-        console.error('Error sending confirmation email:', error);
-        throw error;
+        console.error('Error calling send-email function:', error);
+        return { success: false, error: error.message };
       }
 
-      console.log('Confirmation email sent successfully:', data);
-      return { success: true, data };
+      // Check if the response indicates success
+      if (data && data.success) {
+        console.log('Confirmation email sent successfully:', data);
+        return { success: true, data };
+      } else {
+        console.error('Email sending failed:', data);
+        return { success: false, error: data?.error || 'Unknown error' };
+      }
     } catch (error) {
       console.error('Failed to send confirmation email:', error);
-      return { success: false, error };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   };
 

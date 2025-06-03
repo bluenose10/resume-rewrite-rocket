@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mail, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Mail, CheckCircle, ArrowLeft, RefreshCw } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useEmailConfirmation } from '@/hooks/useEmailConfirmation';
 
 interface CheckEmailViewProps {
   email: string;
@@ -10,6 +12,39 @@ interface CheckEmailViewProps {
 }
 
 const CheckEmailView: React.FC<CheckEmailViewProps> = ({ email, onBackToSignIn }) => {
+  const [isResending, setIsResending] = useState(false);
+  const { sendConfirmationEmail } = useEmailConfirmation();
+  const { toast } = useToast();
+
+  const handleResendEmail = async () => {
+    setIsResending(true);
+    
+    try {
+      const result = await sendConfirmationEmail(email, email.split('@')[0]);
+      
+      if (result.success) {
+        toast({
+          title: "Email sent!",
+          description: "We've sent another confirmation email to your inbox."
+        });
+      } else {
+        toast({
+          title: "Failed to resend email",
+          description: "There was an error sending the email. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to resend email",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen hero-gradient flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -40,6 +75,25 @@ const CheckEmailView: React.FC<CheckEmailViewProps> = ({ email, onBackToSignIn }
             </div>
             
             <div className="space-y-3">
+              <Button
+                onClick={handleResendEmail}
+                disabled={isResending}
+                variant="outline"
+                className="w-full border-white/30 text-white hover:bg-white/10"
+              >
+                {isResending ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Resend email
+                  </>
+                )}
+              </Button>
+              
               <Button
                 onClick={onBackToSignIn}
                 variant="ghost"

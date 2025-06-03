@@ -68,23 +68,41 @@ const Auth = () => {
           description: error.message,
           variant: "destructive"
         });
-      } else {
-        // Send confirmation email through our custom function
-        const emailResult = await sendConfirmationEmail(email, fullName);
-        
-        if (emailResult.success) {
-          console.log('Custom confirmation email sent successfully');
-        } else {
-          console.warn('Custom confirmation email failed, but signup succeeded');
-        }
+        return;
+      }
 
+      // Send confirmation email and handle response properly
+      toast({
+        title: "Sending confirmation email...",
+        description: "Please wait while we send your confirmation email."
+      });
+
+      const emailResult = await sendConfirmationEmail(email, fullName);
+      
+      if (emailResult.success) {
+        console.log('Confirmation email sent successfully');
+        toast({
+          title: "Account created successfully!",
+          description: "Please check your email to confirm your account."
+        });
+        setSubmittedEmail(email);
+        setShowCheckEmail(true);
+      } else {
+        console.error('Confirmation email failed:', emailResult.error);
+        toast({
+          title: "Account created but email failed",
+          description: "Your account was created but we couldn't send the confirmation email. Please try resending it.",
+          variant: "destructive"
+        });
+        // Still show the check email view so user can try to resend
         setSubmittedEmail(email);
         setShowCheckEmail(true);
       }
     } catch (error) {
+      console.error('Sign up error:', error);
       toast({
         title: "Sign up failed",
-        description: "An unexpected error occurred",
+        description: "An unexpected error occurred during sign up",
         variant: "destructive"
       });
     } finally {
