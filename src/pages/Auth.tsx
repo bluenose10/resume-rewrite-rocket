@@ -71,6 +71,8 @@ const Auth = () => {
         return;
       }
 
+      console.log('Account created successfully, attempting to send confirmation email...');
+
       // Send confirmation email and handle response properly
       toast({
         title: "Sending confirmation email...",
@@ -89,11 +91,21 @@ const Auth = () => {
         setShowCheckEmail(true);
       } else {
         console.error('Confirmation email failed:', emailResult.error);
+        
+        // Provide specific error messages based on error codes
+        let errorMessage = "We couldn't send the confirmation email. Please try resending it.";
+        if (emailResult.error?.includes('DOMAIN_NOT_VERIFIED')) {
+          errorMessage = "Email service configuration issue. Please contact support.";
+        } else if (emailResult.error?.includes('MISSING_API_KEY')) {
+          errorMessage = "Email service not configured. Please contact support.";
+        }
+        
         toast({
           title: "Account created but email failed",
-          description: "Your account was created but we couldn't send the confirmation email. Please try resending it.",
+          description: errorMessage,
           variant: "destructive"
         });
+        
         // Still show the check email view so user can try to resend
         setSubmittedEmail(email);
         setShowCheckEmail(true);

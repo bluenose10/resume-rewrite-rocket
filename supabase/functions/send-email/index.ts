@@ -5,8 +5,6 @@ import { renderAsync } from "npm:@react-email/components@0.0.22";
 import { ConfirmationEmail } from "./_templates/confirmation-email.tsx";
 import * as React from "npm:react@18.3.1";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -41,12 +39,30 @@ const handler = async (req: Request): Promise<Response> => {
     // Check if RESEND_API_KEY is available
     const apiKey = Deno.env.get("RESEND_API_KEY");
     console.log("RESEND_API_KEY present:", !!apiKey);
-    console.log("RESEND_API_KEY length:", apiKey ? apiKey.length : 0);
+    
+    if (!apiKey) {
+      console.error("RESEND_API_KEY is missing from environment variables");
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: "Email service not configured. Please contact support.",
+          code: "MISSING_API_KEY"
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Initialize Resend with the API key
+    const resend = new Resend(apiKey);
+    console.log("Resend initialized successfully");
 
     // Handle confirmation email type
     if (requestBody.type === 'confirmation' && requestBody.email) {
       console.log("Processing confirmation email for:", requestBody.email);
-      return await handleConfirmationEmail(requestBody);
+      return await handleConfirmationEmail(requestBody, resend);
     }
 
     // Handle direct email requests (existing functionality)
@@ -78,7 +94,11 @@ const handler = async (req: Request): Promise<Response> => {
     console.error("Full error object:", error);
     
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        success: false,
+        error: error.message || "Unknown error occurred",
+        code: "FUNCTION_ERROR"
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -87,7 +107,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response> => {
+const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Promise<Response> => {
   try {
     console.log("=== CONFIRMATION EMAIL PROCESS START ===");
     console.log("Email:", payload.email);
@@ -127,13 +147,45 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
     const emailResponse = await resend.emails.send(emailData);
     console.log("=== RESEND API RESPONSE ===");
     console.log("Response object:", JSON.stringify(emailResponse, null, 2));
-    console.log("Email ID:", emailResponse.id);
-    console.log("Response type:", typeof emailResponse);
+
+    // Check if the response indicates an error
+    if (emailResponse.error) {
+      console.error("Resend API returned an error:", emailResponse.error);
+      
+      // Check if it's a domain verification error
+      if (emailResponse.error.message && emailResponse.error.message.includes("verify a domain")) {
+        return new Response(
+          JSON.stringify({ 
+            success: false,
+            error: "Email domain not verified. Please verify your domain at resend.com/domains",
+            code: "DOMAIN_NOT_VERIFIED"
+          }),
+          {
+            status: 403,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: emailResponse.error.message || "Email sending failed",
+          code: "RESEND_ERROR"
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    console.log("Email sent successfully with ID:", emailResponse.data?.id);
 
     return new Response(JSON.stringify({ 
       success: true, 
       message: "Confirmation email sent",
-      emailId: emailResponse.id,
+      emailId: emailResponse.data?.id,
       debug: {
         emailSent: true,
         resendResponse: emailResponse
@@ -156,26 +208,10 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
     console.error("Error stack:", error.stack);
     console.error("Full error object:", JSON.stringify(error, null, 2));
     
-    // Check if it's a domain verification error
-    if (error.message && error.message.includes("verify a domain")) {
-      console.log("Domain verification error detected");
-      return new Response(
-        JSON.stringify({ 
-          success: false,
-          error: "Email domain not verified. Please verify your domain at resend.com/domains",
-          code: "DOMAIN_NOT_VERIFIED"
-        }),
-        {
-          status: 403,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
-
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message,
+        error: error.message || "Unknown error in confirmation email",
         debug: {
           errorType: typeof error,
           errorName: error.name,
