@@ -33,9 +33,19 @@ const Auth = () => {
       const { error } = await signIn(email, password);
       
       if (error) {
+        console.error('Sign in error:', error);
+        
+        // Handle specific error types
+        let errorMessage = error.message;
+        if (error.message?.includes('fetch')) {
+          errorMessage = "Network connection issue. Please check your internet connection and try again.";
+        } else if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = "Invalid email or password. Please check your credentials.";
+        }
+        
         toast({
           title: "Sign in failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
       } else {
@@ -43,12 +53,14 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You have successfully signed in."
         });
-        navigate('/');
+        // Force page reload for clean state
+        window.location.href = '/';
       }
     } catch (error) {
+      console.error('Unexpected sign in error:', error);
       toast({
         title: "Sign in failed",
-        description: "An unexpected error occurred",
+        description: "Network error. Please check your connection and try again.",
         variant: "destructive"
       });
     } finally {
@@ -60,12 +72,25 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      console.log('Attempting signup for:', email);
       const { error } = await signUp(email, password, fullName);
       
       if (error) {
+        console.error('Signup error:', error);
+        
+        // Handle specific error types
+        let errorMessage = error.message;
+        if (error.message?.includes('fetch')) {
+          errorMessage = "Network connection issue. Please check your internet connection and try again.";
+        } else if (error.message?.includes('already registered')) {
+          errorMessage = "This email is already registered. Please try signing in instead.";
+        } else if (error.message?.includes('Password should be')) {
+          errorMessage = "Password must be at least 6 characters long.";
+        }
+        
         toast({
           title: "Sign up failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
         return;
@@ -73,48 +98,47 @@ const Auth = () => {
 
       console.log('Account created successfully, attempting to send confirmation email...');
 
-      // Send confirmation email and handle response properly
+      // Account created successfully, now try to send confirmation email
       toast({
-        title: "Sending confirmation email...",
-        description: "Please wait while we send your confirmation email."
+        title: "Account created!",
+        description: "Sending confirmation email..."
       });
 
-      const emailResult = await sendConfirmationEmail(email, fullName);
-      
-      if (emailResult.success) {
-        console.log('Confirmation email sent successfully');
-        toast({
-          title: "Account created successfully!",
-          description: "Please check your email to confirm your account."
-        });
-        setSubmittedEmail(email);
-        setShowCheckEmail(true);
-      } else {
-        console.error('Confirmation email failed:', emailResult.error);
+      try {
+        const emailResult = await sendConfirmationEmail(email, fullName);
         
-        // Provide specific error messages based on error codes
-        let errorMessage = "We couldn't send the confirmation email. Please try resending it.";
-        if (emailResult.error?.includes('DOMAIN_NOT_VERIFIED')) {
-          errorMessage = "Email service configuration issue. Please contact support.";
-        } else if (emailResult.error?.includes('MISSING_API_KEY')) {
-          errorMessage = "Email service not configured. Please contact support.";
+        if (emailResult.success) {
+          console.log('Confirmation email sent successfully');
+          toast({
+            title: "Success!",
+            description: "Please check your email to confirm your account."
+          });
+        } else {
+          console.error('Confirmation email failed:', emailResult.error);
+          toast({
+            title: "Account created",
+            description: "Account created but we couldn't send the confirmation email. You can try to resend it.",
+            variant: "destructive"
+          });
         }
-        
+      } catch (emailError) {
+        console.error('Email sending error:', emailError);
         toast({
-          title: "Account created but email failed",
-          description: errorMessage,
+          title: "Account created",
+          description: "Account created but confirmation email failed. You can try to resend it.",
           variant: "destructive"
         });
-        
-        // Still show the check email view so user can try to resend
-        setSubmittedEmail(email);
-        setShowCheckEmail(true);
       }
+      
+      // Always show the check email view after successful signup
+      setSubmittedEmail(email);
+      setShowCheckEmail(true);
+      
     } catch (error) {
-      console.error('Sign up error:', error);
+      console.error('Unexpected signup error:', error);
       toast({
         title: "Sign up failed",
-        description: "An unexpected error occurred during sign up",
+        description: "Network error. Please check your connection and try again.",
         variant: "destructive"
       });
     } finally {

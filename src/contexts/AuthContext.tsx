@@ -22,6 +22,24 @@ export const useAuth = () => {
   return context;
 };
 
+// Clean up any stale auth state
+const cleanupAuthState = () => {
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  } catch (error) {
+    console.log('Error cleaning auth state:', error);
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -83,7 +101,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName?: string) => {
     try {
+      console.log('Starting signup process for:', email);
+      
+      // Clean up any existing auth state first
+      cleanupAuthState();
+      
+      // Try to sign out first to ensure clean state
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Signout during signup failed (expected):', err);
+      }
+
       const redirectUrl = `${window.location.origin}/`;
+      console.log('Signup redirect URL:', redirectUrl);
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -96,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       
+      console.log('Signup result:', { error });
       return { error };
     } catch (error) {
       console.error('Error in signUp:', error);
@@ -105,11 +137,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Starting signin process for:', email);
+      
+      // Clean up any existing auth state first
+      cleanupAuthState();
+      
+      // Try to sign out first to ensure clean state
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Signout during signin failed (expected):', err);
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
+      console.log('Signin result:', { error });
       return { error };
     } catch (error) {
       console.error('Error in signIn:', error);
@@ -119,12 +164,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
+      cleanupAuthState();
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) {
         console.error('Error signing out:', error);
       }
+      // Force page reload for clean state
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Error in signOut:', error);
+      window.location.href = '/auth';
     }
   };
 
