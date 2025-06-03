@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEmailConfirmation } from '@/hooks/useEmailConfirmation';
 import { Loader2, Eye, EyeOff, FileText, ArrowLeft, Sparkles, Mail, CheckCircle } from 'lucide-react';
 
 const Auth = () => {
@@ -18,6 +19,7 @@ const Auth = () => {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ email: '', password: '', fullName: '' });
   const { signIn, signUp, user } = useAuth();
+  const { sendConfirmationEmail } = useEmailConfirmation();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -72,6 +74,15 @@ const Auth = () => {
           variant: "destructive"
         });
       } else {
+        // Send confirmation email through our custom function
+        const emailResult = await sendConfirmationEmail(signupForm.email, signupForm.fullName);
+        
+        if (emailResult.success) {
+          console.log('Custom confirmation email sent successfully');
+        } else {
+          console.warn('Custom confirmation email failed, but signup succeeded');
+        }
+
         setSubmittedEmail(signupForm.email);
         setIsSignUpAction(true);
         setShowCheckEmail(true);
