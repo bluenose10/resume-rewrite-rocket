@@ -12,13 +12,10 @@ const corsHeaders = {
 };
 
 interface EmailRequest {
-  to?: string;
-  subject?: string;
-  html?: string;
-  from?: string;
   type?: string;
   email?: string;
   fullName?: string;
+  message?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -36,17 +33,34 @@ const handler = async (req: Request): Promise<Response> => {
     const requestBody = await req.json();
     console.log("Request body received:", JSON.stringify(requestBody, null, 2));
     
-    // Check if RESEND_API_KEY is available
-    const apiKey = Deno.env.get("RESEND_API_KEY");
+    // Enhanced environment variable debugging
+    console.log("=== ENVIRONMENT DEBUGGING ===");
+    console.log("Available environment variables:");
+    for (const [key, value] of Object.entries(Deno.env.toObject())) {
+      if (key.includes('RESEND') || key.includes('API')) {
+        console.log(`${key}: ${value ? '[SET]' : '[NOT SET]'}`);
+      }
+    }
+    
+    // Try multiple ways to get the API key
+    const apiKey = Deno.env.get("RESEND_API_KEY") || 
+                   Deno.env.get("resend_api_key") || 
+                   Deno.env.get("RESEND_API_KEY_SECRET");
+    
     console.log("RESEND_API_KEY present:", !!apiKey);
+    console.log("API key length:", apiKey ? apiKey.length : 0);
+    console.log("API key starts with 're_':", apiKey ? apiKey.startsWith('re_') : false);
     
     if (!apiKey) {
       console.error("RESEND_API_KEY is missing from environment variables");
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: "Email service not configured. Please contact support.",
-          code: "MISSING_API_KEY"
+          error: "Email service not configured. RESEND_API_KEY is missing.",
+          code: "MISSING_API_KEY",
+          debug: {
+            availableEnvVars: Object.keys(Deno.env.toObject()).filter(k => k.includes('RESEND') || k.includes('API'))
+          }
         }),
         {
           status: 500,
@@ -55,17 +69,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Initialize Resend with the API key
-    console.log("Initializing Resend...");
-    const resend = new Resend(apiKey);
-
-    // Handle test requests
+    // Handle test requests with enhanced debugging
     if (requestBody.type === 'test') {
       console.log("Processing test request");
       return new Response(JSON.stringify({
         success: true,
         message: "Function is working correctly",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        debug: {
+          apiKeyConfigured: !!apiKey,
+          apiKeyLength: apiKey.length,
+          environment: "edge-function"
+        }
       }), {
         status: 200,
         headers: {
@@ -75,45 +90,41 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    // Initialize Resend with the API key
+    console.log("Initializing Resend...");
+    const resend = new Resend(apiKey);
+
     // Handle confirmation email type
     if (requestBody.type === 'confirmation' && requestBody.email) {
       console.log("Processing confirmation email for:", requestBody.email);
       return await handleConfirmationEmail(requestBody, resend);
     }
 
-    // Handle direct email requests (existing functionality)
-    console.log("Processing direct email request");
-    const { to, subject, html, from }: EmailRequest = requestBody;
-
-    const emailResponse = await resend.emails.send({
-      from: from || "onboarding@resend.dev",
-      to: [to!],
-      subject: subject!,
-      html: html!,
-    });
-
-    console.log("Direct email sent successfully:", emailResponse);
-
+    // Default response for unhandled request types
     return new Response(JSON.stringify({
-      success: true,
-      data: emailResponse
+      success: false,
+      error: "Invalid request type or missing required fields",
+      code: "INVALID_REQUEST"
     }), {
-      status: 200,
+      status: 400,
       headers: {
         "Content-Type": "application/json",
         ...corsHeaders,
       },
     });
+
   } catch (error: any) {
     console.error("=== ERROR in send-email function ===");
     console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
     console.error("Full error object:", error);
     
     return new Response(
       JSON.stringify({ 
         success: false,
         error: error.message || "Unknown error occurred",
-        code: "FUNCTION_ERROR"
+        code: "FUNCTION_ERROR",
+        stack: error.stack
       }),
       {
         status: 500,
@@ -188,13 +199,15 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
   } catch (error: any) {
     console.error("=== CONFIRMATION EMAIL ERROR ===");
     console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
     console.error("Full error object:", error);
     
     return new Response(
       JSON.stringify({ 
         success: false,
         error: error.message || "Unknown error in confirmation email",
-        code: "CONFIRMATION_ERROR"
+        code: "CONFIRMATION_ERROR",
+        stack: error.stack
       }),
       {
         status: 500,
