@@ -25,6 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
   console.log("=== Email Function Called ===");
   console.log("Method:", req.method);
   console.log("URL:", req.url);
+  console.log("Headers:", Object.fromEntries(req.headers.entries()));
   
   if (req.method === "OPTIONS") {
     console.log("CORS preflight request handled");
@@ -39,6 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Check if RESEND_API_KEY is available
     const apiKey = Deno.env.get("RESEND_API_KEY");
     console.log("RESEND_API_KEY present:", !!apiKey);
+    console.log("RESEND_API_KEY length:", apiKey ? apiKey.length : 0);
     
     if (!apiKey) {
       console.error("RESEND_API_KEY is missing from environment variables");
@@ -56,6 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Initialize Resend with the API key
+    console.log("Initializing Resend...");
     const resend = new Resend(apiKey);
     console.log("Resend initialized successfully");
 
@@ -71,7 +74,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Email details - To:", to, "From:", from, "Subject:", subject);
 
     const emailResponse = await resend.emails.send({
-      from: from || "noreply@resend.dev",
+      from: from || "onboarding@resend.dev",
       to: [to!],
       subject: subject!,
       html: html!,
@@ -79,7 +82,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Direct email sent successfully:", emailResponse);
 
-    return new Response(JSON.stringify(emailResponse), {
+    return new Response(JSON.stringify({
+      success: true,
+      data: emailResponse
+    }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
@@ -128,9 +134,9 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
     );
     console.log("Email template rendered successfully, HTML length:", emailHtml.length);
 
-    // Prepare email data
+    // Prepare email data with verified sender
     const emailData = {
-      from: "noreply@resend.dev",
+      from: "onboarding@resend.dev",
       to: [payload.email!],
       subject: "Welcome to ResumeAI - Confirm your account",
       html: emailHtml,
@@ -142,7 +148,7 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
       htmlLength: emailData.html.length
     });
 
-    // Send confirmation email using the default Resend sender
+    // Send confirmation email
     console.log("Calling Resend API...");
     const emailResponse = await resend.emails.send(emailData);
     console.log("=== RESEND API RESPONSE ===");
@@ -152,21 +158,6 @@ const handleConfirmationEmail = async (payload: EmailRequest, resend: any): Prom
     if (emailResponse.error) {
       console.error("Resend API returned an error:", emailResponse.error);
       
-      // Check if it's a domain verification error
-      if (emailResponse.error.message && emailResponse.error.message.includes("verify a domain")) {
-        return new Response(
-          JSON.stringify({ 
-            success: false,
-            error: "Email domain not verified. Please verify your domain at resend.com/domains",
-            code: "DOMAIN_NOT_VERIFIED"
-          }),
-          {
-            status: 403,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          }
-        );
-      }
-
       return new Response(
         JSON.stringify({ 
           success: false,

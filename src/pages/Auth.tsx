@@ -16,7 +16,7 @@ const Auth = () => {
   const [showCheckEmail, setShowCheckEmail] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
   const { signIn, signUp, user } = useAuth();
-  const { sendConfirmationEmail } = useEmailConfirmation();
+  const { sendConfirmationEmail, testEmailFunction } = useEmailConfirmation();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -72,7 +72,15 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      console.log('Attempting signup for:', email);
+      console.log('=== STARTING SIGNUP PROCESS ===');
+      console.log('Email:', email);
+      console.log('Full name:', fullName);
+      
+      // First test if the email function is working
+      console.log('Testing email function...');
+      const testResult = await testEmailFunction();
+      console.log('Test result:', testResult);
+      
       const { error } = await signUp(email, password, fullName);
       
       if (error) {
@@ -105,7 +113,9 @@ const Auth = () => {
       });
 
       try {
+        console.log('Calling sendConfirmationEmail...');
         const emailResult = await sendConfirmationEmail(email, fullName);
+        console.log('Email result:', emailResult);
         
         if (emailResult.success) {
           console.log('Confirmation email sent successfully');
@@ -117,7 +127,7 @@ const Auth = () => {
           console.error('Confirmation email failed:', emailResult.error);
           toast({
             title: "Account created",
-            description: "Account created but we couldn't send the confirmation email. You can try to resend it.",
+            description: `Account created but we couldn't send the confirmation email: ${emailResult.error}`,
             variant: "destructive"
           });
         }
