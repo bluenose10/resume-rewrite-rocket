@@ -40,7 +40,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { to, subject, html, from }: EmailRequest = requestBody;
 
     const emailResponse = await resend.emails.send({
-      from: from || "ResumeAI <onboarding@resend.dev>",
+      from: from || "noreply@resend.dev",
       to: [to!],
       subject: subject!,
       html: html!,
@@ -83,10 +83,10 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
       })
     );
 
-    // Send confirmation email - FIX: Use array format for 'to' field
+    // Send confirmation email using the default Resend sender
     const emailResponse = await resend.emails.send({
-      from: "ResumeAI <onboarding@resend.dev>",
-      to: [payload.email!], // This was the issue - needs to be an array
+      from: "noreply@resend.dev",
+      to: [payload.email!],
       subject: "Welcome to ResumeAI - Confirm your account",
       html: emailHtml,
     });
@@ -107,6 +107,22 @@ const handleConfirmationEmail = async (payload: EmailRequest): Promise<Response>
 
   } catch (error: any) {
     console.error("Error sending confirmation email:", error);
+    
+    // Check if it's a domain verification error
+    if (error.message && error.message.includes("verify a domain")) {
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: "Email domain not verified. Please verify your domain at resend.com/domains",
+          code: "DOMAIN_NOT_VERIFIED"
+        }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     return new Response(
       JSON.stringify({ 
         success: false,
