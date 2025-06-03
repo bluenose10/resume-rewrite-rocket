@@ -19,7 +19,7 @@ interface EmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  console.log("=== Email Function Called ===");
+  console.log("=== Email Function Called (v2.0) ===");
   console.log("Method:", req.method);
   console.log("URL:", req.url);
   
@@ -34,32 +34,55 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Request body received:", JSON.stringify(requestBody, null, 2));
     
     // Enhanced environment variable debugging
-    console.log("=== ENVIRONMENT DEBUGGING ===");
-    console.log("Available environment variables:");
-    for (const [key, value] of Object.entries(Deno.env.toObject())) {
-      if (key.includes('RESEND') || key.includes('API')) {
-        console.log(`${key}: ${value ? '[SET]' : '[NOT SET]'}`);
-      }
-    }
+    console.log("=== COMPREHENSIVE ENV DEBUG ===");
+    const allEnvVars = Deno.env.toObject();
+    console.log("Total environment variables count:", Object.keys(allEnvVars).length);
     
-    // Try multiple ways to get the API key
-    const apiKey = Deno.env.get("RESEND_API_KEY") || 
-                   Deno.env.get("resend_api_key") || 
-                   Deno.env.get("RESEND_API_KEY_SECRET");
+    // Log all environment variable names (not values for security)
+    console.log("All environment variable names:", Object.keys(allEnvVars).sort());
     
-    console.log("RESEND_API_KEY present:", !!apiKey);
-    console.log("API key length:", apiKey ? apiKey.length : 0);
-    console.log("API key starts with 're_':", apiKey ? apiKey.startsWith('re_') : false);
+    // Check for Resend-related variables specifically
+    const resendVars = Object.keys(allEnvVars).filter(key => 
+      key.toLowerCase().includes('resend') || key.toLowerCase().includes('api')
+    );
+    console.log("Resend/API related variable names:", resendVars);
+    
+    // Try multiple ways to get the API key with detailed logging
+    console.log("Checking RESEND_API_KEY specifically...");
+    const apiKey1 = Deno.env.get("RESEND_API_KEY");
+    console.log("Deno.env.get('RESEND_API_KEY') result:", apiKey1 ? `[SET - length: ${apiKey1.length}]` : '[NOT SET]');
+    
+    const apiKey2 = Deno.env.get("resend_api_key");
+    console.log("Deno.env.get('resend_api_key') result:", apiKey2 ? `[SET - length: ${apiKey2.length}]` : '[NOT SET]');
+    
+    const apiKey3 = allEnvVars["RESEND_API_KEY"];
+    console.log("allEnvVars['RESEND_API_KEY'] result:", apiKey3 ? `[SET - length: ${apiKey3.length}]` : '[NOT SET]');
+    
+    // Use the first available API key
+    const apiKey = apiKey1 || apiKey2 || apiKey3;
+    
+    console.log("Final API key status:", {
+      present: !!apiKey,
+      length: apiKey ? apiKey.length : 0,
+      startsWithRe: apiKey ? apiKey.startsWith('re_') : false,
+      firstChars: apiKey ? apiKey.substring(0, 5) + '...' : 'N/A'
+    });
     
     if (!apiKey) {
-      console.error("RESEND_API_KEY is missing from environment variables");
+      console.error("=== CRITICAL: RESEND_API_KEY MISSING ===");
+      console.error("Environment variables available:", Object.keys(allEnvVars).length);
+      console.error("Resend-related variables found:", resendVars);
+      
       return new Response(
         JSON.stringify({ 
           success: false,
-          error: "Email service not configured. RESEND_API_KEY is missing.",
+          error: "Email service not configured. RESEND_API_KEY is missing from environment.",
           code: "MISSING_API_KEY",
           debug: {
-            availableEnvVars: Object.keys(Deno.env.toObject()).filter(k => k.includes('RESEND') || k.includes('API'))
+            totalEnvVars: Object.keys(allEnvVars).length,
+            resendRelatedVars: resendVars,
+            checkedVariables: ["RESEND_API_KEY", "resend_api_key"],
+            functionVersion: "2.0"
           }
         }),
         {
@@ -71,15 +94,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Handle test requests with enhanced debugging
     if (requestBody.type === 'test') {
-      console.log("Processing test request");
+      console.log("Processing test request with API key present");
       return new Response(JSON.stringify({
         success: true,
-        message: "Function is working correctly",
+        message: "Function is working correctly with API key",
         timestamp: new Date().toISOString(),
         debug: {
-          apiKeyConfigured: !!apiKey,
+          apiKeyConfigured: true,
           apiKeyLength: apiKey.length,
-          environment: "edge-function"
+          apiKeyValid: apiKey.startsWith('re_'),
+          environment: "edge-function",
+          functionVersion: "2.0"
         }
       }), {
         status: 200,
@@ -91,7 +116,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Initialize Resend with the API key
-    console.log("Initializing Resend...");
+    console.log("Initializing Resend client...");
     const resend = new Resend(apiKey);
 
     // Handle confirmation email type
@@ -124,7 +149,8 @@ const handler = async (req: Request): Promise<Response> => {
         success: false,
         error: error.message || "Unknown error occurred",
         code: "FUNCTION_ERROR",
-        stack: error.stack
+        stack: error.stack,
+        functionVersion: "2.0"
       }),
       {
         status: 500,
