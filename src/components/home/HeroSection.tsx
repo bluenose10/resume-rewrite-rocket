@@ -1,6 +1,4 @@
-
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,19 +15,6 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes }) => {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  const handleStartBuilding = () => {
-    if (loading) {
-      return; // Don't do anything while loading
-    }
-    
-    if (user) {
-      onStartBuilding();
-    } else {
-      navigate('/auth');
-    }
-  };
 
   const handleCVUploadSuccess = (uploadedCvId: string) => {
     console.log('CV uploaded with ID:', uploadedCvId);
@@ -85,7 +70,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartBuilding, totalResumes
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4 px-2">
             <Button 
-              onClick={handleStartBuilding}
+              onClick={onStartBuilding}
               disabled={loading}
               className="w-full sm:w-auto bg-brand-cyan hover:bg-brand-cyan/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-lg glow-cyan transition-all duration-300 hover:scale-105"
             >

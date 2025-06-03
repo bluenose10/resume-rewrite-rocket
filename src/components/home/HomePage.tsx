@@ -1,6 +1,8 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useResumeStats } from '@/hooks/useResumeStats';
+import { useAuth } from '@/contexts/AuthContext';
 import HeroSection from './HeroSection';
 import FeaturesSection from './FeaturesSection';
 import HowItWorksSection from './HowItWorksSection';
@@ -12,6 +14,9 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
   // Use stats hook with error handling
   let stats = { totalResumes: 0 };
   try {
@@ -21,6 +26,19 @@ const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
     console.log('Stats loading deferred:', error);
     // Use default stats if hook fails
   }
+
+  // Smart authentication-aware handler for all homepage buttons
+  const handleStartBuilding = () => {
+    if (loading) {
+      return; // Don't do anything while loading
+    }
+    
+    if (user) {
+      onStartBuilding(); // User is authenticated, go to builder
+    } else {
+      navigate('/auth'); // User not authenticated, go to auth page
+    }
+  };
 
   return (
     <div className="min-h-screen hero-gradient relative overflow-hidden">
@@ -37,13 +55,13 @@ const HomePage: React.FC<HomePageProps> = ({ onStartBuilding }) => {
       {/* All sections with mobile-first design */}
       <div className="relative z-10">
         <HeroSection 
-          onStartBuilding={onStartBuilding}
+          onStartBuilding={handleStartBuilding}
           totalResumes={stats.totalResumes}
         />
         <FeaturesSection />
-        <HowItWorksSection onStartBuilding={onStartBuilding} />
+        <HowItWorksSection onStartBuilding={handleStartBuilding} />
         <TestimonialsSection />
-        <CTASection onStartBuilding={onStartBuilding} />
+        <CTASection onStartBuilding={handleStartBuilding} />
       </div>
     </div>
   );
