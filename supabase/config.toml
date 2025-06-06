@@ -3,3 +3,10 @@ project_id = "uqoxukprtmpnpsnxngog"
 
 [functions.send-email]
 verify_jwt = false
+
+[functions.extract-cv-content]
+verify_jwt = false
+
+[functions.redesign-cv]
+verify_jwt = false
+

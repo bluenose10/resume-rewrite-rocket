@@ -4,10 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Upload, FileText, Loader2, Palette } from 'lucide-react';
+import { Upload, FileText, Loader2, Palette, AlertCircle } from 'lucide-react';
 import CVRedesignModal from './CVRedesignModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Progress } from '@/components/ui/progress';
 
 interface CVUploadModalProps {
   onUploadSuccess?: (uploadedCvId: string) => void;
@@ -17,10 +18,13 @@ interface CVUploadModalProps {
 const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children }) => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [processingPhase, setProcessingPhase] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadedCvId, setUploadedCvId] = useState<string | null>(null);
   const [showRedesignStep, setShowRedesignStep] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -92,6 +96,10 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
     }
 
     setIsUploading(true);
+    setUploadProgress(0);
+    setProcessingPhase('Uploading file');
+    setErrorDetails(null);
+    
     try {
       console.log('Starting CV upload for user:', user.id);
       
@@ -102,9 +110,20 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       
       console.log('Uploading file to path:', filePath);
       
+      // Simulate upload progress
+      const uploadProgressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          const newProgress = prev + Math.random() * 10;
+          return newProgress > 90 ? 90 : newProgress;
+        });
+      }, 300);
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('uploaded-cvs')
         .upload(filePath, file);
+
+      clearInterval(uploadProgressInterval);
+      setUploadProgress(100);
 
       if (uploadError) {
         console.error('Storage upload error:', uploadError);
@@ -112,6 +131,7 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       }
 
       console.log('File uploaded successfully:', uploadData);
+      setProcessingPhase('Generating file URL');
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
@@ -119,6 +139,7 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
         .getPublicUrl(filePath);
 
       console.log('Public URL generated:', publicUrl);
+      setProcessingPhase('Saving CV metadata');
 
       // Store CV metadata with user ID
       const { data: cvData, error: insertError } = await supabase
@@ -139,6 +160,7 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       }
 
       console.log('CV metadata saved:', cvData);
+      setProcessingPhase('Extracting CV content');
 
       // Call extraction function
       console.log('Calling extract-cv-content function...');
@@ -167,6 +189,8 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
         });
       }
 
+      setProcessingPhase('Complete');
+      
       // Show redesign step
       setUploadedCvId(cvData.id);
       setShowRedesignStep(true);
@@ -178,6 +202,7 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
       
     } catch (error) {
       console.error('Upload error:', error);
+      setErrorDetails(error.message);
       toast({
         title: "Upload failed",
         description: `Failed to upload CV: ${error.message}`,
@@ -205,6 +230,9 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
     setFile(null);
     setUploadedCvId(null);
     setShowRedesignStep(false);
+    setUploadProgress(0);
+    setProcessingPhase('');
+    setErrorDetails(null);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -220,6 +248,36 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
     setIsOpen(open);
     if (!open) resetModal();
   };
+
+  const renderProcessingProgress = () => (
+    <div className="space-y-4">
+      <Progress value={uploadProgress} className="h-2" />
+      <p className="text-sm text-center text-gray-600">
+        {processingPhase}... {Math.round(uploadProgress)}%
+      </p>
+    </div>
+  );
+
+  const renderErrorState = () => (
+    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div className="flex items-start gap-3">
+        <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+        <div>
+          <h4 className="font-semibold text-red-700">Upload Failed</h4>
+          <p className="text-sm text-red-600 mt-1">
+            {errorDetails || "There was an error uploading your CV. Please try again."}
+          </p>
+        </div>
+      </div>
+      <Button 
+        onClick={resetModal} 
+        className="w-full mt-4"
+        variant="outline"
+      >
+        Try Again
+      </Button>
+    </div>
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -264,53 +322,65 @@ const CVUploadModal: React.FC<CVUploadModalProps> = ({ onUploadSuccess, children
           </div>
         ) : (
           <div className="space-y-4">
-            <div
-              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                dragActive 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-            >
-              {file ? (
-                <div className="space-y-2">
-                  <FileText className="mx-auto h-12 w-12 text-green-500" />
-                  <p className="text-sm font-medium">{file.name}</p>
-                  <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="font-medium">Drop your CV here</p>
-                  <p className="text-sm text-gray-500">or click to browse</p>
-                  <p className="text-xs text-gray-400">Supports: PDF and DOCX files</p>
-                </div>
-              )}
-              <input
-                type="file"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                accept=".pdf,.docx"
-                onChange={handleFileSelect}
-              />
-            </div>
+            {errorDetails && renderErrorState()}
+            
+            {!errorDetails && (
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  dragActive 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-300 hover:border-gray-400'
+                } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                {file ? (
+                  <div className="space-y-2">
+                    <FileText className="mx-auto h-12 w-12 text-green-500" />
+                    <p className="text-sm font-medium">{file.name}</p>
+                    <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="font-medium">Drop your CV here</p>
+                    <p className="text-sm text-gray-500">or click to browse</p>
+                    <p className="text-xs text-gray-400">Supports: PDF and DOCX files</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  accept=".pdf,.docx"
+                  onChange={handleFileSelect}
+                  disabled={isUploading}
+                />
+              </div>
+            )}
+
+            {isUploading && renderProcessingProgress()}
 
             <Button 
               onClick={handleUpload} 
-              disabled={isUploading || !file}
+              disabled={isUploading || !file || !!errorDetails}
               className="w-full"
             >
               {isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading & Processing...
+                  Processing...
                 </>
               ) : (
                 'Upload CV'
               )}
             </Button>
+
+            <div className="text-xs text-gray-500 text-center">
+              By uploading, you agree that your CV will be processed using AI technology 
+              to extract and optimize its content.
+            </div>
           </div>
         )}
       </DialogContent>
