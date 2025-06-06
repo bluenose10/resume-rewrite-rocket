@@ -53,7 +53,60 @@ const SimpleResumePreview: React.FC<SimpleResumePreviewProps> = ({ data }) => {
     );
   };
 
+  // Divide sections into pages (simplified approach)
+  const organizeSectionsIntoPages = (sections: string[]) => {
+    // Major sections that should always start a new page if they don't fit completely
+    const majorSections = ['experience', 'education', 'projects', 'skills'];
+    
+    const pages: string[][] = [[]];
+    let currentPageIndex = 0;
+    let currentPageSize = 0;
+    
+    sections.forEach((sectionId) => {
+      // Estimate section size (this is simplified)
+      let sectionSize = 0;
+      
+      switch(sectionId) {
+        case 'experience':
+          sectionSize = (data.experience?.length || 0) * 50;
+          break;
+        case 'education':
+          sectionSize = (data.education?.length || 0) * 40;
+          break;
+        case 'projects':
+          sectionSize = (data.projects?.length || 0) * 45;
+          break;
+        case 'skills':
+          sectionSize = 30 + (data.skills?.length || 0) * 5;
+          break;
+        case 'summary':
+        case 'personalStatement':
+          sectionSize = 40;
+          break;
+        default:
+          sectionSize = 30;
+      }
+      
+      // If section won't fit on current page or is a major section that should start a new page
+      if (currentPageSize + sectionSize > 500 || 
+          (majorSections.includes(sectionId) && currentPageSize > 200)) {
+        currentPageIndex++;
+        pages[currentPageIndex] = [sectionId];
+        currentPageSize = sectionSize;
+      } else {
+        if (!pages[currentPageIndex]) {
+          pages[currentPageIndex] = [];
+        }
+        pages[currentPageIndex].push(sectionId);
+        currentPageSize += sectionSize;
+      }
+    });
+    
+    return pages;
+  };
+
   const visibleSections = getVisibleSections();
+  const pagesOfSections = organizeSectionsIntoPages(visibleSections);
 
   return (
     <div className="resume-container">
@@ -74,7 +127,8 @@ const SimpleResumePreview: React.FC<SimpleResumePreviewProps> = ({ data }) => {
             margin: 0 !important;
             box-shadow: none !important;
             border: none !important;
-            page-break-inside: avoid;
+            page-break-after: always;
+            break-after: page;
           }
           
           .resume-section {
@@ -89,37 +143,45 @@ const SimpleResumePreview: React.FC<SimpleResumePreviewProps> = ({ data }) => {
           
           .page-break-after {
             page-break-after: always;
+            break-after: page;
           }
           
           .page-break-before {
             page-break-before: always;
+            break-before: page;
+          }
+          
+          .last-page {
+            page-break-after: avoid;
+            break-after: auto;
           }
         }
       `}</style>
       
       <div className="space-y-8">
-        <div 
-          className="resume-page bg-white shadow-lg border border-gray-200 mx-auto relative"
-          style={{ 
-            width: '794px', 
-            maxWidth: '100%',
-            padding: '40px'
-          }}
-        >
-          <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
-          
-          <div className="space-y-6 mt-6">
-            {visibleSections.map((sectionId, index) => {
-              const needsPageBreak = index > 0 && (
-                sectionId === 'experience' || 
-                sectionId === 'education' || 
-                sectionId === 'projects'
-              );
-              
-              return (
+        {pagesOfSections.map((pageSections, pageIndex) => (
+          <div 
+            key={`page-${pageIndex}`}
+            className={`resume-page bg-white shadow-lg border border-gray-200 mx-auto relative ${
+              pageIndex === pagesOfSections.length - 1 ? 'last-page' : ''
+            }`}
+            style={{ 
+              width: '794px', 
+              maxWidth: '100%',
+              padding: '40px',
+              marginBottom: '30px'
+            }}
+          >
+            {/* Only show header on the first page */}
+            {pageIndex === 0 && (
+              <PersonalInfoHeader personalInfo={data.personalInfo} theme={theme} />
+            )}
+            
+            <div className="space-y-6 mt-6">
+              {pageSections.map((sectionId) => (
                 <div 
                   key={sectionId} 
-                  className={`resume-section ${needsPageBreak ? 'page-break-before' : ''}`}
+                  className="resume-section"
                 >
                   <SectionRenderer 
                     sectionId={sectionId} 
@@ -127,10 +189,15 @@ const SimpleResumePreview: React.FC<SimpleResumePreviewProps> = ({ data }) => {
                     theme={theme}
                   />
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            
+            {/* Add page numbers */}
+            <div className="absolute bottom-4 right-4 text-gray-400 text-sm">
+              Page {pageIndex + 1} of {pagesOfSections.length}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, FileText, Image, Printer } from 'lucide-react';
+import { Download, FileText, Image, Printer, Loader2 } from 'lucide-react';
 import { ExportOptions } from '@/types/export';
 import { useResumeStats } from '@/hooks/useResumeStats';
 import { toast } from 'sonner';
@@ -27,6 +27,7 @@ const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ onExport, isExp
 
   const handleExport = async () => {
     try {
+      toast.loading('Generating your resume...', { id: 'export-progress' });
       await onExport(options);
       
       // Increment resume count after successful export
@@ -39,10 +40,10 @@ const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ onExport, isExp
       }
       
       setIsOpen(false);
-      toast.success('Resume exported successfully!');
+      toast.success('Resume exported successfully!', { id: 'export-progress' });
     } catch (error) {
       console.error('Export failed:', error);
-      toast.error('Failed to export resume. Please try again.');
+      toast.error('Failed to export resume. Please try again.', { id: 'export-progress' });
     }
   };
 
@@ -82,21 +83,26 @@ const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ onExport, isExp
                   PDF
                 </Label>
               </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                <RadioGroupItem value="png" id="png" />
-                <Label htmlFor="png" className="cursor-pointer flex items-center gap-2">
+              <div className="flex items-center space-x-2 p-3 border rounded-lg opacity-50">
+                <RadioGroupItem value="png" id="png" disabled />
+                <Label htmlFor="png" className="cursor-not-allowed flex items-center gap-2">
                   <Image className="h-4 w-4" />
                   PNG
                 </Label>
               </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                <RadioGroupItem value="jpeg" id="jpeg" />
-                <Label htmlFor="jpeg" className="cursor-pointer flex items-center gap-2">
+              <div className="flex items-center space-x-2 p-3 border rounded-lg opacity-50">
+                <RadioGroupItem value="jpeg" id="jpeg" disabled />
+                <Label htmlFor="jpeg" className="cursor-not-allowed flex items-center gap-2">
                   <Image className="h-4 w-4" />
                   JPEG
                 </Label>
               </div>
             </RadioGroup>
+            {options.format !== 'pdf' && (
+              <p className="text-xs text-amber-500 mt-2">
+                Image formats will be available soon. Please use PDF for now.
+              </p>
+            )}
           </div>
 
           {/* Quality Selection */}
@@ -165,7 +171,14 @@ const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({ onExport, isExp
               disabled={isExporting}
               className="flex-1"
             >
-              {isExporting ? 'Exporting...' : `Export as ${options.format.toUpperCase()}`}
+              {isExporting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Exporting...
+                </>
+              ) : (
+                `Export as ${options.format.toUpperCase()}`
+              )}
             </Button>
             <Button
               onClick={handlePrint}

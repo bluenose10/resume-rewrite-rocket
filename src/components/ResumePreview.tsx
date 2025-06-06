@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ResumeData } from '@/types/resume';
 import ExportOptionsModal from './ExportOptionsModal';
 import SimpleResumePreview from './SimpleResumePreview';
-import { generateSimplePDF } from '@/utils/simplePdfGenerator';
+import { generatePDF } from '@/utils/pdfGenerator';
 import { ExportOptions } from '@/types/export';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,13 +13,16 @@ interface ResumePreviewProps {
 
 const ResumePreview: React.FC<ResumePreviewProps> = React.memo(({ data }) => {
   const { toast } = useToast();
-  const [isExporting, setIsExporting] = React.useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async (options: ExportOptions) => {
     setIsExporting(true);
     try {
       const fileName = `${data.personalInfo.firstName || 'Resume'}_${data.personalInfo.lastName || 'Document'}.${options.format}`;
-      await generateSimplePDF('resume-content', fileName, options);
+      const pdfUrl = await generatePDF('resume-content', fileName, options);
+      
+      // Open the PDF in a new tab
+      window.open(pdfUrl, '_blank');
       
       toast({
         title: "Export Successful!",
