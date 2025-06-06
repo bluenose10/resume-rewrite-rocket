@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Palette, Loader2, CheckCircle, FileText, RefreshCw } from 'lucide-react';
+import { Palette, Loader2, CheckCircle, FileText, RefreshCw, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { ResumeData } from '@/types/resume';
 
